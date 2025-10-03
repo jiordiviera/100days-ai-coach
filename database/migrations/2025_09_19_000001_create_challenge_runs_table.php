@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('target_days')->default(100);
             $table->string('status')->default('active'); // draft|active|paused|completed
             $table->boolean('is_public')->default(false);
+            $table->string('public_join_code')->nullable();
             $table->timestamps();
         });
     }
