@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+  pull_request:
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: task_manager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: false
+      APP_URL: http://localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: task_manager_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      QUEUE_CONNECTION: sync
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      BROADCAST_CONNECTION: log
+      MAIL_MAILER: log
+      AI_PROVIDER: fake
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          extensions: pgsql, pdo_pgsql
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.2.19'
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Prepare application key
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Build assets
+        run: bun run build
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      - name: Execute test suite
+        run: php artisan test
