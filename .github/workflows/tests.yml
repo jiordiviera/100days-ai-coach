@@ -64,7 +64,7 @@ jobs:
         run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
 
       - name: Install frontend dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Prepare application key
         run: |
