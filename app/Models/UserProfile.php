@@ -10,6 +10,26 @@ class UserProfile extends Model
 {
     use HasUlids;
 
+    /**
+     * Reference structure for the JSON preferences payload.
+     */
+    public const PREFERENCE_SCHEMA = [
+        'language' => 'en|fr',
+        'timezone' => 'Africa/Douala',
+        'reminder_time' => '20:30',
+        'channels' => [
+            'email' => true,
+            'slack' => false,
+            'push' => false,
+        ],
+        'notification_types' => [
+            'daily_reminder' => true,
+            'weekly_digest' => true,
+        ],
+        'ai_provider' => 'groq|openai|local',
+        'tone' => 'neutral|fun',
+    ];
+
     protected $fillable = [
         'user_id',
         'join_reason',
@@ -19,6 +39,7 @@ class UserProfile extends Model
 
     protected $casts = [
         'preferences' => 'array',
+        'social_links' => 'array',
     ];
 
     public function user(): BelongsTo

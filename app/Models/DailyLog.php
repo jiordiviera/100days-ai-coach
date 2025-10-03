@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class DailyLog extends Model
 {
+    use HasFactory;
     use HasUlids;
 
     protected $fillable = [
@@ -21,12 +24,23 @@ class DailyLog extends Model
         'learnings',
         'challenges_faced',
         'completed',
+        'summary_md',
+        'tags',
+        'coach_tip',
+        'share_draft',
+        'ai_model',
+        'ai_latency_ms',
+        'ai_cost_usd',
+        'public_token',
     ];
 
     protected $casts = [
         'date' => 'date',
         'hours_coded' => 'decimal:2',
         'projects_worked_on' => 'array',
+        'tags' => 'array',
+        'ai_cost_usd' => 'decimal:3',
+        'ai_latency_ms' => 'integer',
         'completed' => 'boolean',
     ];
 
@@ -38,5 +52,21 @@ class DailyLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Ensure a shareable ULID token is present on the log.
+     */
+    public function ensurePublicToken(): string
+    {
+        if (! $this->public_token) {
+            $this->public_token = (string) Str::ulid();
+
+            if ($this->exists) {
+                $this->save();
+            }
+        }
+
+        return $this->public_token;
     }
 }

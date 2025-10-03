@@ -14,6 +14,10 @@ return new class extends Migration
             $table->string('join_reason')->nullable();
             $table->string('focus_area')->nullable();
             $table->json('preferences')->nullable();
+            $table->json('social_links')->nullable(); // { "github":"...", "twitter":"...", "linkedin":"...", "website":"..." }
+            $table->string('avatar_url')->nullable();
+            $table->string('bio', 160)->nullable();
+            $table->string('username', 32)->nullable()->unique();
             $table->timestamps();
         });
     }

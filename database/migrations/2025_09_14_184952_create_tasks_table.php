@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('is_completed')->default(false);
             $table->date('due_date')->nullable();
-            $table->foreignUlid('assigned_user_id')->nullable()->after('user_id')->constrained('users')->nullOnDelete();
+            $table->foreignUlid('assigned_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

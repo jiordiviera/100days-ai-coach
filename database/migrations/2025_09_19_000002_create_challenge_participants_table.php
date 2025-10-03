@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamp('joined_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['challenge_run_id', 'user_id']);
+            $table->unique(['challenge_run_id', 'user_id'], 'challenge_participants_run_user_unique_v2');
         });
     }
 
