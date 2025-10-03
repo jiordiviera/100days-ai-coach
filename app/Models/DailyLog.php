@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\GenerateDailyLogInsights;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,14 @@ class DailyLog extends Model
 {
     use HasFactory;
     use HasUlids;
+
+    /**
+     * Dispatch the AI insights generation job for this log.
+     */
+    public function queueAiGeneration(bool $force = false): void
+    {
+        GenerateDailyLogInsights::dispatch($this->id, $force);
+    }
 
     protected $fillable = [
         'challenge_run_id',

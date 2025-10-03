@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Ai\AiManager;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Schedule;
@@ -14,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(AiManager::class, fn ($app) => new AiManager($app));
     }
 
     /**

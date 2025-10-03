@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Page;
 
+use App\Jobs\GenerateDailyLogInsights;
 use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\Project;
@@ -38,6 +39,18 @@ class DailyChallenge extends Component implements HasForms
     public array $summary = [];
 
     public array $projectBreakdown = [];
+
+    public array $aiPanel = [
+        'status' => 'empty',
+        'summary' => null,
+        'tags' => [],
+        'coach_tip' => null,
+        'share_draft' => null,
+        'model' => null,
+        'latency_ms' => null,
+        'cost_usd' => null,
+        'updated_at' => null,
+    ];
 
     public bool $canGoPrevious = false;
 
@@ -269,6 +282,7 @@ class DailyChallenge extends Component implements HasForms
 
         $this->refreshHistory($run);
         $this->buildSummary($run);
+        $this->refreshAiPanel($this->todayEntry);
     }
 
     public function saveEntry(): void
@@ -280,7 +294,7 @@ class DailyChallenge extends Component implements HasForms
         $date = Carbon::parse($this->challengeDate);
         $dayNumber = Carbon::parse($run->start_date)->diffInDays($date) + 1;
 
-        DailyLog::updateOrCreate(
+        $log = DailyLog::updateOrCreate(
             [
                 'challenge_run_id' => $run->id,
                 'user_id' => auth()->id(),
@@ -296,6 +310,8 @@ class DailyChallenge extends Component implements HasForms
                 'completed' => true,
             ]
         );
+
+        $log->queueAiGeneration();
 
         $hours = isset($data['hours_coded']) ? (float) $data['hours_coded'] : 0.0;
         $yesterday = DailyLog::where('challenge_run_id', $run->id)
@@ -315,6 +331,84 @@ class DailyChallenge extends Component implements HasForms
         session()->flash('message', 'Entrée quotidienne sauvegardée !');
         $this->isEditing = false;
         $this->loadTodayEntry($run);
+    }
+
+    public function regenerateAi(): void
+    {
+        if (! $this->todayEntry) {
+            Notification::make()
+                ->title('Aucun journal à régénérer')
+                ->body("Créez d'abord votre entrée du jour avant de relancer l'IA.")
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $log = $this->todayEntry->fresh();
+
+        if (! $log) {
+            Notification::make()
+                ->title('Entrée introuvable')
+                ->body('Veuillez recharger la page et réessayer.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        if (GenerateDailyLogInsights::isThrottledFor($log)) {
+            Notification::make()
+                ->title('Régénération IA limitée')
+                ->body("Une génération IA a déjà été effectuée aujourd'hui. Réessayez demain.")
+                ->info()
+                ->send();
+
+            return;
+        }
+
+        $log->queueAiGeneration();
+
+        Notification::make()
+            ->title('Régénération planifiée')
+            ->body("Le résumé IA sera mis à jour dans les prochaines minutes.")
+            ->send();
+
+        $this->refreshAiPanel($log);
+        $this->aiPanel['status'] = 'pending';
+    }
+
+    protected function refreshAiPanel(?DailyLog $log): void
+    {
+        if (! $log) {
+            $this->aiPanel = [
+                'status' => 'empty',
+                'summary' => null,
+                'tags' => [],
+                'coach_tip' => null,
+                'share_draft' => null,
+                'model' => null,
+                'latency_ms' => null,
+                'cost_usd' => null,
+                'updated_at' => null,
+            ];
+
+            return;
+        }
+
+        $status = filled($log->summary_md) ? 'ready' : 'pending';
+
+        $this->aiPanel = [
+            'status' => $status,
+            'summary' => $log->summary_md,
+            'tags' => $log->tags ?? [],
+            'coach_tip' => $log->coach_tip,
+            'share_draft' => $log->share_draft,
+            'model' => $log->ai_model,
+            'latency_ms' => $log->ai_latency_ms,
+            'cost_usd' => $log->ai_cost_usd,
+            'updated_at' => $log->updated_at,
+        ];
     }
 
     protected function refreshHistory(ChallengeRun $run): void
