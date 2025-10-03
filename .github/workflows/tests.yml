@@ -55,13 +55,24 @@ jobs:
           coverage: none
           extensions: pgsql, pdo_pgsql
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.2.19'
+
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+
+      - name: Install frontend dependencies
+        run: bun install --frozen-lockfile
 
       - name: Prepare application key
         run: |
           cp .env.example .env
           php artisan key:generate
+
+      - name: Build assets
+        run: bun run build
 
       - name: Run database migrations
         run: php artisan migrate --force
