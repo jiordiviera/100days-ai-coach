@@ -1,0 +1,7 @@
+/vendor
+/public
+/storage
+/bootstrap
+*.min.js
+*.min.css
+!resources/views/**/*.blade.php
