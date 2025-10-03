@@ -5,9 +5,9 @@ namespace App\Services\Ai;
 use App\Models\DailyLog;
 use App\Services\Ai\Contracts\AiDriver;
 use App\Services\Ai\Dto\DailyLogAiResult;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
@@ -27,9 +27,7 @@ class AiManager
             try {
                 $driver = $this->resolveDriver($driverName);
 
-                $result = $driver->generateDailyLogInsights($log);
-
-                return $result;
+                return $driver->generateDailyLogInsights($log);
             } catch (Throwable $e) {
                 $errors[$driverName] = $e;
                 report($e);
@@ -45,11 +43,18 @@ class AiManager
         $default = config('ai.default', 'fake');
         $fallbacks = config('ai.fallback', []);
 
-        $fallbacks = array_filter(Arr::wrap($fallbacks), static fn ($driver) => $driver !== null);
+        if (is_string($fallbacks)) {
+            $fallbacks = array_map('trim', explode(',', $fallbacks));
+        }
+
+        $fallbacks = array_filter(Arr::wrap($fallbacks), static fn ($driver) => filled($driver));
 
         return array_values(array_unique(array_merge([$default], $fallbacks)));
     }
 
+    /**
+     * @throws BindingResolutionException
+     */
     protected function resolveDriver(string $driverName): AiDriver
     {
         $drivers = config('ai.drivers', []);

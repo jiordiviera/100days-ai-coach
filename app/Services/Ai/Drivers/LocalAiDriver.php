@@ -11,7 +11,7 @@ use App\Services\Ai\Support\DailyLogPromptBuilder;
 use Illuminate\Support\Arr;
 use RuntimeException;
 
-class GroqAiDriver implements AiDriver
+class LocalAiDriver implements AiDriver
 {
     public function __construct(
         protected DailyLogPromptBuilder $promptBuilder,
@@ -20,10 +20,10 @@ class GroqAiDriver implements AiDriver
 
     public function generateDailyLogInsights(DailyLog $log): DailyLogAiResult
     {
-        $config = config('services.ai.groq');
+        $config = config('services.ai.local');
 
-        if (empty($config['api_key'])) {
-            throw new RuntimeException('Missing Groq API key.');
+        if (empty($config['base_url'])) {
+            throw new RuntimeException('Missing local AI endpoint configuration.');
         }
 
         $client = new AiHttpClient(
@@ -31,7 +31,7 @@ class GroqAiDriver implements AiDriver
             headers: [
                 'Content-Type' => 'application/json',
             ],
-            apiKey: $config['api_key'],
+            apiKey: $config['api_key'] ?? null,
         );
 
         $payload = [
@@ -48,7 +48,6 @@ class GroqAiDriver implements AiDriver
         $response->throw();
 
         $body = $response->json();
-
         $structured = AiResponseParser::extractStructuredPayload($body);
 
         $tokens = (int) Arr::get($body, 'usage.total_tokens', 0);

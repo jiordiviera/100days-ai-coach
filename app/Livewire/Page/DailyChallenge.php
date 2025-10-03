@@ -52,6 +52,8 @@ class DailyChallenge extends Component implements HasForms
         'updated_at' => null,
     ];
 
+    public bool $shouldPollAi = false;
+
     public bool $canGoPrevious = false;
 
     public bool $canGoNext = false;
@@ -376,6 +378,7 @@ class DailyChallenge extends Component implements HasForms
 
         $this->refreshAiPanel($log);
         $this->aiPanel['status'] = 'pending';
+        $this->shouldPollAi = true;
     }
 
     protected function refreshAiPanel(?DailyLog $log): void
@@ -393,6 +396,8 @@ class DailyChallenge extends Component implements HasForms
                 'updated_at' => null,
             ];
 
+            $this->shouldPollAi = false;
+
             return;
         }
 
@@ -409,6 +414,8 @@ class DailyChallenge extends Component implements HasForms
             'cost_usd' => $log->ai_cost_usd,
             'updated_at' => $log->updated_at,
         ];
+
+        $this->shouldPollAi = $status === 'pending';
     }
 
     protected function refreshHistory(ChallengeRun $run): void
@@ -536,5 +543,21 @@ class DailyChallenge extends Component implements HasForms
         return view('livewire.page.daily-challenge', [
             'run' => $run,
         ]);
+    }
+
+    public function pollAiPanel(): void
+    {
+        if (! $this->shouldPollAi || ! $this->todayEntry) {
+            return;
+        }
+
+        $log = DailyLog::with('challengeRun')->find($this->todayEntry->id);
+
+        if (! $log) {
+            return;
+        }
+
+        $this->todayEntry = $log;
+        $this->refreshAiPanel($log);
     }
 }

@@ -5,11 +5,14 @@ namespace App\Services\Ai\Drivers;
 use App\Models\DailyLog;
 use App\Services\Ai\Contracts\AiDriver;
 use App\Services\Ai\Dto\DailyLogAiResult;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Random\RandomException;
 
 class FakeAiDriver implements AiDriver
 {
+    /**
+     * @throws RandomException
+     */
     public function generateDailyLogInsights(DailyLog $log): DailyLogAiResult
     {
         $base = Str::headline($log->notes ?? 'AI Coach Summary');

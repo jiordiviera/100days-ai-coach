@@ -136,7 +136,7 @@
           </div>
 
           @if ($todayEntry)
-            <div class="mt-6 space-y-4">
+            <div class="mt-6 space-y-4" @if($shouldPollAi) wire:poll.7s="pollAiPanel" @endif>
               <div class="rounded-xl border border-border/70 bg-card px-4 py-4 shadow-sm">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>

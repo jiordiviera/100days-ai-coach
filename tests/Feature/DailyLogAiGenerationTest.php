@@ -154,3 +154,40 @@ it('prevents manual regeneration when throttled', function (): void {
 
     Bus::assertNotDispatched(GenerateDailyLogInsights::class);
 });
+
+it('polls the AI panel until insights are ready', function (): void {
+    $this->travelTo(Carbon::parse('2024-10-05 09:00:00'));
+
+    $user = User::factory()->create();
+    $run = ChallengeRun::factory()->for($user, 'owner')->create([
+        'status' => 'active',
+        'start_date' => now()->toDateString(),
+    ]);
+
+    $log = DailyLog::factory()->for($run, 'challengeRun')->for($user, 'user')->create([
+        'day_number' => 1,
+        'summary_md' => null,
+        'tags' => null,
+        'coach_tip' => null,
+        'share_draft' => null,
+    ]);
+
+    $this->actingAs($user);
+
+    $component = Livewire::test(DailyChallenge::class);
+
+    $component->assertSet('shouldPollAi', true)
+        ->assertSet('aiPanel.status', 'pending');
+
+    $log->forceFill([
+        'summary_md' => '## Ready summary',
+        'tags' => ['ready'],
+        'coach_tip' => 'Ship it!',
+        'share_draft' => 'Day 1 ready to share',
+    ])->save();
+
+    $component->call('pollAiPanel')
+        ->assertSet('shouldPollAi', false)
+        ->assertSet('aiPanel.status', 'ready')
+        ->assertSet('aiPanel.summary', '## Ready summary');
+});
