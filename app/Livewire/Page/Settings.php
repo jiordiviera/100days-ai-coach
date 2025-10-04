@@ -7,14 +7,15 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
@@ -125,8 +126,8 @@ class Settings extends Component implements HasForms, HasActions
                     ->columnSpan(1),
 
                 // Section Réseaux Sociaux
-                Placeholder::make('social_section')
-                    ->content('Réseaux sociaux')
+                TextEntry::make('social_section')
+                    ->state('Réseaux sociaux')
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 KeyValue::make('profile.social_links')
