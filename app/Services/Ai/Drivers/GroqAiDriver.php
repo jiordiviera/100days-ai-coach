@@ -15,8 +15,7 @@ class GroqAiDriver implements AiDriver
 {
     public function __construct(
         protected DailyLogPromptBuilder $promptBuilder,
-    ) {
-    }
+    ) {}
 
     public function generateDailyLogInsights(DailyLog $log): DailyLogAiResult
     {

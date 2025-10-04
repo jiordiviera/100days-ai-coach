@@ -35,7 +35,7 @@ class ChallengeShow extends Component implements HasForms
 
     public function mount(ChallengeRun $run): void
     {
-//        dd($run);
+        //        dd($run);
         $this->run = $run->load('participantLinks.user', 'owner');
         abort_unless($this->canView(), 403);
 
@@ -247,7 +247,7 @@ class ChallengeShow extends Component implements HasForms
             ->latest('day_number')
             ->take(10)
             ->get();
-//        dd($this->run->participantLinks);
+        //        dd($this->run->participantLinks);
         // Global progression
         $participantsCount = max(1, $this->run->participantLinks()->count());
         $totalDone = DailyLog::where('challenge_run_id', $this->run->id)->count();
