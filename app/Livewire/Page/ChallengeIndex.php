@@ -4,11 +4,13 @@ namespace App\Livewire\Page;
 
 use App\Models\ChallengeRun;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -46,9 +48,13 @@ class ChallengeIndex extends Component implements HasForms
                 TextInput::make('title')
                     ->label('Titre')
                     ->placeholder('100 Days of Code')
-                    ->required()
+                    ->default('Mon défi 100DaysOfCode')
+                    ->maxLength(255),
+                Textarea::make('description')
+                    ->label('Description (optionnel)')
+                    ->rows(2)
                     ->maxLength(255)
-                    ->unique(ChallengeRun::class, 'title'),
+                    ->columnSpanFull(),
                 DatePicker::make('start_date')
                     ->label('Date de début')
                     ->native(false)
@@ -92,11 +98,6 @@ class ChallengeIndex extends Component implements HasForms
             'target_days' => (int) $data['target_days'],
             'status' => 'active',
             'is_public' => (bool) ($data['is_public'] ?? false),
-        ]);
-
-        $run->participantLinks()->create([
-            'user_id' => auth()->id(),
-            'joined_at' => now(),
         ]);
 
         $this->form->fill([

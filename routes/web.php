@@ -2,7 +2,6 @@
 
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
-use App\Livewire\Page\Onboarding;
 use App\Livewire\Page\ChallengeShow;
 use App\Livewire\Page\DailyChallenge;
 use App\Livewire\Page\Dashboard;
@@ -17,7 +16,6 @@ Route::get('/', Welcome::class)->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
-    Route::get('onboarding', Onboarding::class)->name('onboarding');
     Route::get('logout', function () {
         auth()->logout();
 

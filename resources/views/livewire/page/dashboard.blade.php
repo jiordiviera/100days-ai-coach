@@ -1,6 +1,5 @@
 @php
     $active = $stats['active'] ?? null;
-    $onboardingMessages = session('onboarding_messages');
     $projectCount = $stats['projectCount'] ?? 0;
     $taskCount = $stats['taskCount'] ?? 0;
     $completedTaskCount = $stats['completedTaskCount'] ?? 0;
@@ -14,24 +13,6 @@
 @endphp
 
 <div class="mx-auto max-w-6xl space-y-6 py-6">
-  @if ($needsOnboarding && ! $onboardingMessages)
-    <x-filament::card class="border border-primary-200 bg-primary-50 text-primary-900">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="text-sm">Complétez l’onboarding pour configurer votre challenge personnalisé.</div>
-        <x-filament::button tag="a" href="{{ route('onboarding') }}" size="sm">Continuer</x-filament::button>
-      </div>
-    </x-filament::card>
-  @endif
-
-  @if ($onboardingMessages)
-    <x-filament::card class="border border-primary-200 bg-primary-50 text-primary-900">
-      <ul class="space-y-1 text-sm">
-        @foreach ($onboardingMessages as $message)
-          <li>{{ $message }}</li>
-        @endforeach
-      </ul>
-    </x-filament::card>
-  @endif
     <x-filament::section
         heading="Tableau de bord"
         description="Bienvenue dans votre espace 100DaysOfCode."

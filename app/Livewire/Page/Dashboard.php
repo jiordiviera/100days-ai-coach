@@ -171,8 +171,6 @@ class Dashboard extends Component
             $newBadges = $evaluation['newly_awarded'];
         }
 
-        $needsOnboarding = auth()->user()->needsOnboarding();
-
         return view('livewire.page.dashboard', [
             'stats' => $stats,
             'recentProjects' => $recentProjects,
@@ -180,7 +178,6 @@ class Dashboard extends Component
             'dailyProgress' => $dailyProgress,
             'earnedBadges' => $earnedBadges,
             'newBadges' => $newBadges,
-            'needsOnboarding' => $needsOnboarding,
         ]);
     }
 

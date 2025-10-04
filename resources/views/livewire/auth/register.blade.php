@@ -45,7 +45,7 @@
         </div>
 
         <p class="mt-6 text-xs text-muted-foreground text-center">
-            En créant un compte, vous accéderez ensuite à un court onboarding pour configurer votre challenge.
+            Une fois le compte créé, vous serez redirigé directement vers le journal quotidien pour lancer votre streak.
         </p>
     </div>
 </div>

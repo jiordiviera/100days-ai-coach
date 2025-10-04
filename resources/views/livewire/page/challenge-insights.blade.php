@@ -8,10 +8,10 @@
     </x-slot>
 
     <div class="flex flex-wrap gap-2">
-      <x-filament::button tag="a" href="{{ route('challenges.show', $run->id) }}" color="gray">
+      <x-filament::button tag="a" wire:navigate href="{{ route('challenges.show', $run->id) }}" color="gray">
         Retour au challenge
       </x-filament::button>
-      <x-filament::button tag="a" href="{{ route('daily-challenge') }}">
+      <x-filament::button tag="a" wire:navigate href="{{ route('daily-challenge') }}">
         Journal du jour
       </x-filament::button>
     </div>

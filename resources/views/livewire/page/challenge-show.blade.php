@@ -48,10 +48,10 @@
           @endif
         </div>
       <div class="flex gap-2">
-        <x-filament::button tag="a" href="{{ route('challenges.insights', $run->id) }}" color="gray">
+        <x-filament::button wire:navigate tag="a" href="{{ route('challenges.insights', $run->id) }}" color="gray">
           Insights
         </x-filament::button>
-        <x-filament::button tag="a" href="{{ route('daily-challenge') }}">
+        <x-filament::button wire:navigate tag="a" href="{{ route('daily-challenge') }}">
           Journal du jour
         </x-filament::button>
       </div>
@@ -118,7 +118,7 @@
 
       <form
         wire:submit.prevent="sendInvite"
-        class="flex gap-2 items-end flex-wrap"
+        class="flex gap-2 items-center flex-wrap "
       >
         <div class="grow min-w-60">
           {{ $this->form }}
