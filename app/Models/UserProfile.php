@@ -35,6 +35,8 @@ class UserProfile extends Model
         'join_reason',
         'focus_area',
         'username',
+        'github_id',
+        'github_username',
         'preferences',
     ];
 

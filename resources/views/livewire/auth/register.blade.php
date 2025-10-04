@@ -22,9 +22,15 @@
         </div>
 
         <div class="mt-6">
-            <x-filament::button class="w-full justify-center" color="gray" outlined disabled>
+            <x-filament::button
+                tag="a"
+                href="{{ route('auth.github.redirect') }}"
+                class="w-full justify-center"
+                color="gray"
+                outlined
+            >
                 @include('components.ui.icons.github')
-                <span>S'inscrire avec GitHub (bientôt)</span>
+                <span>S'inscrire avec GitHub</span>
             </x-filament::button>
         </div>
 
