@@ -6,8 +6,7 @@ use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -15,8 +14,10 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -51,17 +52,6 @@ class Settings extends Component implements HasForms, HasActions
 
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
 
-        // Convertir social_links en format repeater
-        $socialLinks = [];
-        foreach ($profile->social_links ?? [] as $platform => $username) {
-            if (filled($username)) {
-                $socialLinks[] = [
-                    'platform' => $platform,
-                    'username' => $username,
-                ];
-            }
-        }
-
         $this->form->fill([
             'profile' => [
                 'name' => $user->name,
@@ -69,12 +59,12 @@ class Settings extends Component implements HasForms, HasActions
                 'focus_area' => $profile->focus_area,
                 'bio' => $profile->bio,
                 'avatar_url' => $profile->avatar_url,
-                'social_links' => $socialLinks,
+                'social_links' => $profile->social_links ?? [],
             ],
             'notifications' => [
                 'language' => $preferences['language'] ?? 'en',
                 'timezone' => $preferences['timezone'] ?? 'Africa/Douala',
-                'reminder_time' => $preferences['reminder_time'] ?? '20:30',
+                'reminder_time' => $this->normalizeReminderTime($preferences['reminder_time'] ?? null),
                 'channels' => collect($preferences['channels'] ?? [])->filter()->keys()->all(),
                 'notification_types' => collect($preferences['notification_types'] ?? [])->filter()->keys()->all(),
             ],
@@ -139,42 +129,14 @@ class Settings extends Component implements HasForms, HasActions
                     ->content('Réseaux sociaux')
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
-                Repeater::make('profile.social_links')
-                    ->label('')
-                    ->schema([
-                        Select::make('platform')
-                            ->label('Plateforme')
-                            ->options([
-                                'github' => 'GitHub',
-                                'twitter' => 'Twitter / X',
-                                'linkedin' => 'LinkedIn',
-                                'website' => 'Site web',
-                                'instagram' => 'Instagram',
-                                'facebook' => 'Facebook',
-                                'youtube' => 'YouTube',
-                                'tiktok' => 'TikTok',
-                                'discord' => 'Discord',
-                                'telegram' => 'Telegram',
-                            ])
-                            ->required()
-                            ->searchable()
-                            ->native(false)
-                            ->columnSpan(1),
-                        TextInput::make('username')
-                            ->label('Nom d\'utilisateur ou URL')
-                            ->placeholder('@username ou https://...')
-                            ->maxLength(255)
-                            ->required()
-                            ->columnSpan(1),
-                    ])
-                    ->columns(2)
-                    ->addActionLabel('Ajouter un réseau social')
+                KeyValue::make('profile.social_links')
+                    ->label('Réseaux sociaux')
+                    ->keyLabel('Plateforme')
+                    ->valueLabel('Nom d\'utilisateur ou URL')
+                    ->keyPlaceholder('github')
+                    ->valuePlaceholder('@username ou https://...')
+                    ->addButtonLabel('Ajouter un réseau social')
                     ->reorderable()
-                    ->collapsible()
-                    ->itemLabel(fn(array $state): ?string => isset($state['platform'])
-                        ? ucfirst($state['platform']) . (isset($state['username']) ? ': ' . $state['username'] : '')
-                        : null
-                    )
                     ->columnSpan(1),
 
                 // Section Notifications
@@ -266,11 +228,11 @@ class Settings extends Component implements HasForms, HasActions
         $bio = $data['profile']['bio'] ?? null;
         $avatarUrl = $data['profile']['avatar_url'] ?? null;
 
-        // Convertir le repeater en format associatif
         $socialLinksArray = [];
-        foreach ($data['profile']['social_links'] ?? [] as $link) {
-            if (isset($link['platform']) && isset($link['username']) && filled($link['username'])) {
-                $socialLinksArray[$link['platform']] = $link['username'];
+        foreach ($data['profile']['social_links'] ?? [] as $platform => $link) {
+            if (filled($platform) && filled($link)) {
+                $key = Str::of($platform)->lower()->slug('_')->value();
+                $socialLinksArray[$key] = trim($link);
             }
         }
 
@@ -287,10 +249,12 @@ class Settings extends Component implements HasForms, HasActions
         $channels = array_fill_keys($data['notifications']['channels'] ?? [], true);
         $notificationTypes = array_fill_keys($data['notifications']['notification_types'] ?? [], true);
 
+        $reminderTime = $this->normalizeReminderTime($data['notifications']['reminder_time'] ?? null);
+
         $updatedPreferences = array_replace_recursive($user->profilePreferencesDefaults(), $preferences, [
             'language' => $data['notifications']['language'] ?? 'en',
             'timezone' => $data['notifications']['timezone'] ?? 'Africa/Douala',
-            'reminder_time' => $data['notifications']['reminder_time'] ?? '20:30',
+            'reminder_time' => $reminderTime,
             'channels' => array_merge([
                 'email' => false,
                 'slack' => false,
@@ -312,6 +276,19 @@ class Settings extends Component implements HasForms, HasActions
             ->title('Paramètres mis à jour')
             ->success()
             ->send();
+    }
+
+    protected function normalizeReminderTime(?string $value): string
+    {
+        if (blank($value)) {
+            return '20:30';
+        }
+
+        try {
+            return Carbon::parse($value)->format('H:i');
+        } catch (\Throwable) {
+            return '20:30';
+        }
     }
 
     protected function timezoneOptions(): array
