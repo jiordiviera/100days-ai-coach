@@ -6,7 +6,6 @@ use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\TaskComment;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
@@ -243,12 +242,14 @@ class ChallengeInsights extends Component
                 if ($date->isSameDay($expected)) {
                     $streak++;
                     $expected->subDay();
+
                     continue;
                 }
 
                 if ($date->isSameDay($expected->copy()->subDay())) {
                     $streak++;
                     $expected = $date->copy()->subDay();
+
                     continue;
                 }
 
@@ -271,4 +272,3 @@ class ChallengeInsights extends Component
         return view('livewire.page.challenge-insights');
     }
 }
-

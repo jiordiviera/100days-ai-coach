@@ -46,7 +46,7 @@ test('groq driver parses structured payload and returns result', function (): vo
         ], 200),
     ]);
 
-    $driver = new GroqAiDriver(new DailyLogPromptBuilder());
+    $driver = new GroqAiDriver(new DailyLogPromptBuilder);
 
     $result = $driver->generateDailyLogInsights($log);
 

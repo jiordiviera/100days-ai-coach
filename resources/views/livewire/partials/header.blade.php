@@ -17,6 +17,7 @@
           <a wire:navigate href="{{ route('dashboard') }}" class="text-muted-foreground hover:text-primary">Dashboard</a>
           <a wire:navigate href="{{ route('challenges.index') }}" class="text-muted-foreground hover:text-primary">Challenges</a>
           <a wire:navigate href="{{ route('projects.index') }}" class="text-muted-foreground hover:text-primary">Projets</a>
+          <a wire:navigate href="{{ route('settings') }}" class="text-muted-foreground hover:text-primary">Paramètres</a>
         @else
           <a wire:navigate href="{{ route('login') }}" class="text-muted-foreground hover:text-primary">Connexion</a>
           @if (Route::has('register'))
@@ -76,12 +77,13 @@
   <div x-show="open" x-transition class="md:hidden border-t border-border/70 bg-background">
     <nav class="flex flex-col gap-1 p-4 text-sm font-medium">
       <a wire:navigate href="{{ route('home') }}" class="rounded px-3 py-2 hover:bg-muted">Accueil</a>
-      @auth
-        <a wire:navigate href="{{ route('dashboard') }}" class="rounded px-3 py-2 hover:bg-muted">Dashboard</a>
-        <a wire:navigate href="{{ route('challenges.index') }}" class="rounded px-3 py-2 hover:bg-muted">Challenges</a>
-        <a wire:navigate href="{{ route('projects.index') }}" class="rounded px-3 py-2 hover:bg-muted">Projets</a>
-        <a wire:navigate href="{{ route('logout') }}" class="mt-2 rounded px-3 py-2 bg-destructive text-destructive-foreground">Déconnexion</a>
-      @else
+        @auth
+          <a wire:navigate href="{{ route('dashboard') }}" class="rounded px-3 py-2 hover:bg-muted">Dashboard</a>
+          <a wire:navigate href="{{ route('challenges.index') }}" class="rounded px-3 py-2 hover:bg-muted">Challenges</a>
+          <a wire:navigate href="{{ route('projects.index') }}" class="rounded px-3 py-2 hover:bg-muted">Projets</a>
+          <a wire:navigate href="{{ route('settings') }}" class="rounded px-3 py-2 hover:bg-muted">Paramètres</a>
+          <a wire:navigate href="{{ route('logout') }}" class="mt-2 rounded px-3 py-2 bg-destructive text-destructive-foreground">Déconnexion</a>
+        @else
         <a wire:navigate href="{{ route('login') }}" class="rounded px-3 py-2 hover:bg-muted">Connexion</a>
         @if (Route::has('register'))
           <a wire:navigate href="{{ route('register') }}" class="rounded px-3 py-2 hover:bg-muted">Inscription</a>

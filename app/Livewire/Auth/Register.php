@@ -3,12 +3,12 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
-use Illuminate\Support\Str;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -93,7 +93,7 @@ class Register extends Component implements HasForms
         auth()->login($user);
 
         return redirect()->route('daily-challenge')
-            ->with('message', "Bienvenue ! Complétez votre premier journal pour lancer votre streak.");
+            ->with('message', 'Bienvenue ! Complétez votre premier journal pour lancer votre streak.');
     }
 
     public function render(): View

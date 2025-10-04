@@ -392,7 +392,7 @@ class DailyChallenge extends Component implements HasForms
 
         Notification::make()
             ->title('Régénération planifiée')
-            ->body("Le résumé IA sera mis à jour dans les prochaines minutes.")
+            ->body('Le résumé IA sera mis à jour dans les prochaines minutes.')
             ->send();
 
         $this->refreshAiPanel($log);

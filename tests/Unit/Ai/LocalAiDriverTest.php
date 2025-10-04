@@ -46,7 +46,7 @@ test('local driver defaults cost to zero when not provided', function (): void {
         ], 200),
     ]);
 
-    $driver = new LocalAiDriver(new DailyLogPromptBuilder());
+    $driver = new LocalAiDriver(new DailyLogPromptBuilder);
 
     $result = $driver->generateDailyLogInsights($log);
 

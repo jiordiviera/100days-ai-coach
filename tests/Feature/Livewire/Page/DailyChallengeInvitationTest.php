@@ -5,7 +5,6 @@ use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);

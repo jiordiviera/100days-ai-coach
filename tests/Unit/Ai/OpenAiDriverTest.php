@@ -36,7 +36,7 @@ test('openai driver parses structured payload', function (): void {
                         'summary_md' => '## Day 6 Summary',
                         'tags' => ['laravel', 'ai'],
                         'coach_tip' => 'Share the knowledge with your team.',
-                        'share_draft' => "Day 6/100 — Expanded our AI integrations!",
+                        'share_draft' => 'Day 6/100 — Expanded our AI integrations!',
                     ]).PHP_EOL.'```',
                 ],
             ]],
@@ -46,7 +46,7 @@ test('openai driver parses structured payload', function (): void {
         ], 200),
     ]);
 
-    $driver = new OpenAiAiDriver(new DailyLogPromptBuilder());
+    $driver = new OpenAiAiDriver(new DailyLogPromptBuilder);
 
     $result = $driver->generateDailyLogInsights($log);
 

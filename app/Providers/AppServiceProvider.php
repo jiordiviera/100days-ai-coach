@@ -32,6 +32,6 @@ class AppServiceProvider extends ServiceProvider
             'warning' => Color::Amber,
         ]);
 
-        Schedule::command('daily-logs:send-reminders')->dailyAt('20:00');
+        Schedule::command('daily-logs:send-reminders')->everyFiveMinutes()->withoutOverlapping();
     }
 }

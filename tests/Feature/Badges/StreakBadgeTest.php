@@ -3,11 +3,10 @@
 use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\User;
-use App\Support\BadgeEvaluator;
 use App\Services\Badges\StreakPunchlineGenerator;
+use App\Support\BadgeEvaluator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -49,7 +48,7 @@ it('awards the streak_7 badge with an AI punchline meta', function (): void {
         ]);
     }
 
-    $evaluator = new BadgeEvaluator();
+    $evaluator = new BadgeEvaluator;
 
     $result = $evaluator->evaluate($user->load('badges'), $run, [
         'badges' => [[

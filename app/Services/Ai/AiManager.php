@@ -15,8 +15,7 @@ class AiManager
 {
     public function __construct(
         protected Container $container,
-    ) {
-    }
+    ) {}
 
     public function generateInsights(DailyLog $log, bool $force = false): DailyLogAiResult
     {
@@ -31,6 +30,7 @@ class AiManager
             } catch (Throwable $e) {
                 $errors[$driverName] = $e;
                 report($e);
+
                 continue;
             }
         }

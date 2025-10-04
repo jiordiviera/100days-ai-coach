@@ -190,4 +190,69 @@
   p {
     @apply text-foreground/80;
   }
+
+    [wire\:key*="social_links"] .fi-fo-repeater-item {
+        @apply border-gray-200 dark:border-gray-700;
+    }
+
+    /* Amélioration de l'espacement des checkboxes */
+    .fi-fo-checkbox-list {
+        @apply gap-3;
+    }
+
+    .fi-fo-field-wrp:not(:has(.fi-fo-repeater)):not(:has(.fi-fo-placeholder)) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    @media (max-width: 640px) {
+        .fi-fo-field-wrp:not(:has(.fi-fo-repeater)):not(:has(.fi-fo-placeholder)) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Style pour les placeholders (titres de section) */
+    .fi-fo-placeholder {
+        font-size: 1rem;
+        font-weight: 600;
+        color: rgb(17 24 39);
+        border-bottom: 1px solid rgb(229 231 235);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .dark .fi-fo-placeholder {
+        color: rgb(255 255 255);
+        border-bottom-color: rgb(55 65 81);
+    }
+
+    .fi-fo-placeholder:first-child {
+        margin-top: 0;
+    }
+
+    /* Amélioration des checkboxes */
+    .fi-fo-checkbox-list {
+        gap: 0.75rem;
+    }
+
+    /* Style pour le repeater */
+    .fi-fo-repeater {
+        margin-top: 0.5rem;
+    }
+
+    .fi-fo-repeater-item {
+        border-color: rgb(229 231 235);
+    }
+
+    .dark .fi-fo-repeater-item {
+        border-color: rgb(55 65 81);
+    }
+
+    /* Supprime les colonnes par défaut de Filament pour éviter les conflits */
+    .fi-fo-component-ctn > div[class*="grid-cols"] {
+        display: block !important;
+    }
 }
