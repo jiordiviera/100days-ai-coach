@@ -6,6 +6,7 @@ use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\User;
 use App\Models\UserBadge;
+use App\Services\Badges\StreakPunchlineGenerator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -19,6 +20,8 @@ class BadgeEvaluator
         $computed = $dailyProgress['badges'] ?? [];
 
         $newlyAwarded = [];
+        $generator = app(StreakPunchlineGenerator::class);
+
         foreach ($computed as $badge) {
             $key = $badge['id'] ?? null;
             if (! $key) {
@@ -26,13 +29,25 @@ class BadgeEvaluator
             }
 
             if (! in_array($key, $currentBadges, true)) {
+                $meta = [
+                    'run_id' => $run->id,
+                    'awarded_for' => $badge,
+                ];
+
+                if ($key === 'streak_7') {
+                    $punchline = $generator->generate($user, $run);
+                    $meta['punchline'] = $punchline['text'] ?? null;
+                    $meta['ai'] = [
+                        'model' => $punchline['ai_model'] ?? null,
+                        'latency_ms' => $punchline['ai_latency_ms'] ?? null,
+                        'cost_usd' => $punchline['ai_cost_usd'] ?? null,
+                    ];
+                }
+
                 UserBadge::create([
                     'user_id' => $user->id,
                     'badge_key' => $key,
-                    'meta' => [
-                        'run_id' => $run->id,
-                        'awarded_for' => $badge,
-                    ],
+                    'meta' => $meta,
                     'awarded_at' => Carbon::now(),
                 ]);
                 $definition = $definitions->get($key, []);
