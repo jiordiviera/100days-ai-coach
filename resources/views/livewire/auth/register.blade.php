@@ -22,9 +22,15 @@
         </div>
 
         <div class="mt-6">
-            <x-filament::button class="w-full justify-center" color="gray" outlined disabled>
+            <x-filament::button
+                tag="a"
+                href="{{ route('auth.github.redirect') }}"
+                class="w-full justify-center"
+                color="gray"
+                outlined
+            >
                 @include('components.ui.icons.github')
-                <span>S'inscrire avec GitHub (bientôt)</span>
+                <span>S'inscrire avec GitHub</span>
             </x-filament::button>
         </div>
 
@@ -45,7 +51,7 @@
         </div>
 
         <p class="mt-6 text-xs text-muted-foreground text-center">
-            En créant un compte, vous accéderez ensuite à un court onboarding pour configurer votre challenge.
+            Une fois le compte créé, vous serez redirigé directement vers le journal quotidien pour lancer votre streak.
         </p>
     </div>
 </div>

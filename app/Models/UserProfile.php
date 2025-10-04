@@ -34,6 +34,9 @@ class UserProfile extends Model
         'user_id',
         'join_reason',
         'focus_area',
+        'username',
+        'github_id',
+        'github_username',
         'preferences',
     ];
 
@@ -47,4 +50,3 @@ class UserProfile extends Model
         return $this->belongsTo(User::class);
     }
 }
-

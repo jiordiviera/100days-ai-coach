@@ -46,6 +46,26 @@ class User extends Authenticatable
         ];
     }
 
+    public function profilePreferencesDefaults(): array
+    {
+        return [
+            'language' => 'en',
+            'timezone' => 'Africa/Douala',
+            'reminder_time' => '20:30',
+            'channels' => [
+                'email' => true,
+                'slack' => false,
+                'push' => false,
+            ],
+            'notification_types' => [
+                'daily_reminder' => true,
+                'weekly_digest' => true,
+            ],
+            'ai_provider' => 'groq',
+            'tone' => 'neutral',
+        ];
+    }
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);

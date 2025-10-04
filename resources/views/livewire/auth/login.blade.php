@@ -28,13 +28,14 @@
 
         <div class="mt-6">
             <x-filament::button
+                tag="a"
+                href="{{ route('auth.github.redirect') }}"
                 class="w-full justify-center"
                 color="gray"
                 outlined
-                disabled
             >
-                @include("components.ui.icons.github")
-                <span>Continuer avec GitHub (bientôt)</span>
+                @include('components.ui.icons.github')
+                <span>Continuer avec GitHub</span>
             </x-filament::button>
         </div>
 

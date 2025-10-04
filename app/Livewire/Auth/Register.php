@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -34,6 +35,16 @@ class Register extends Component implements HasForms
                     ->minLength(3)
                     ->maxLength(255)
                     ->autocomplete('name'),
+                TextInput::make('username')
+                    ->label('Pseudo (optionnel)')
+                    ->placeholder('Ex. coder123')
+                    ->maxLength(32)
+                    ->helperText('Affiché dans le journal et les classements.')
+                    ->alphaDash()
+                    ->autocomplete('username')
+                    ->rule('nullable')
+                    ->rule('unique:user_profiles,username')
+                    ->dehydrateStateUsing(fn ($state) => $state ? Str::of($state)->lower()->slug()->value() : null),
                 TextInput::make('email')
                     ->label('Email')
                     ->email()
@@ -61,15 +72,28 @@ class Register extends Component implements HasForms
         $this->form->validate();
         $data = $this->form->getState();
 
+        $username = null;
+        if (! empty($data['username'])) {
+            $username = Str::of($data['username'])->lower()->slug()->value();
+        }
+
         $user = User::create([
             'name' => trim($data['name'] ?? ''),
             'email' => strtolower(trim($data['email'] ?? '')),
             'password' => $data['password'] ?? '',
         ]);
 
+        $user->profile()->create([
+            'join_reason' => 'self_onboarding',
+            'focus_area' => null,
+            'username' => $username,
+            'preferences' => $user->profilePreferencesDefaults(),
+        ]);
+
         auth()->login($user);
 
-        return redirect()->route('onboarding');
+        return redirect()->route('daily-challenge')
+            ->with('message', "Bienvenue ! Complétez votre premier journal pour lancer votre streak.");
     }
 
     public function render(): View
@@ -77,4 +101,3 @@ class Register extends Component implements HasForms
         return view('livewire.auth.register');
     }
 }
-

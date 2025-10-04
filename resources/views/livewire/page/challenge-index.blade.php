@@ -37,7 +37,7 @@
                                 {{ $run->target_days }} jours
                             </div>
                         </div>
-                        <x-filament::button tag="a" href="{{ route('challenges.show', $run) }}" color="gray">
+                        <x-filament::button wire:navigate tag="a" href="{{ route('challenges.show', $run) }}" color="gray">
                             Ouvrir
                         </x-filament::button>
                     </li>

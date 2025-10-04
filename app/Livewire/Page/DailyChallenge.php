@@ -3,6 +3,7 @@
 namespace App\Livewire\Page;
 
 use App\Jobs\GenerateDailyLogInsights;
+use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\Project;
@@ -16,6 +17,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -52,6 +54,10 @@ class DailyChallenge extends Component implements HasForms
         'updated_at' => null,
     ];
 
+    public Collection $pendingInvitations;
+
+    public string $inviteCode = '';
+
     public bool $shouldPollAi = false;
 
     public bool $canGoPrevious = false;
@@ -70,6 +76,7 @@ class DailyChallenge extends Component implements HasForms
     {
         $this->challengeDate = now()->format('Y-m-d');
         $this->allProjects = collect();
+        $this->pendingInvitations = collect();
 
         $run = $this->ensureChallengeRun();
         $this->form->fill([
@@ -94,6 +101,8 @@ class DailyChallenge extends Component implements HasForms
             })
             ->latest('start_date')
             ->first();
+
+        $this->refreshPendingInvitations();
 
         if (! $run) {
             $this->challengeRunId = null;
@@ -125,6 +134,16 @@ class DailyChallenge extends Component implements HasForms
         $this->allProjects = Project::query()
             ->where('challenge_run_id', $run->id)
             ->orderBy('name')
+            ->get();
+    }
+
+    protected function refreshPendingInvitations(): void
+    {
+        $this->pendingInvitations = ChallengeInvitation::query()
+            ->where('email', auth()->user()->email)
+            ->whereNull('accepted_at')
+            ->with(['run.owner:id,name'])
+            ->latest()
             ->get();
     }
 
@@ -559,5 +578,136 @@ class DailyChallenge extends Component implements HasForms
 
         $this->todayEntry = $log;
         $this->refreshAiPanel($log);
+    }
+
+    public function acceptInvitation(string $invitationId): void
+    {
+        $invitation = ChallengeInvitation::query()
+            ->whereKey($invitationId)
+            ->whereNull('accepted_at')
+            ->where('email', auth()->user()->email)
+            ->with('run')
+            ->first();
+
+        if (! $invitation) {
+            Notification::make()
+                ->title('Invitation introuvable')
+                ->body('Cette invitation a déjà été utilisée ou a expiré.')
+                ->warning()
+                ->send();
+
+            $this->refreshPendingInvitations();
+
+            return;
+        }
+
+        $run = $this->finalizeInvitation($invitation);
+        $this->challengeRunId = $run->id;
+        $this->loadTodayEntry($run);
+
+        Notification::make()
+            ->title('Invitation acceptée')
+            ->body("Vous avez rejoint le challenge « {$run->title} ». Bon courage !")
+            ->success()
+            ->send();
+    }
+
+    public function joinWithCode(): void
+    {
+        $code = Str::upper(trim($this->inviteCode));
+
+        if ($code === '') {
+            Notification::make()
+                ->title('Code requis')
+                ->body('Saisissez un code d’invitation ou de challenge public.')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $invitation = ChallengeInvitation::query()
+            ->where('token', $code)
+            ->whereNull('accepted_at')
+            ->with('run')
+            ->first();
+
+        if ($invitation) {
+            if ($invitation->email !== auth()->user()->email) {
+                Notification::make()
+                    ->title('Invitation réservée')
+                    ->body('Ce code est associé à une autre adresse email.')
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
+            $run = $this->finalizeInvitation($invitation);
+            $this->inviteCode = '';
+            $this->challengeRunId = $run->id;
+            $this->loadTodayEntry($run);
+            $this->refreshPendingInvitations();
+
+            Notification::make()
+                ->title('Invitation acceptée')
+                ->body("Vous avez rejoint le challenge « {$run->title} ». Bon courage !")
+                ->success()
+                ->send();
+
+            return;
+        }
+
+        $run = ChallengeRun::query()
+            ->where('public_join_code', $code)
+            ->where('is_public', true)
+            ->first();
+
+        if (! $run) {
+            Notification::make()
+                ->title('Code invalide')
+                ->body('Impossible de trouver un challenge pour ce code.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $this->attachToRun($run);
+        $this->inviteCode = '';
+        $this->challengeRunId = $run->id;
+        $this->loadTodayEntry($run);
+        $this->refreshPendingInvitations();
+
+        Notification::make()
+            ->title('Challenge rejoint')
+            ->body("Vous avez rejoint « {$run->title} ». Bon challenge !")
+            ->success()
+            ->send();
+    }
+
+    protected function finalizeInvitation(ChallengeInvitation $invitation): ChallengeRun
+    {
+        $run = $invitation->run;
+
+        $this->attachToRun($run);
+
+        if (! $invitation->accepted_at) {
+            $invitation->forceFill(['accepted_at' => now()])->save();
+        }
+
+        $this->refreshPendingInvitations();
+
+        return $run;
+    }
+
+    protected function attachToRun(ChallengeRun $run): void
+    {
+        $run->participantLinks()->firstOrCreate(
+            ['user_id' => auth()->id()],
+            ['joined_at' => now()]
+        );
+
+        $this->refreshProjects($run);
     }
 }

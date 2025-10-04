@@ -2,16 +2,53 @@
   @if (! $run)
     <x-filament::card>
       <x-slot name="heading">Aucun challenge actif</x-slot>
-      <p class="text-sm text-muted-foreground">
-        Rejoignez ou créez un challenge pour consigner votre progression dans le journal quotidien.
-      </p>
-      <div class="mt-4 flex flex-wrap gap-2">
-        <x-filament::button tag="a" href="{{ route('challenges.index') }}">
-          Voir les challenges
-        </x-filament::button>
-        <x-filament::button tag="a" href="{{ route('dashboard') }}" color="gray">
-          Retour au tableau de bord
-        </x-filament::button>
+      <div class="space-y-5">
+        <p class="text-sm text-muted-foreground">
+          Rejoignez un challenge existant ou créez votre propre aventure pour démarrer votre journal quotidien.
+        </p>
+
+        @if ($pendingInvitations->isNotEmpty())
+          <div class="rounded-lg border border-border/70 bg-muted/30 px-4 py-3">
+            <h3 class="text-sm font-semibold">Invitations en attente</h3>
+            <ul class="mt-3 space-y-3 text-sm">
+              @foreach ($pendingInvitations as $invitation)
+                <li class="flex flex-wrap items-center justify-between gap-3 rounded-md bg-background px-3 py-2 shadow-sm">
+                  <div>
+                    <p class="font-medium text-foreground">{{ $invitation->run->title }}</p>
+                    <p class="text-xs text-muted-foreground">Invité par {{ $invitation->run->owner?->name ?? 'un membre' }}</p>
+                  </div>
+                  <x-filament::button size="xs" wire:click="acceptInvitation('{{ $invitation->id }}')" wire:loading.attr="disabled">
+                    Accepter
+                  </x-filament::button>
+                </li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
+        <form wire:submit.prevent="joinWithCode" class="space-y-3">
+          <label class="text-sm font-medium text-foreground" for="invite_code">Rejoindre via un code</label>
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <x-filament::input
+              id="invite_code"
+              wire:model.defer="inviteCode"
+              placeholder="Code d’invitation ou challenge public"
+              class="flex-1"
+            />
+            <x-filament::button type="submit" wire:loading.attr="disabled">
+              Rejoindre
+            </x-filament::button>
+          </div>
+        </form>
+
+        <div class="flex flex-wrap gap-2">
+          <x-filament::button tag="a" href="{{ route('challenges.index') }}">
+            Parcourir les challenges
+          </x-filament::button>
+          <x-filament::button tag="a" href="{{ route('dashboard') }}" color="gray">
+            Retour au tableau de bord
+          </x-filament::button>
+        </div>
       </div>
     </x-filament::card>
   @else
