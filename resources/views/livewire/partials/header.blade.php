@@ -13,6 +13,7 @@
         ? [
             ['label' => 'Challenges', 'route' => route('challenges.index'), 'active' => ['challenges.*']],
             ['label' => 'Projets', 'route' => route('projects.index'), 'active' => ['projects.*']],
+            ['label' => 'Leaderboard', 'route' => route('leaderboard'), 'active' => ['leaderboard']],
             ['label' => 'Paramètres', 'route' => route('settings'), 'active' => ['settings']],
         ]
         : [];
