@@ -10,10 +10,12 @@ use App\Livewire\Page\TaskManager;
 use App\Livewire\Page\Welcome;
 use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
+use App\Http\Controllers\PublicDailyLogController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Welcome::class)->name('home');
+Route::get('share/{token}', [PublicDailyLogController::class, 'show'])->name('logs.share');
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
