@@ -483,10 +483,10 @@ class DailyChallenge extends Component implements HasForms
         $this->summary = [
             'streak' => $this->computeStreak($logs),
             'totalLogs' => $totalLogs,
-            'totalHours' => round($totalHours, 2),
+            'totalHours' => round($totalHours, 1),
             'completion' => (int) round(min(100, ($totalLogs / $target) * 100)),
-            'averageHours' => $totalLogs > 0 ? round($totalHours / $totalLogs, 2) : 0.0,
-            'hoursThisWeek' => round((float) $hoursThisWeek, 2),
+            'averageHours' => $totalLogs > 0 ? round($totalHours / $totalLogs, 1) : 0.0,
+            'hoursThisWeek' => round((float) $hoursThisWeek, 1),
             'lastLogAt' => $lastLog?->date ? Carbon::parse($lastLog->date) : null,
         ];
 

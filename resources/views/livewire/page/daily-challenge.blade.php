@@ -1,312 +1,458 @@
-<div class="mx-auto max-w-5xl space-y-6 py-6">
-  @if (! $run)
-    <x-filament::card>
-      <x-slot name="heading">Aucun challenge actif</x-slot>
-      <div class="space-y-5">
-        <p class="text-sm text-muted-foreground">
-          Rejoignez un challenge existant ou créez votre propre aventure pour démarrer votre journal quotidien.
-        </p>
+@php
+    use Illuminate\Support\Str;
+    use Illuminate\Support\Carbon;
 
-        @if ($pendingInvitations->isNotEmpty())
-          <div class="rounded-lg border border-border/70 bg-muted/30 px-4 py-3">
-            <h3 class="text-sm font-semibold">Invitations en attente</h3>
-            <ul class="mt-3 space-y-3 text-sm">
-              @foreach ($pendingInvitations as $invitation)
-                <li class="flex flex-wrap items-center justify-between gap-3 rounded-md bg-background px-3 py-2 shadow-sm">
-                  <div>
-                    <p class="font-medium text-foreground">{{ $invitation->run->title }}</p>
-                    <p class="text-xs text-muted-foreground">Invité par {{ $invitation->run->owner?->name ?? 'un membre' }}</p>
-                  </div>
-                  <x-filament::button size="xs" wire:click="acceptInvitation('{{ $invitation->id }}')" wire:loading.attr="disabled">
-                    Accepter
-                  </x-filament::button>
-                </li>
-              @endforeach
-            </ul>
+    $formatHours = static fn ($value) => rtrim(rtrim(number_format((float) $value, 1, '.', ' '), '0'), '.');
+    $formatNumber = static fn ($value) => number_format((int) $value, 0, '.', ' ');
+@endphp
+
+<div class="mx-auto max-w-6xl space-y-12 px-4 py-10 sm:px-6 lg:px-0">
+  @if (! $run)
+    <section class="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-background to-background shadow-lg">
+      <div class="absolute inset-0">
+        <div class="absolute -left-16 bottom-0 h-32 w-32 rounded-full bg-primary/15 blur-3xl"></div>
+        <div class="absolute -right-12 top-0 h-32 w-32 rounded-full bg-secondary/20 blur-3xl"></div>
+      </div>
+
+      <div class="relative grid gap-10 p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-10">
+        <div class="space-y-6">
+          <div class="space-y-2">
+            <span class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+              Journal quotidien
+            </span>
+            <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">Aucun challenge actif pour l'instant</h1>
+            <p class="max-w-xl text-sm text-muted-foreground sm:text-base">
+              Rejoins un run #100DaysOfCode ou crée ton propre challenge pour commencer à consigner tes shipments et débloquer des badges.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <a
+              wire:navigate
+              href="{{ route('challenges.index') }}"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:shadow-xl hover:shadow-primary/30"
+            >
+              Explorer les challenges
+            </a>
+            <a
+              wire:navigate
+              href="{{ route('dashboard') }}"
+              class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+            >
+              Retour au tableau de bord
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-5 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-xl">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-muted-foreground">Rejoindre via un code</p>
+            <p class="text-sm text-muted-foreground">Colle ici un code public ou une invitation privée pour démarrer immédiatement.</p>
+          </div>
+          <form wire:submit.prevent="joinWithCode" class="space-y-3">
+            <div class="flex flex-col gap-3 sm:flex-row">
+              <input
+                type="text"
+                wire:model.defer="inviteCode"
+                placeholder="Code d'invitation ou challenge public"
+                class="flex-1 rounded-2xl border border-border/70 bg-background px-4 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              >
+              <button
+                type="submit"
+                wire:loading.attr="disabled"
+                class="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+              >
+                Rejoindre
+              </button>
+            </div>
+          </form>
+
+          @if ($pendingInvitations->isNotEmpty())
+            <div class="space-y-3 rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
+              <h3 class="text-sm font-semibold text-foreground">Invitations en attente</h3>
+              <ul class="space-y-2 text-sm">
+                @foreach ($pendingInvitations as $invitation)
+                  <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-background px-3 py-2">
+                    <div>
+                      <p class="font-medium text-foreground">{{ $invitation->run->title }}</p>
+                      <p class="text-xs text-muted-foreground">Invité par {{ $invitation->run->owner?->name ?? 'un membre' }}</p>
+                    </div>
+                    <button
+                      type="button"
+                      wire:click="acceptInvitation('{{ $invitation->id }}')"
+                      wire:loading.attr="disabled"
+                      class="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow hover:shadow-lg"
+                    >
+                      Accepter
+                    </button>
+                  </li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
+        </div>
+      </div>
+    </section>
+  @else
+    @php
+      $challengeDateParsed = Carbon::parse($challengeDate);
+      $formattedDate = $challengeDateParsed->translatedFormat('d F Y');
+      $dayLabel = "Jour {$currentDayNumber} sur {$run->target_days}";
+      $progressPercent = $summary['completion'] ?? 0;
+    @endphp
+    <section class="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-background to-background shadow-lg">
+      <div class="absolute inset-0">
+        <div class="absolute -left-16 bottom-0 h-32 w-32 rounded-full bg-primary/15 blur-3xl"></div>
+        <div class="absolute -right-12 top-0 h-32 w-32 rounded-full bg-secondary/20 blur-3xl"></div>
+      </div>
+
+      <div class="relative grid gap-10 p-8 lg:grid-cols-[1.25fr_0.75fr] lg:p-10">
+        <div class="space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-2">
+              <span class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                {{ $dayLabel }}
+              </span>
+              <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">{{ $formattedDate }}</h1>
+              <p class="max-w-xl text-sm text-muted-foreground sm:text-base">
+                Challenge « {{ $run->title ?? '100DaysOfCode' }} » animé par {{ $run->owner->name }}. Consigne ton shipment pour garder ta streak.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                wire:click="goToDay('previous')"
+                @class([
+                    'rounded-full border px-4 py-2 text-xs font-semibold transition',
+                    'border-border/70 text-muted-foreground hover:border-primary hover:text-primary' => $canGoPrevious,
+                    'border-border/40 text-muted-foreground/70 cursor-not-allowed' => ! $canGoPrevious,
+                ])
+                @disabled(! $canGoPrevious)
+              >
+                Jour précédent
+              </button>
+              <button
+                type="button"
+                wire:click="goToDay('next')"
+                @class([
+                    'rounded-full border px-4 py-2 text-xs font-semibold transition',
+                    'border-border/70 text-muted-foreground hover:border-primary hover:text-primary' => $canGoNext,
+                    'border-border/40 text-muted-foreground/70 cursor-not-allowed' => ! $canGoNext,
+                ])
+                @disabled(! $canGoNext)
+              >
+                Jour suivant
+              </button>
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
+              <p class="text-xs uppercase tracking-widest text-muted-foreground">Streak actuel</p>
+              <p class="mt-2 text-2xl font-semibold text-foreground">{{ $summary['streak'] ?? 0 }} {{ Str::plural('jour', $summary['streak'] ?? 0) }}</p>
+              <p class="text-xs text-muted-foreground">Ne casse pas la série</p>
+            </div>
+            <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
+              <p class="text-xs uppercase tracking-widest text-muted-foreground">Logs enregistrés</p>
+              <p class="mt-2 text-2xl font-semibold text-foreground">{{ $summary['totalLogs'] ?? 0 }}</p>
+              <p class="text-xs text-muted-foreground">Depuis le début du run</p>
+            </div>
+            <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
+              <p class="text-xs uppercase tracking-widest text-muted-foreground">Heures cumulées</p>
+              <p class="mt-2 text-2xl font-semibold text-foreground">{{ $formatHours($summary['totalHours'] ?? 0) }} h</p>
+              <p class="text-xs text-muted-foreground">{{ $formatHours($summary['hoursThisWeek'] ?? 0) }} h cette semaine</p>
+            </div>
+            <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
+              <p class="text-xs uppercase tracking-widest text-muted-foreground">Progression</p>
+              <p class="mt-2 text-2xl font-semibold text-foreground">{{ $progressPercent }}%</p>
+              <p class="text-xs text-muted-foreground">Objectif : {{ $run->target_days }} jours</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative space-y-4 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-xl">
+          <div>
+            <p class="text-xs uppercase tracking-widest text-muted-foreground">Raccourcis</p>
+            <h2 class="mt-1 text-lg font-semibold text-foreground">Actions rapides</h2>
+          </div>
+          <dl class="space-y-3 text-sm text-muted-foreground">
+            <div class="flex items-center justify-between">
+              <dt>Dernier log</dt>
+              <dd>
+                @if ($summary['lastLogAt'] ?? false)
+                  {{ $summary['lastLogAt']->translatedFormat('d/m/Y') }}
+                @else
+                  —
+                @endif
+              </dd>
+            </div>
+            <div class="flex items-center justify-between">
+              <dt>Projets actifs</dt>
+              <dd>{{ count($projectBreakdown) }}</dd>
+            </div>
+            <div class="flex items-center justify-between">
+              <dt>Entrées restantes</dt>
+              <dd>{{ max(0, $run->target_days - ($summary['totalLogs'] ?? 0)) }}</dd>
+            </div>
+          </dl>
+          @if (auth()->id() !== $run->owner_id)
+            <button
+              type="button"
+              wire:confirm="Quitter le challenge ?"
+              wire:click="leave"
+              class="w-full rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+            >
+              Quitter le challenge
+            </button>
+          @endif
+        </div>
+      </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+      <article class="space-y-6 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+        @if ($showReminder)
+          <div class="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Pas encore de log pour aujourd'hui. Renseigne ta journée pour conserver ta streak !
+          </div>
+        @endif
+        @if (session()->has('message'))
+          <div class="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            {{ session('message') }}
           </div>
         @endif
 
-        <form wire:submit.prevent="joinWithCode" class="space-y-3">
-          <label class="text-sm font-medium text-foreground" for="invite_code">Rejoindre via un code</label>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <x-filament::input
-              id="invite_code"
-              wire:model.defer="inviteCode"
-              placeholder="Code d’invitation ou challenge public"
-              class="flex-1"
-            />
-            <x-filament::button type="submit" wire:loading.attr="disabled">
-              Rejoindre
-            </x-filament::button>
-          </div>
-        </form>
-
-        <div class="flex flex-wrap gap-2">
-          <x-filament::button tag="a" href="{{ route('challenges.index') }}">
-            Parcourir les challenges
-          </x-filament::button>
-          <x-filament::button tag="a" href="{{ route('dashboard') }}" color="gray">
-            Retour au tableau de bord
-          </x-filament::button>
-        </div>
-      </div>
-    </x-filament::card>
-  @else
-    <div class="grid gap-6 lg:grid-cols-3">
-      <div class="space-y-4 lg:col-span-2">
-        <x-filament::card>
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-xs uppercase text-muted-foreground">
-                Jour {{ $currentDayNumber }}/{{ $run->target_days }}
-              </p>
-              <h2 class="text-xl font-semibold">
-                {{ \Illuminate\Support\Carbon::parse($challengeDate)->translatedFormat('d F Y') }}
-              </h2>
+        @if ($todayEntry && ! $isEditing)
+          <div class="space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">
+                Entrée complétée pour ce jour
+              </span>
+              <button
+                type="button"
+                wire:click="startEditing"
+                class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+              >
+                Modifier mon entrée
+              </button>
             </div>
+
+            <div class="space-y-4">
+              <div>
+                <p class="text-xs uppercase tracking-widest text-muted-foreground">Description</p>
+                <p class="mt-1 whitespace-pre-line rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-sm">
+                  {{ $todayEntry->notes ?: '—' }}
+                </p>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-3">
+                <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Heures codées</p>
+                  <p class="mt-1 text-base font-semibold text-foreground">{{ $formatHours($todayEntry->hours_coded) }}</p>
+                </div>
+                <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Apprentissages</p>
+                  <p class="mt-1 text-sm text-foreground">{{ $todayEntry->learnings ?: '—' }}</p>
+                </div>
+                <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Difficultés</p>
+                  <p class="mt-1 text-sm text-foreground">{{ $todayEntry->challenges_faced ?: '—' }}</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-widest text-muted-foreground">Projets travaillés</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  @php($projects = collect($todayEntry->projects_worked_on ?? []))
+                  @forelse ($projects as $pid)
+                    @php($project = $allProjects->firstWhere('id', $pid))
+                    <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $project?->name ?? 'Projet supprimé' }}</span>
+                  @empty
+                    <span class="text-sm text-muted-foreground">Aucun projet associé.</span>
+                  @endforelse
+                </div>
+              </div>
+            </div>
+          </div>
+        @else
+          <form wire:submit.prevent="saveEntry" class="space-y-5">
+            {{ $this->form }}
+
+            <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>Raccourcis :</span>
+              @foreach ([0.5, 1, 2, 3, 4] as $preset)
+                @php($label = rtrim(rtrim(number_format($preset, 1, '.', ' '), '0'), '.'))
+                <button
+                  type="button"
+                  wire:click="$set('dailyForm.hours_coded', {{ $preset }})"
+                  class="rounded-full border border-border/70 px-3 py-1 text-foreground transition hover:border-primary hover:text-primary"
+                >
+                  {{ $label }} h
+                </button>
+              @endforeach
+            </div>
+
             <div class="flex flex-wrap gap-2">
-              <x-filament::button color="gray" size="sm" wire:click="goToDay('previous')" :disabled="! $canGoPrevious">
-                Jour précédent
-              </x-filament::button>
-              <x-filament::button color="gray" size="sm" wire:click="goToDay('next')" :disabled="! $canGoNext">
-                Jour suivant
-              </x-filament::button>
+              <button
+                type="submit"
+                class="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+              >
+                Sauvegarder ma progression
+              </button>
+              @if ($todayEntry)
+                <button
+                  type="button"
+                  wire:click="cancelEditing"
+                  class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                >
+                  Annuler
+                </button>
+              @endif
             </div>
-          </div>
+          </form>
+        @endif
 
-          <div class="mt-4 text-xs text-muted-foreground">
-            Défi « {{ $run->title ?? '100 Days of Code' }} » · démarré le {{ $run->start_date->translatedFormat('d/m/Y') }}
-          </div>
-
-          <div class="mt-6">
-            @if ($showReminder)
-              <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                Pas encore de log pour aujourd’hui. Renseignez votre journée pour conserver votre streak !
+        @if ($todayEntry)
+          <div class="rounded-3xl border border-border/60 bg-background/90 p-6 shadow-sm" @if($shouldPollAi) wire:poll.7s="pollAiPanel" @endif>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-semibold text-foreground">Insights IA</h2>
+                <p class="text-xs text-muted-foreground">
+                  @if ($aiPanel['status'] === 'pending')
+                    Génération en cours...
+                  @elseif ($aiPanel['updated_at'])
+                    Mis à jour le {{ optional($aiPanel['updated_at'])->translatedFormat('d/m/Y à H\hi') }}
+                  @else
+                    En attente d'une première génération.
+                  @endif
+                </p>
               </div>
-            @endif
-            @if (session()->has('message'))
-              <div class="mb-4 rounded-md bg-green-100 px-3 py-2 text-sm text-green-800 dark:bg-green-900/60 dark:text-green-200">
-                {{ session('message') }}
-              </div>
-            @endif
-
-            @if ($todayEntry && ! $isEditing)
-              <div class="space-y-5">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <x-filament::badge color="success">
-                    Entrée complétée pour ce jour
-                  </x-filament::badge>
-                  <x-filament::button size="sm" wire:click="startEditing">
-                    Modifier mon entrée
-                  </x-filament::button>
-                </div>
-
-                <dl class="space-y-3 text-sm">
-                  <div>
-                    <dt class="text-xs uppercase text-muted-foreground">Description</dt>
-                    <dd class="mt-1 whitespace-pre-line rounded-md bg-muted px-3 py-2 text-sm">
-                      {{ $todayEntry->notes }}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt class="text-xs uppercase text-muted-foreground">Projets travaillés</dt>
-                    <dd class="mt-1 flex flex-wrap gap-2">
-                      @php($projects = collect($todayEntry->projects_worked_on ?? []))
-
-                      @if ($projects->isNotEmpty())
-                        @foreach ($projects as $pid)
-                          @php($project = $allProjects->firstWhere('id', $pid))
-                          <x-filament::badge color="gray">
-                            {{ $project?->name ?? 'Projet supprimé' }}
-                          </x-filament::badge>
-                        @endforeach
-                      @else
-                        <span class="text-muted-foreground">Aucun</span>
-                      @endif
-                    </dd>
-                  </div>
-
-                  <div class="grid gap-3 md:grid-cols-3">
-                    <div class="rounded-md bg-muted px-3 py-2">
-                      <p class="text-xs uppercase text-muted-foreground">Heures codées</p>
-                      <p class="text-base font-semibold">{{ $todayEntry->hours_coded }}</p>
-                    </div>
-                    <div class="rounded-md bg-muted px-3 py-2">
-                      <p class="text-xs uppercase text-muted-foreground">Apprentissages</p>
-                      <p class="text-sm">{{ $todayEntry->learnings ?: '—' }}</p>
-                    </div>
-                    <div class="rounded-md bg-muted px-3 py-2">
-                      <p class="text-xs uppercase text-muted-foreground">Difficultés</p>
-                      <p class="text-sm">{{ $todayEntry->challenges_faced ?: '—' }}</p>
-                    </div>
-                  </div>
-                </dl>
-              </div>
-            @else
-              <form wire:submit.prevent="saveEntry" class="space-y-4">
-                {{ $this->form }}
-
-                <div class="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  <span>Raccourcis d'heures :</span>
-                  @foreach ([0.5, 1, 2, 3, 4] as $preset)
-                    <button
-                      type="button"
-                      wire:click="$set('dailyForm.hours_coded', {{ $preset }})"
-                      class="rounded-full border border-border px-3 py-1 text-foreground hover:border-primary hover:text-primary"
-                    >
-                      {{ rtrim(rtrim(number_format($preset, 2, ',', ' '), '0'), ',') }} h
-                    </button>
-                  @endforeach
-                </div>
-
-                <x-filament::button type="submit" color="primary">
-                  Sauvegarder ma progression
-                </x-filament::button>
-                @if ($todayEntry)
-                  <x-filament::button type="button" color="gray" wire:click="cancelEditing">
-                    Annuler
-                  </x-filament::button>
-                @endif
-              </form>
-            @endif
-          </div>
-
-          @if ($todayEntry)
-            <div class="mt-6 space-y-4" @if($shouldPollAi) wire:poll.7s="pollAiPanel" @endif>
-              <div class="rounded-xl border border-border/70 bg-card px-4 py-4 shadow-sm">
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 class="text-lg font-semibold">Insights IA</h3>
-                    <p class="text-xs text-muted-foreground">
-                      @if ($aiPanel['status'] === 'pending')
-                        Génération en cours…
-                      @elseif ($aiPanel['updated_at'])
-                        Mis à jour le {{ optional($aiPanel['updated_at'])->translatedFormat('d/m/Y à H\hi') }}
-                      @else
-                        En attente d'une première génération IA.
-                      @endif
-                    </p>
-                  </div>
-                  <div class="flex flex-wrap gap-2" x-data="{
-                      copied: false,
-                      draft: {{ Js::from($aiPanel['share_draft'] ?? '') }},
-                      copyDraft() {
-                        if (! this.draft) {
-                          return;
-                        }
-
-                        navigator.clipboard.writeText(this.draft);
-                        this.copied = true;
-                        setTimeout(() => this.copied = false, 2000);
+              <div
+                class="flex flex-wrap gap-2"
+                x-data="{
+                    copied: false,
+                    draft: {{ Js::from($aiPanel['share_draft'] ?? '') }},
+                    copyDraft() {
+                      if (! this.draft) {
+                        return;
                       }
-                    }">
-                    <x-filament::button size="sm" color="gray" wire:click="regenerateAi" :disabled="$aiPanel['status'] === 'pending'">
-                      Relancer l'IA
-                    </x-filament::button>
-                    <x-filament::button
-                      size="sm"
-                      color="primary"
-                      x-on:click.prevent="copyDraft()"
-                      x-bind:disabled="! draft"
-                    >
-                      <span x-show="!copied">Copier le brouillon</span>
-                      <span x-show="copied" x-cloak>Copié !</span>
-                    </x-filament::button>
+
+                      navigator.clipboard.writeText(this.draft);
+                      this.copied = true;
+                      setTimeout(() => this.copied = false, 2000);
+                    }
+                }"
+              >
+                <button
+                  type="button"
+                  wire:click="regenerateAi"
+                  @disabled($aiPanel['status'] === 'pending')
+                  class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                >
+                  Relancer l'IA
+                </button>
+                <button
+                  type="button"
+                  @click.prevent="copyDraft()"
+                  x-bind:disabled="! draft"
+                  class="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+                >
+                  <span x-show="!copied">Copier le brouillon</span>
+                  <span x-show="copied" x-cloak>Copié !</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-4">
+              <div>
+                <p class="text-xs uppercase tracking-widest text-muted-foreground">Résumé</p>
+                @if ($aiPanel['status'] === 'ready' && $aiPanel['summary'])
+                  <div class="prose prose-sm max-w-none dark:prose-invert">
+                    {!! Str::markdown($aiPanel['summary']) !!}
                   </div>
+                @else
+                  <div class="h-20 rounded-2xl bg-muted/70 animate-pulse" aria-hidden="true"></div>
+                @endif
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-widest text-muted-foreground">Tags</p>
+                @if ($aiPanel['status'] === 'ready' && filled($aiPanel['tags']))
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    @foreach ($aiPanel['tags'] as $tag)
+                      <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $tag }}</span>
+                    @endforeach
+                  </div>
+                @else
+                  <div class="flex gap-2">
+                    <div class="h-6 w-20 rounded-full bg-muted/70 animate-pulse"></div>
+                    <div class="h-6 w-14 rounded-full bg-muted/60 animate-pulse"></div>
+                    <div class="h-6 w-16 rounded-full bg-muted/40 animate-pulse"></div>
+                  </div>
+                @endif
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Conseil du coach</p>
+                  @if ($aiPanel['status'] === 'ready' && $aiPanel['coach_tip'])
+                    <p class="mt-1 rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-sm">{{ $aiPanel['coach_tip'] }}</p>
+                  @else
+                    <div class="h-16 rounded-2xl bg-muted/60 animate-pulse"></div>
+                  @endif
                 </div>
-
-                <div class="mt-4 space-y-4">
-                  <div>
-                    <p class="text-xs uppercase text-muted-foreground">Résumé</p>
-                    @if ($aiPanel['status'] === 'ready' && $aiPanel['summary'])
-                      <div class="prose prose-sm max-w-none dark:prose-invert">
-                        {!! \Illuminate\Support\Str::markdown($aiPanel['summary']) !!}
-                      </div>
-                    @else
-                      <div class="h-20 rounded-md bg-muted/70 animate-pulse" aria-hidden="true"></div>
-                    @endif
-                  </div>
-
-                  <div>
-                    <p class="text-xs uppercase text-muted-foreground">Tags</p>
-                    @if ($aiPanel['status'] === 'ready' && filled($aiPanel['tags']))
-                      <div class="mt-1 flex flex-wrap gap-2">
-                        @foreach ($aiPanel['tags'] as $tag)
-                          <x-filament::badge color="primary">{{ $tag }}</x-filament::badge>
-                        @endforeach
-                      </div>
-                    @else
-                      <div class="flex gap-2">
-                        <div class="h-6 w-20 rounded-full bg-muted/70 animate-pulse"></div>
-                        <div class="h-6 w-12 rounded-full bg-muted/50 animate-pulse"></div>
-                        <div class="h-6 w-16 rounded-full bg-muted/40 animate-pulse"></div>
-                      </div>
-                    @endif
-                  </div>
-
-                  <div class="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <p class="text-xs uppercase text-muted-foreground">Conseil du coach</p>
-                      @if ($aiPanel['status'] === 'ready' && $aiPanel['coach_tip'])
-                        <p class="mt-1 rounded-md bg-muted px-3 py-2 text-sm">{{ $aiPanel['coach_tip'] }}</p>
-                      @else
-                        <div class="h-14 rounded-md bg-muted/60 animate-pulse"></div>
-                      @endif
-                    </div>
-                    <div>
-                      <p class="text-xs uppercase text-muted-foreground">Brouillon de partage</p>
-                      @if ($aiPanel['status'] === 'ready' && $aiPanel['share_draft'])
-                        <pre class="mt-1 max-h-48 overflow-auto rounded-md bg-muted px-3 py-2 text-xs">{{ $aiPanel['share_draft'] }}</pre>
-                      @else
-                        <div class="h-20 rounded-md bg-muted/60 animate-pulse"></div>
-                      @endif
-                    </div>
-                  </div>
-
-                  @if ($aiPanel['status'] === 'ready' && $aiPanel['model'])
-                    <p class="text-xs text-muted-foreground">
-                      Généré avec {{ $aiPanel['model'] }} · {{ $aiPanel['latency_ms'] ?? '—' }} ms · ${{ number_format((float) ($aiPanel['cost_usd'] ?? 0), 3) }}
-                    </p>
+                <div>
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Brouillon de partage</p>
+                  @if ($aiPanel['status'] === 'ready' && $aiPanel['share_draft'])
+                    <pre class="mt-1 max-h-48 overflow-auto rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-xs">{{ $aiPanel['share_draft'] }}</pre>
+                  @else
+                    <div class="h-20 rounded-2xl bg-muted/60 animate-pulse"></div>
                   @endif
                 </div>
               </div>
-            </div>
-          @endif
-        </x-filament::card>
-      </div>
 
-      <div class="space-y-4">
-        <x-filament::card heading="Mes statistiques">
-          <dl class="space-y-2 text-sm">
+              @if ($aiPanel['status'] === 'ready' && $aiPanel['model'])
+                <p class="text-xs text-muted-foreground">
+                  Généré avec {{ $aiPanel['model'] }} · {{ $aiPanel['latency_ms'] ?? '—' }} ms · ${{ number_format((float) ($aiPanel['cost_usd'] ?? 0), 3) }}
+                </p>
+              @endif
+            </div>
+          </div>
+        @endif
+      </article>
+
+      <aside class="space-y-6">
+        <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+          <h2 class="text-lg font-semibold text-foreground">Mes statistiques</h2>
+          <dl class="mt-4 space-y-3 text-sm">
             <div class="flex items-center justify-between">
               <dt>Streak actuel</dt>
-              <dd>{{ $summary['streak'] ?? 0 }} {{ \Illuminate\Support\Str::plural('jour', $summary['streak'] ?? 0) }}</dd>
+              <dd>{{ $summary['streak'] ?? 0 }} {{ Str::plural('jour', $summary['streak'] ?? 0) }}</dd>
             </div>
             <div class="flex items-center justify-between">
               <dt>Entrées totales</dt>
               <dd>{{ $summary['totalLogs'] ?? 0 }}</dd>
             </div>
             <div class="flex items-center justify-between">
-              <dt>Heures totales</dt>
-              <dd>{{ $summary['totalHours'] ?? 0 }} h</dd>
+              <dt>Heures cumulées</dt>
+              <dd>{{ $formatHours($summary['totalHours'] ?? 0) }} h</dd>
+            </div>
+            <div class="flex items-center justify-between">
+              <dt>Heures moyennes / log</dt>
+              <dd>{{ $formatHours($summary['averageHours'] ?? 0) }} h</dd>
             </div>
             <div class="flex items-center justify-between">
               <dt>Heures cette semaine</dt>
-              <dd>{{ $summary['hoursThisWeek'] ?? 0 }} h</dd>
+              <dd>{{ $formatHours($summary['hoursThisWeek'] ?? 0) }} h</dd>
             </div>
             <div class="flex items-center justify-between">
               <dt>Progression</dt>
               <dd>{{ $summary['completion'] ?? 0 }}%</dd>
             </div>
             <div class="flex items-center justify-between">
-              <dt>Heures moyennes</dt>
-              <dd>{{ $summary['averageHours'] ?? 0 }} h</dd>
-            </div>
-            <div class="flex items-center justify-between">
               <dt>Dernier log</dt>
               <dd>
-                @if (! empty($summary['lastLogAt']))
+                @if ($summary['lastLogAt'] ?? false)
                   {{ $summary['lastLogAt']->translatedFormat('d/m/Y') }}
                 @else
                   —
@@ -314,48 +460,48 @@
               </dd>
             </div>
           </dl>
-        </x-filament::card>
+        </section>
 
-        <x-filament::card heading="Historique récent">
-          <div class="space-y-2">
+        <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+          <h2 class="text-lg font-semibold text-foreground">Historique récent</h2>
+          <div class="mt-3 space-y-2 text-sm">
             @forelse ($history as $entry)
               <button
                 type="button"
                 wire:click="setDate('{{ $entry['date'] ?? $challengeDate }}')"
-                class="w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-left text-sm hover:border-primary"
+                class="w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-2 text-left transition hover:border-primary/50 hover:text-primary"
               >
                 <div class="flex items-center justify-between">
                   <span>Jour {{ $entry['day_number'] }}</span>
                   <span class="text-xs text-muted-foreground">
-                    {{ $entry['date'] ? \Illuminate\Support\Carbon::parse($entry['date'])->translatedFormat('d/m') : '—' }}
+                    {{ $entry['date'] ? Carbon::parse($entry['date'])->translatedFormat('d/m') : '—' }}
                   </span>
                 </div>
                 <div class="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{{ $entry['hours'] }} h</span>
-                  <span>
-                    {{ count($entry['projects']) }} {{ \Illuminate\Support\Str::plural('projet', count($entry['projects'])) }}
-                  </span>
+                  <span>{{ $formatHours($entry['hours']) }} h</span>
+                  <span>{{ count($entry['projects']) }} {{ Str::plural('projet', count($entry['projects'])) }}</span>
                 </div>
               </button>
             @empty
-              <p class="text-sm text-muted-foreground">Pas encore d'historique.</p>
+              <p class="text-xs text-muted-foreground">Pas encore d'historique à afficher.</p>
             @endforelse
           </div>
-        </x-filament::card>
+        </section>
 
-        <x-filament::card heading="Projets les plus actifs">
-          <div class="space-y-2 text-sm">
+        <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+          <h2 class="text-lg font-semibold text-foreground">Projets les plus actifs</h2>
+          <div class="mt-3 space-y-2 text-sm">
             @forelse ($projectBreakdown as $project)
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between rounded-2xl border border-border/60 bg-background/80 px-3 py-2">
                 <span>{{ $project['name'] }}</span>
-                <span class="text-xs text-muted-foreground">{{ $project['count'] }} {{ \Illuminate\Support\Str::plural('jour', $project['count']) }}</span>
+                <span class="text-xs text-muted-foreground">{{ $project['count'] }} {{ Str::plural('jour', $project['count']) }}</span>
               </div>
             @empty
-              <p class="text-sm text-muted-foreground">Aucun projet lié pour l'instant.</p>
+              <p class="text-xs text-muted-foreground">Associe ton journal à un projet pour voir ici la répartition.</p>
             @endforelse
           </div>
-        </x-filament::card>
-      </div>
-    </div>
+        </section>
+      </aside>
+    </section>
   @endif
 </div>
