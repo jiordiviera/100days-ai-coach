@@ -157,6 +157,8 @@ class Settings extends Component implements HasForms, HasActions
                 Select::make('notifications.timezone')
                     ->label('Fuseau horaire')
                     ->options($this->timezones)
+                    ->native(false)
+                    ->preload(true)
                     ->searchable()
                     ->required()
                     ->columnSpan(1),
@@ -309,7 +311,7 @@ class Settings extends Component implements HasForms, HasActions
             ->filter(fn($tz) => Str::contains($tz, ['/']))
             ->mapWithKeys(fn($tz) => [$tz => $tz])
             ->all();
-
+        
         return $preferred + $common;
     }
 
