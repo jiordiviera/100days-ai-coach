@@ -61,6 +61,9 @@ class User extends Authenticatable
             ],
             'ai_provider' => 'groq',
             'tone' => 'neutral',
+            'wakatime' => [
+                'hide_project_names' => true,
+            ],
         ];
     }
 

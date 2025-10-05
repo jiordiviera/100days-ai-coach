@@ -1,12 +1,14 @@
 <?php
 
 use App\Console\Commands\SendDailyLogReminders;
+use App\Console\Commands\SyncWakaTime;
 use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Mail\MailServiceProvider;
 use Livewire\LivewireServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
@@ -16,7 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withCommands([
         SendDailyLogReminders::class,
+        SyncWakaTime::class,
     ])
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('wakatime:sync')->dailyAt('01:00');
+    })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',

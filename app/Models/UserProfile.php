@@ -38,11 +38,15 @@ class UserProfile extends Model
         'github_id',
         'github_username',
         'preferences',
+        'wakatime_api_key',
+        'wakatime_settings',
     ];
 
     protected $casts = [
         'preferences' => 'array',
         'social_links' => 'array',
+        'wakatime_api_key' => 'encrypted',
+        'wakatime_settings' => 'array',
     ];
 
     public function user(): BelongsTo
