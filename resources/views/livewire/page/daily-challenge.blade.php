@@ -451,6 +451,59 @@
         @endif
 
         <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-semibold text-foreground">Partage public</h2>
+              <p class="text-xs text-muted-foreground">Génère un lien public en lecture seule pour ton journal.</p>
+            </div>
+            @if ($publicShare)
+              <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Actif</span>
+            @else
+              <span class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Inactif</span>
+            @endif
+          </div>
+
+          @if ($publicShare)
+            <div class="mt-4 space-y-3">
+              <div class="rounded-2xl border border-border/70 bg-background/80 p-3 text-xs">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="truncate">{{ $publicShare['url'] }}</span>
+                  <button
+                    type="button"
+                    onclick="navigator.clipboard.writeText('{{ $publicShare['url'] }}'); this.innerText='Copié !'; setTimeout(() => this.innerText='Copier', 2000);"
+                    class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 font-semibold text-xs text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                  >
+                    Copier
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                wire:click="disablePublicShare"
+                wire:loading.attr="disabled"
+                class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive"
+              >
+                Désactiver le partage
+              </button>
+            </div>
+          @else
+            <div class="mt-4 space-y-3">
+              <p class="text-xs text-muted-foreground">
+                Enregistre ton entrée du jour puis génère un lien public pour la partager sur les réseaux.
+              </p>
+              <button
+                type="button"
+                wire:click="enablePublicShare"
+                wire:loading.attr="disabled"
+                class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+              >
+                Générer le lien public
+              </button>
+            </div>
+          @endif
+        </section>
+
+        <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
           <h2 class="text-lg font-semibold text-foreground">Mes statistiques</h2>
           <dl class="mt-4 space-y-3 text-sm">
             <div class="flex items-center justify-between">
