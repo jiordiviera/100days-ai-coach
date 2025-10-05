@@ -11,8 +11,7 @@ class GitHubTemplateService
 {
     public function __construct(
         private readonly GitHubClient $client,
-    ) {
-    }
+    ) {}
 
     public function listInstallableOwners(User $user): array
     {

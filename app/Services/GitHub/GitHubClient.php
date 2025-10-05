@@ -8,14 +8,12 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class GitHubClient
 {
     public function __construct(
         private readonly ?string $baseUri = null,
-    ) {
-    }
+    ) {}
 
     public function listOrganizations(string $accessToken): array
     {
@@ -101,7 +99,7 @@ class GitHubClient
     protected function handleException(array $body, RequestException $exception): void
     {
         $status = $exception->response?->status();
-        Log::error("Exception", [$exception]);
+        Log::error('Exception', [$exception]);
         $message = $this->messageFromResponse($status, $body) ?? $exception->getMessage();
 
         throw new GitHubApiException($message, $status, $body);

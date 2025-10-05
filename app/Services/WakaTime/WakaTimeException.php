@@ -4,6 +4,4 @@ namespace App\Services\WakaTime;
 
 use RuntimeException;
 
-class WakaTimeException extends RuntimeException
-{
-}
+class WakaTimeException extends RuntimeException {}

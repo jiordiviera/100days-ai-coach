@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyLog;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class PublicDailyLogController extends Controller
 {
