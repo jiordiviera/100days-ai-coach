@@ -61,6 +61,9 @@ class User extends Authenticatable
             ],
             'ai_provider' => 'groq',
             'tone' => 'neutral',
+            'wakatime' => [
+                'hide_project_names' => true,
+            ],
         ];
     }
 
@@ -113,6 +116,11 @@ class User extends Authenticatable
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function repositories(): HasMany
+    {
+        return $this->hasMany(UserRepository::class);
     }
 
     public function needsOnboarding(): bool

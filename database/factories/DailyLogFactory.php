@@ -37,6 +37,8 @@ class DailyLogFactory extends Factory
             'ai_latency_ms' => $this->faker->numberBetween(120, 900),
             'ai_cost_usd' => $this->faker->randomFloat(3, 0, 5),
             'public_token' => null,
+            'wakatime_summary' => null,
+            'wakatime_synced_at' => null,
         ];
     }
 }

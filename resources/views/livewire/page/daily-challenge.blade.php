@@ -422,6 +422,87 @@
       </article>
 
       <aside class="space-y-6">
+        @if ($githubRepository)
+          <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold text-foreground">Repository GitHub</h2>
+                <p class="text-xs text-muted-foreground">Consigne tes logs dans ton repo dédié.</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {{ \Illuminate\Support\Str::ucfirst($githubRepository['visibility'] ?? 'private') }}
+              </span>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-sm">
+              <span class="font-medium text-foreground">{{ $githubRepository['label'] }}</span>
+              <a
+                href="{{ $githubRepository['url'] }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+              >
+                Ouvrir
+                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12.293 2.293a1 1 0 011.414 0l4 4a1 1 0 01-.707 1.707H15a1 1 0 110-2h.586L11 3.414V5a1 1 0 11-2 0V2a1 1 0 011-1h3a1 1 0 01.707.293zM5 5a3 3 0 00-3 3v7a3 3 0 003 3h7a3 3 0 003-3v-2a1 1 0 112 0v2a5 5 0 01-5 5H5a5 5 0 01-5-5V8a5 5 0 015-5h2a1 1 0 110 2H5z" clip-rule="evenodd" />
+                </svg>
+              </a>
+            </div>
+          </section>
+        @endif
+
+        <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-semibold text-foreground">Partage public</h2>
+              <p class="text-xs text-muted-foreground">Génère un lien public en lecture seule pour ton journal.</p>
+            </div>
+            @if ($publicShare)
+              <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Actif</span>
+            @else
+              <span class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Inactif</span>
+            @endif
+          </div>
+
+          @if ($publicShare)
+            <div class="mt-4 space-y-3">
+              <div class="rounded-2xl border border-border/70 bg-background/80 p-3 text-xs">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="truncate">{{ $publicShare['url'] }}</span>
+                  <button
+                    type="button"
+                    onclick="navigator.clipboard.writeText('{{ $publicShare['url'] }}'); this.innerText='Copié !'; setTimeout(() => this.innerText='Copier', 2000);"
+                    class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 font-semibold text-xs text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                  >
+                    Copier
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                wire:click="disablePublicShare"
+                wire:loading.attr="disabled"
+                class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive"
+              >
+                Désactiver le partage
+              </button>
+            </div>
+          @else
+            <div class="mt-4 space-y-3">
+              <p class="text-xs text-muted-foreground">
+                Enregistre ton entrée du jour puis génère un lien public pour la partager sur les réseaux.
+              </p>
+              <button
+                type="button"
+                wire:click="enablePublicShare"
+                wire:loading.attr="disabled"
+                class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+              >
+                Générer le lien public
+              </button>
+            </div>
+          @endif
+        </section>
+
         <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
           <h2 class="text-lg font-semibold text-foreground">Mes statistiques</h2>
           <dl class="mt-4 space-y-3 text-sm">

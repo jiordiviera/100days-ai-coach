@@ -72,11 +72,26 @@ class DailyChallenge extends Component implements HasForms
 
     public ?array $previousEntry = null;
 
+    public ?array $githubRepository = null;
+
+    public ?array $publicShare = null;
+
     public function mount(): void
     {
         $this->challengeDate = now()->format('Y-m-d');
         $this->allProjects = collect();
         $this->pendingInvitations = collect();
+
+        $user = auth()->user()->loadMissing('repositories');
+        $repository = $user->repositories->firstWhere('provider', 'github');
+
+        if ($repository) {
+            $this->githubRepository = [
+                'label' => $repository->repo_owner.'/'.$repository->repo_name,
+                'url' => $repository->repo_url,
+                'visibility' => $repository->visibility,
+            ];
+        }
 
         $run = $this->ensureChallengeRun();
         $this->form->fill([
@@ -304,6 +319,7 @@ class DailyChallenge extends Component implements HasForms
         $this->refreshHistory($run);
         $this->buildSummary($run);
         $this->refreshAiPanel($this->todayEntry);
+        $this->refreshShareLink($this->todayEntry);
     }
 
     public function saveEntry(): void
@@ -352,6 +368,64 @@ class DailyChallenge extends Component implements HasForms
         session()->flash('message', 'Entrée quotidienne sauvegardée !');
         $this->isEditing = false;
         $this->loadTodayEntry($run);
+    }
+
+    public function enablePublicShare(): void
+    {
+        if (! $this->todayEntry) {
+            Notification::make()
+                ->title('Aucun journal à partager')
+                ->body('Enregistre ton entrée du jour pour générer un lien de partage.')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $log = $this->todayEntry->fresh();
+
+        if (! $log) {
+            Notification::make()
+                ->title('Entrée introuvable')
+                ->body('Rafraîchis la page et réessaie.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $log->ensurePublicToken();
+        $this->todayEntry = $log;
+        $this->refreshShareLink($log);
+
+        Notification::make()
+            ->title('Lien de partage prêt')
+            ->body('Copie l’URL et partage ton journal #100DaysOfCode !')
+            ->success()
+            ->send();
+    }
+
+    public function disablePublicShare(): void
+    {
+        if (! $this->todayEntry) {
+            return;
+        }
+
+        $log = $this->todayEntry->fresh();
+
+        if (! $log) {
+            return;
+        }
+
+        $log->forceFill(['public_token' => null])->save();
+        $this->todayEntry = $log;
+        $this->refreshShareLink(null);
+
+        Notification::make()
+            ->title('Partage désactivé')
+            ->body('Ce journal n’est plus accessible publiquement.')
+            ->info()
+            ->send();
     }
 
     public function regenerateAi(): void
@@ -435,6 +509,20 @@ class DailyChallenge extends Component implements HasForms
         ];
 
         $this->shouldPollAi = $status === 'pending';
+    }
+
+    protected function refreshShareLink(?DailyLog $log): void
+    {
+        if (! $log || ! $log->public_token) {
+            $this->publicShare = null;
+
+            return;
+        }
+
+        $this->publicShare = [
+            'token' => $log->public_token,
+            'url' => route('logs.share', ['token' => $log->public_token]),
+        ];
     }
 
     protected function refreshHistory(ChallengeRun $run): void

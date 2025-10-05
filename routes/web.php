@@ -1,24 +1,28 @@
 <?php
 
+use App\Http\Controllers\PublicDailyLogController;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
 use App\Livewire\Page\ChallengeShow;
 use App\Livewire\Page\DailyChallenge;
 use App\Livewire\Page\Dashboard;
+use App\Livewire\Page\Leaderboard;
 use App\Livewire\Page\ProjectManager;
 use App\Livewire\Page\TaskManager;
 use App\Livewire\Page\Welcome;
 use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Welcome::class)->name('home');
+Route::get('share/{token}', [PublicDailyLogController::class, 'show'])->name('logs.share');
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
     Route::get('logout', function () {
-        auth()->logout();
+        Auth::logout();
 
         return redirect()->route('home');
     })->name('logout');
@@ -31,25 +35,26 @@ Route::middleware('auth')->group(function () {
     Route::get('challenges/{run}', ChallengeShow::class)->name('challenges.show');
     Route::get('challenges/{run}/insights', ChallengeInsights::class)->name('challenges.insights');
     Route::get('challenge/daily', DailyChallenge::class)->name('daily-challenge');
+    Route::get('leaderboard', Leaderboard::class)->name('leaderboard');
     Route::get('challenges/invite/{token}', function (string $token) {
         $inv = ChallengeInvitation::with('run')->where('token', $token)->firstOrFail();
         // Expiration
         if ($inv->expires_at && now()->greaterThan($inv->expires_at)) {
             abort(410, 'Invitation expirée');
         }
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             return Redirect::guest(route('login'));
         }
 
         $run = $inv->run;
-        $user = auth()->user();
+        $user = Auth::user();
 
         $hasAnotherActiveRun = ChallengeRun::query()
             ->where('status', 'active')
             ->where('id', '!=', $run->id)
             ->where(function ($query) use ($user) {
                 $query->where('owner_id', $user->id)
-                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+                    ->orWhereHas('participantLinks', fn ($participantQuery) => $participantQuery->where('user_id', $user->id));
             })
             ->exists();
 
@@ -58,10 +63,10 @@ Route::middleware('auth')->group(function () {
                 ->with('message', 'Tu participes déjà à un autre challenge actif. Termine-le avant de rejoindre ce run.');
         }
 
-        $exists = $run->participantLinks()->where('user_id', auth()->id())->exists();
+        $exists = $run->participantLinks()->where('user_id', Auth::id())->exists();
         if (! $exists) {
             $run->participantLinks()->create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'joined_at' => now(),
             ]);
         }
@@ -70,8 +75,8 @@ Route::middleware('auth')->group(function () {
             $inv->forceFill(['accepted_at' => now()])->save();
         }
 
-        if (! auth()->user()->profile()->exists()) {
-            auth()->user()->profile()->create([
+        if (! Auth::user()->profile()->exists()) {
+            Auth::user()->profile()->create([
                 'join_reason' => 'invited',
                 'focus_area' => null,
                 'preferences' => [

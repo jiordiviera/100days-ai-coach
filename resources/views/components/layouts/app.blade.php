@@ -48,6 +48,5 @@
     <!-- Scripts -->
     @filamentScripts
     @livewireScripts
-  @fluxScripts
   </body>
 </html>
