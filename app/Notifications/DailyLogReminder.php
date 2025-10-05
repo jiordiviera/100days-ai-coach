@@ -11,9 +11,7 @@ class DailyLogReminder extends Notification
 {
     use Queueable;
 
-    public function __construct(public ChallengeRun $run)
-    {
-    }
+    public function __construct(public ChallengeRun $run) {}
 
     public function via(object $notifiable): array
     {
@@ -24,7 +22,7 @@ class DailyLogReminder extends Notification
     {
         $title = $this->run->title ?? '100 Days of Code';
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject("N'oubliez pas votre journal 100DaysOfCode")
             ->greeting('Salut '.$notifiable->name.' !')
             ->line("Vous n'avez pas encore renseigné votre progression pour aujourd'hui dans le challenge \"{$title}\".")
@@ -40,4 +38,3 @@ class DailyLogReminder extends Notification
         ];
     }
 }
-

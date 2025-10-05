@@ -16,3 +16,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
     Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/settings', \App\Livewire\Page\Settings::class)->name('settings');
+});

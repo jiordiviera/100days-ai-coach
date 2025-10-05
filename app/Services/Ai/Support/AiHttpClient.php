@@ -11,8 +11,7 @@ class AiHttpClient
         protected string $baseUrl,
         protected array $headers = [],
         protected ?string $apiKey = null,
-    ) {
-    }
+    ) {}
 
     public function request(): PendingRequest
     {

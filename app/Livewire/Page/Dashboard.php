@@ -7,9 +7,8 @@ use App\Models\DailyLog;
 use App\Models\Task;
 use App\Support\BadgeEvaluator;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class Dashboard extends Component
@@ -165,7 +164,7 @@ class Dashboard extends Component
         $newBadges = [];
 
         if ($run) {
-            $badgeEvaluator = new BadgeEvaluator();
+            $badgeEvaluator = new BadgeEvaluator;
             $evaluation = $badgeEvaluator->evaluate(auth()->user()->loadMissing('badges'), $run, $dailyProgress);
             $earnedBadges = $evaluation['earned'];
             $newBadges = $evaluation['newly_awarded'];
@@ -226,7 +225,7 @@ class Dashboard extends Component
             ];
         }
 
-        if ($hasEntryToday && !$badges) {
+        if ($hasEntryToday && ! $badges) {
             $badges[] = [
                 'id' => 'fresh-start',
                 'label' => 'Entrée du jour',

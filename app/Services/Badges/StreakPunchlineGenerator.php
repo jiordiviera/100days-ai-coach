@@ -11,9 +11,7 @@ use Throwable;
 
 readonly class StreakPunchlineGenerator
 {
-    public function __construct(private AiManager $aiManager)
-    {
-    }
+    public function __construct(private AiManager $aiManager) {}
 
     public function generate(User $user, ChallengeRun $run): array
     {

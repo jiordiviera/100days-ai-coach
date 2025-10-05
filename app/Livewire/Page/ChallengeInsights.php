@@ -6,7 +6,6 @@ use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\TaskComment;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
@@ -82,8 +81,8 @@ class ChallengeInsights extends Component
         $totalParticipants = $participants->count();
         $totalLogs = $logs->count();
         $totalHours = (float) $logs->sum('hours_coded');
-        $averageHours = $totalLogs > 0 ? round($totalHours / $totalLogs, 2) : 0.0;
-        $hoursPerParticipant = $totalParticipants > 0 ? round($totalHours / $totalParticipants, 2) : 0.0;
+        $averageHours = $totalLogs > 0 ? round($totalHours / $totalLogs, 1) : 0.0;
+        $hoursPerParticipant = $totalParticipants > 0 ? round($totalHours / $totalParticipants, 1) : 0.0;
 
         $completionAverage = 0;
         if ($totalParticipants > 0) {
@@ -92,7 +91,7 @@ class ChallengeInsights extends Component
 
                 return ($count / $target) * 100;
             })->average();
-            $completionAverage = round(min(100, $completionAverage), 1);
+            $completionAverage = (int) round(min(100, $completionAverage));
         }
 
         $startDate = $this->run->start_date ? Carbon::parse($this->run->start_date) : null;
@@ -109,7 +108,7 @@ class ChallengeInsights extends Component
         return [
             'totalParticipants' => $totalParticipants,
             'totalLogs' => $totalLogs,
-            'totalHours' => round($totalHours, 2),
+            'totalHours' => round($totalHours, 1),
             'averageHours' => $averageHours,
             'hoursPerParticipant' => $hoursPerParticipant,
             'completionAverage' => $completionAverage,
@@ -136,12 +135,12 @@ class ChallengeInsights extends Component
             $hours = (float) $userLogs->sum('hours_coded');
             $lastLog = $userLogs->sortByDesc(fn ($log) => $log->date ?? $log->created_at)->first();
             $streak = $this->computeStreak($userLogs);
-            $percent = round(min(100, ($logsCount / $target) * 100), 1);
+            $percent = (int) round(min(100, ($logsCount / $target) * 100));
 
             $rows[] = [
                 'user' => $user,
                 'logs' => $logsCount,
-                'hours' => round($hours, 2),
+                'hours' => round($hours, 1),
                 'streak' => $streak,
                 'percent' => $percent,
                 'lastLogAt' => $lastLog?->date ? Carbon::parse($lastLog->date) : null,
@@ -243,12 +242,14 @@ class ChallengeInsights extends Component
                 if ($date->isSameDay($expected)) {
                     $streak++;
                     $expected->subDay();
+
                     continue;
                 }
 
                 if ($date->isSameDay($expected->copy()->subDay())) {
                     $streak++;
                     $expected = $date->copy()->subDay();
+
                     continue;
                 }
 
@@ -271,4 +272,3 @@ class ChallengeInsights extends Component
         return view('livewire.page.challenge-insights');
     }
 }
-

@@ -3,7 +3,6 @@
 use App\Livewire\Page\ChallengeShow;
 use App\Mail\ChallengeInvitationMail;
 use App\Models\ChallengeInvitation;
-use App\Models\ChallengeParticipant;
 use App\Models\ChallengeRun;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

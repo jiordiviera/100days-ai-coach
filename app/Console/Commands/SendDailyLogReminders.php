@@ -58,4 +58,3 @@ class SendDailyLogReminders extends Command
         return self::SUCCESS;
     }
 }
-

@@ -12,6 +12,5 @@ class DailyLogAiResult
         public readonly string $model,
         public readonly int $latencyMs,
         public readonly float $costUsd,
-    ) {
-    }
+    ) {}
 }
