@@ -198,7 +198,7 @@ class ChallengeShow extends Component implements HasForms
             $byUser[] = [
                 'user' => $u,
                 'done' => $done,
-                'percent' => round(min(100, $done / $target * 100), 1),
+                'percent' => (int) round(min(100, $done / $target * 100)),
                 'streak' => $streak,
             ];
         }
@@ -249,9 +249,10 @@ class ChallengeShow extends Component implements HasForms
             ->get();
         //        dd($this->run->participantLinks);
         // Global progression
-        $participantsCount = max(1, $this->run->participantLinks()->count());
+        $participantsCountActual = $this->run->participantLinks()->count();
+        $participantsCountForPercent = max(1, $participantsCountActual);
         $totalDone = DailyLog::where('challenge_run_id', $this->run->id)->count();
-        $globalPercent = round(min(100, ($totalDone / ($participantsCount * max(1, (int) $this->run->target_days))) * 100), 1);
+        $globalPercent = (int) round(min(100, ($totalDone / ($participantsCountForPercent * max(1, (int) $this->run->target_days))) * 100));
 
         // My done days set for calendar
         $myDoneDays = DailyLog::where('challenge_run_id', $this->run->id)
@@ -260,13 +261,27 @@ class ChallengeShow extends Component implements HasForms
             ->all();
         $myDoneDays = array_map('intval', $myDoneDays);
 
+        $activeDayNumber = null;
+        $daysRemaining = null;
+        $startDate = $this->run->start_date;
+        if ($startDate) {
+            $activeDayNumber = (int) (Carbon::parse($startDate)->startOfDay()->diffInDays(Carbon::now()->startOfDay()) + 1);
+            $activeDayNumber = max(1, min($this->run->target_days, $activeDayNumber));
+            $daysRemaining = max(0, $this->run->target_days - $activeDayNumber);
+        }
+
+        $myStreak = $this->computeStreak(auth()->id());
+
         return view('livewire.page.challenge-show', [
             'progress' => $this->progress,
             'pendingInvites' => $pendingInvites,
             'myRecentLogs' => $myRecentLogs,
             'globalPercent' => $globalPercent,
-            'participantsCount' => $participantsCount,
+            'participantsCount' => $participantsCountActual,
             'myDoneDays' => $myDoneDays,
+            'activeDayNumber' => $activeDayNumber,
+            'daysRemaining' => $daysRemaining,
+            'myStreak' => $myStreak,
         ]);
     }
 

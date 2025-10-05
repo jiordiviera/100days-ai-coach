@@ -74,12 +74,18 @@ class ChallengeIndex extends Component implements HasForms
 
     public function create()
     {
-        if ($this->ownerHasActiveChallenge()) {
+        $activeRun = $this->fetchActiveRun();
+
+        if ($activeRun) {
             $this->hasActiveChallenge = true;
+
+            $message = $activeRun->owner_id === auth()->id()
+                ? "Terminez votre challenge actuel avant d'en démarrer un nouveau."
+                : "Vous participez déjà à un challenge actif. Terminez-le avant d'en démarrer un nouveau.";
 
             Notification::make()
                 ->title('Challenge déjà en cours')
-                ->body('Terminez votre challenge actuel avant d\'en démarrer un nouveau.')
+                ->body($message)
                 ->warning()
                 ->persistent()
                 ->send();
@@ -120,15 +126,21 @@ class ChallengeIndex extends Component implements HasForms
 
     public function render(): View
     {
-        $this->refreshEligibility();
+        $activeRun = $this->fetchActiveRun();
+        $this->hasActiveChallenge = (bool) $activeRun;
 
         $user = auth()->user();
-        $owned = $user->challengeRunsOwned()->latest()->get();
-        $joined = $user->challengeRuns()->whereNotIn('challenge_runs.id', $owned->pluck('id'))->latest()->get();
+        $owned = $user->challengeRunsOwned()->with('owner:id,name')->latest()->get();
+        $joined = $user->challengeRuns()
+            ->with('owner:id,name')
+            ->whereNotIn('challenge_runs.id', $owned->pluck('id'))
+            ->latest()
+            ->get();
 
         return view('livewire.page.challenge-index', [
             'owned' => $owned,
             'joined' => $joined,
+            'activeRun' => $activeRun,
             'hasActiveChallenge' => $this->hasActiveChallenge,
         ]);
     }
@@ -143,6 +155,34 @@ class ChallengeIndex extends Component implements HasForms
 
     protected function refreshEligibility(): void
     {
-        $this->hasActiveChallenge = $this->ownerHasActiveChallenge();
+        $this->hasActiveChallenge = $this->userHasActiveChallenge();
+    }
+
+    protected function userHasActiveChallenge(): bool
+    {
+        $user = auth()->user();
+
+        return ChallengeRun::query()
+            ->where('status', 'active')
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+            })
+            ->exists();
+    }
+
+    protected function fetchActiveRun(): ?ChallengeRun
+    {
+        $user = auth()->user();
+
+        return ChallengeRun::query()
+            ->with('owner:id,name')
+            ->where('status', 'active')
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+            })
+            ->latest('start_date')
+            ->first();
     }
 }

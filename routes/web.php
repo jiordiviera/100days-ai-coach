@@ -9,6 +9,7 @@ use App\Livewire\Page\ProjectManager;
 use App\Livewire\Page\TaskManager;
 use App\Livewire\Page\Welcome;
 use App\Models\ChallengeInvitation;
+use App\Models\ChallengeRun;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
@@ -39,8 +40,24 @@ Route::middleware('auth')->group(function () {
         if (! auth()->check()) {
             return Redirect::guest(route('login'));
         }
-        // Attach participant
+
         $run = $inv->run;
+        $user = auth()->user();
+
+        $hasAnotherActiveRun = ChallengeRun::query()
+            ->where('status', 'active')
+            ->where('id', '!=', $run->id)
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+            })
+            ->exists();
+
+        if ($hasAnotherActiveRun) {
+            return Redirect::route('challenges.index')
+                ->with('message', 'Tu participes déjà à un autre challenge actif. Termine-le avant de rejoindre ce run.');
+        }
+
         $exists = $run->participantLinks()->where('user_id', auth()->id())->exists();
         if (! $exists) {
             $run->participantLinks()->create([

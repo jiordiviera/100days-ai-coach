@@ -1,149 +1,211 @@
-<footer class="border-t border-border">
-    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div class="xl:grid xl:grid-cols-3 xl:gap-8">
-            <div class="space-y-4 xl:col-span-1">
-                <h2 class="text-2xl font-bold tracking-tight">
-                    <span class="bg-clip-text text-primary">100DaysOfCode</span>
-                </h2>
-                <p class="text-foreground/80">
-                    Relevez le défi des 100 jours de code et suivez votre progression au
-                    quotidien.
-                </p>
-                <div class="flex space-x-5">
-                    <a href="https://github.com/jiordiviera/100DaysOfCOde">
-                        <span class="sr-only">GitHub</span>
-                        {{--                        <svg--}}
-                        {{--                            class="h-6 w-6"--}}
-                        {{--                            fill="currentColor"--}}
-                        {{--                            viewBox="0 0 24 24"--}}
-                        {{--                            aria-hidden="true"--}}
-                        {{--                        >--}}
-                        {{--                            <path--}}
-                        {{--                                fill-rule="evenodd"--}}
-                        {{--                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"--}}
-                        {{--                                clip-rule="evenodd"--}}
-                        {{--                            />--}}
-                        {{--                        </svg>--}}
-                        <svg class="size-6" viewBox="0 0 1024 1024" fill="none"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                  d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
-                                  transform="scale(64)" fill="#ffff" />
-                        </svg>
-                    </a>
-                    <a href="https://x.com/hashtag/100DaysOfCode">
-                        <span class="sr-only">Twitter</span>
-                        {{--            <svg--}}
-                        {{--              class="h-6 w-6"--}}
-                        {{--              fill="currentColor"--}}
-                        {{--              viewBox="0 0 24 24"--}}
-                        {{--              aria-hidden="true"--}}
-                        {{--            >--}}
-                        {{--              <path--}}
-                        {{--                d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"--}}
-                        {{--              />--}}
-                        {{--            </svg>--}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 1200 1227">
-                            <path fill="#fff"
-                                  d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z" />
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            <div class="mt-12 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-                <div class="md:grid md:grid-cols-2 md:gap-8">
-                    <div>
-                        <h3
-                            class="text-sm font-semibold uppercase tracking-wider text-foreground/70"
-                        >
-                            Ressources
-                        </h3>
-                        <ul role="list" class="mt-4 space-y-3">
-                            <li>
-                                <a href="https://www.100daysofcode.com/" class="text-base">
-                                    Site officiel
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://x.com/hashtag/100DaysOfCode" class="text-base">
-                                    X
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="https://github.com/kallaway/100-days-of-code"
-                                    class="text-base"
-                                >
-                                    GitHub
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="mt-12 md:mt-0">
-                        <h3
-                            class="text-sm font-semibold uppercase tracking-wider text-foreground/70"
-                        >
-                            Application
-                        </h3>
-                        <ul role="list" class="mt-4 space-y-3">
-                            <li>
-                                <a href="{{ route("home") }}" class="text-base">Accueil</a>
-                            </li>
-                            <li>
-                                <a href="{{ route("dashboard") }}" class="text-base">
-                                    Tableau de bord
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route("projects.index") }}" class="text-base">
-                                    Projets
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="md:grid md:grid-cols-2 md:gap-8">
-                    <div>
-                        <h3
-                            class="text-sm font-semibold uppercase tracking-wider text-foreground/70"
-                        >
-                            Légal
-                        </h3>
-                        <ul role="list" class="mt-4 space-y-3">
-                            <li>
-                                <a href="#" class="text-base">Mentions légales</a>
-                            </li>
-                            <li>
-                                <a href="#" class="text-base">Politique de confidentialité</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="mt-12 md:mt-0">
-                        <h3
-                            class="text-sm font-semibold uppercase tracking-wider text-foreground/70"
-                        >
-                            Contact
-                        </h3>
-                        <ul role="list" class="mt-4 space-y-3">
-                            <li>
-                                <a href="https://linkedin.com/in/jiordiviera" class="text-base">
-                                    LinkedIn
-                                </a>
-                            </li>
-                            <li>
-                                <a href="mailto:hello@jiordiviera.me" class="text-base">
-                                    Email
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+@php
+    $isAuthenticated = auth()->check();
+    $user = auth()->user();
+    $cta = $isAuthenticated
+        ? [
+            'eyebrow' => 'On garde le rythme',
+            'title' => 'Rédige ton log du jour',
+            'description' => 'Capture ton apprentissage et garde ta streak vivante.',
+            'route' => route('daily-challenge'),
+            'label' => 'Ouvrir le Daily Challenge',
+        ]
+        : [
+            'eyebrow' => '#100DaysOfCode',
+            'title' => 'Rejoins la communauté des expéditeurs',
+            'description' => 'Fixe ton objectif, suis ta progression, partage tes victoires.',
+            'route' => Route::has('register') ? route('register') : route('home'),
+            'label' => Route::has('register') ? 'Commencer maintenant' : 'Explorer le défi',
+        ];
+
+    $ctaSecondary = $isAuthenticated
+        ? ['label' => 'Voir mes projets', 'route' => route('projects.index')]
+        : ['label' => 'Voir la démo', 'route' => '#how-it-works'];
+
+    $ctaSecondarySupportsNavigate = ! str_starts_with($ctaSecondary['route'], '#');
+
+    $ctaBullets = $isAuthenticated
+        ? [
+            'Sauvegarde ta streak quotidienne en moins d’une minute.',
+            'Active le coach IA pour résumer et partager ton apprentissage.',
+            'Débloque des badges à chaque étape clé du run.',
+        ]
+        : [
+            'Planifie tes 100 prochains jours avec un journal guidé.',
+            'Reçois rappels et tips IA pour tenir la cadence.',
+            'Suis ta progression et décroche des badges visibles.',
+        ];
+
+    $navigationSections = [
+        [
+            'title' => 'Produit',
+            'links' => [
+                ['label' => 'Accueil', 'route' => route('home'), 'visible' => true],
+                ['label' => 'Dashboard', 'route' => route('dashboard'), 'visible' => $isAuthenticated],
+                ['label' => 'Daily Challenge', 'route' => route('daily-challenge'), 'visible' => $isAuthenticated],
+            ],
+        ],
+        [
+            'title' => 'Parcours',
+            'links' => [
+                ['label' => 'Challenges', 'route' => route('challenges.index'), 'visible' => $isAuthenticated],
+                ['label' => 'Projets', 'route' => route('projects.index'), 'visible' => $isAuthenticated],
+                ['label' => '#100DaysOfCode', 'route' => 'https://www.100daysofcode.com/', 'visible' => true, 'external' => true],
+            ],
+        ],
+        [
+            'title' => 'Support',
+            'links' => [
+                ['label' => 'Mentions légales', 'route' => '#', 'visible' => true],
+                ['label' => 'Politique de confidentialité', 'route' => '#', 'visible' => true],
+                ['label' => 'Contact', 'route' => 'mailto:hello@jiordiviera.me', 'visible' => true, 'external' => true],
+            ],
+        ],
+        [
+            'title' => 'Ressources',
+            'links' => [
+                ['label' => 'GitHub', 'route' => 'https://github.com/jiordiviera/100DaysOfCode', 'visible' => true, 'external' => true],
+                ['label' => 'Community hashtag', 'route' => 'https://x.com/hashtag/100DaysOfCode', 'visible' => true, 'external' => true],
+                ['label' => 'Docs fil rouge', 'route' => route('home') . '#how-it-works', 'visible' => true],
+            ],
+        ],
+    ];
+
+    $socials = [
+        [
+            'label' => 'GitHub',
+            'url' => 'https://github.com/jiordiviera/100DaysOfCode',
+            'icon' => 'github',
+        ],
+        [
+            'label' => 'X',
+            'url' => 'https://x.com/hashtag/100DaysOfCode',
+            'icon' => 'x',
+        ],
+        [
+            'label' => 'LinkedIn',
+            'url' => 'https://linkedin.com/in/jiordiviera',
+            'icon' => 'linkedin',
+        ],
+    ];
+@endphp
+
+<footer class="border-t border-border/80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section class="relative mt-5 mb-16 overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 shadow-lg  sm:p-10">
+      <div class="max-w-3xl space-y-4">
+        <span class="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">{{ $cta['eyebrow'] }}</span>
+        <h2 class="text-2xl font-semibold text-foreground sm:text-3xl">{{ $cta['title'] }}</h2>
+        <p class="text-sm text-muted-foreground sm:text-base">{{ $cta['description'] }}</p>
+        <a
+          wire:navigate
+          href="{{ $cta['route'] }}"
+          class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow transition hover:shadow-md"
+        >
+          {{ $cta['label'] }}
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h9.69l-2.47-2.47a.75.75 0 111.06-1.06l3.75 3.75a.75.75 0 010 1.06l-3.75 3.75a.75.75 0 01-1.06-1.06l2.47-2.47H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+      <div class="pointer-events-none absolute -right-10 bottom-0 hidden h-36 w-36 rotate-12 rounded-full bg-primary/20 blur-3xl sm:block"></div>
+    </section>
+
+    <div class="grid gap-12 pb-12 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="space-y-5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" class="h-6 w-6">
+              <path d="M4 12C4 7.582 7.582 4 12 4s8 3.582 8 8-3.582 8-8 8" stroke-linecap="round" />
+              <path d="M8 12l2.25 2.25L16 8.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <div class="flex flex-col">
+            <span class="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">#100Days</span>
+            <span class="text-lg font-semibold text-foreground">{{ config('app.name') }}</span>
+          </div>
         </div>
-        <div class="mt-12 border-t border-gray-800 pt-8">
-            <p class="text-base text-foreground/70 text-center">
-                <b>&copy;</b> {{ date("Y") }} 100DaysOfCode. Tous droits réservés.
-            </p>
+        <p class="text-sm leading-relaxed text-muted-foreground">
+          Un coach IA pour tenir la cadence, garder ta streak et célébrer chaque shipment.
+        </p>
+        <div class="flex items-center gap-3">
+          @foreach ($socials as $social)
+            <a
+              href="{{ $social['url'] }}"
+              target="_blank"
+              rel="noopener"
+              class="flex h-9 w-9 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+            >
+              <span class="sr-only">{{ $social['label'] }}</span>
+              @switch($social['icon'])
+                @case('github')
+                  <svg class="h-5 w-5" viewBox="0 0 16 16" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 012 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.74-3.65 3.94.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0016 8c0-4.42-3.58-8-8-8z" clip-rule="evenodd" />
+                  </svg>
+                  @break
+                @case('x')
+                  <svg class="h-5 w-5" viewBox="0 0 1200 1227" fill="currentColor">
+                    <path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z" />
+                  </svg>
+                  @break
+                @case('linkedin')
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4.98 3.5c0 1.38-1.11 2.5-2.48 2.5A2.49 2.49 0 010 3.5C0 2.12 1.12 1 2.5 1S5 2.12 5 3.5zM.22 23h4.52V7.98H.22V23zM7.55 7.98h4.33v2.05h.06c.6-1.14 2.06-2.35 4.24-2.35 4.53 0 5.36 2.98 5.36 6.86V23h-4.52v-6.55c0-1.56-.03-3.56-2.17-3.56-2.17 0-2.5 1.7-2.5 3.44V23H7.55V7.98z" />
+                  </svg>
+                  @break
+              @endswitch
+            </a>
+          @endforeach
         </div>
+      </div>
+
+      @foreach ($navigationSections as $section)
+        @php
+            $visibleLinks = collect($section['links'])->filter(fn ($link) => $link['visible'])->values();
+        @endphp
+        @if ($visibleLinks->isNotEmpty())
+          <div class="space-y-4">
+            <h3 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{{ $section['title'] }}</h3>
+            <ul class="space-y-3 text-sm">
+              @foreach ($visibleLinks as $link)
+                <li>
+                  @if (!empty($link['external']))
+                    <a
+                      href="{{ $link['route'] }}"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-muted-foreground transition hover:text-primary"
+                    >
+                      {{ $link['label'] }}
+                    </a>
+                  @else
+                    <a
+                      wire:navigate
+                      href="{{ $link['route'] }}"
+                      class="text-muted-foreground transition hover:text-primary"
+                    >
+                      {{ $link['label'] }}
+                    </a>
+                  @endif
+                </li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+      @endforeach
     </div>
+
+    <div class="border-t border-border/70 py-6">
+      <div class="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row sm:text-sm">
+        <p>&copy; {{ now()->year }} {{ config('app.name') }}. Tous droits réservés.</p>
+        @if ($isAuthenticated && $user)
+          <p class="flex items-center gap-1">
+            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-[0.7rem] font-semibold text-primary">{{ mb_substr($user->name, 0, 1) }}</span>
+            <span>Connecté en tant que <span class="font-semibold text-foreground">{{ $user->name }}</span></span>
+          </p>
+        @else
+          <p>Prêt à commencer ? <a wire:navigate href="{{ route('home') }}" class="font-semibold text-primary">Découvre le défi</a></p>
+        @endif
+      </div>
+    </div>
+  </div>
 </footer>
