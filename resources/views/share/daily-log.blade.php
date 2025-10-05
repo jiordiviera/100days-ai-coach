@@ -199,7 +199,7 @@
       @endif
 
       <div class="footer">
-        Partagé via <strong>100DaysOfCode AI Coach</strong> —
+        Partagé via <strong>{{ config('app.name') }}</strong> —
         <a class="button" href="{{ route('home') }}">Découvrir l’app</a>
       </div>
     </article>
