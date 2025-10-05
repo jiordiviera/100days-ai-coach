@@ -62,6 +62,12 @@ return [
         'client_id' => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
         'redirect' => env('GITHUB_REDIRECT_URI', '/auth/github/callback'),
+        'base_uri' => env('GITHUB_API_BASE_URI', 'https://api.github.com/'),
+        'template' => [
+            'owner' => env('GITHUB_TEMPLATE_OWNER', 'jiordiviera'),
+            'repository' => env('GITHUB_TEMPLATE_REPO', '100DaysOfCode-Template'),
+            'visibility' => env('GITHUB_TEMPLATE_VISIBILITY', 'public'), // public|private
+        ],
     ],
 
     'wakatime' => [

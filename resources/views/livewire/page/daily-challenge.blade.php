@@ -422,6 +422,34 @@
       </article>
 
       <aside class="space-y-6">
+        @if ($githubRepository)
+          <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold text-foreground">Repository GitHub</h2>
+                <p class="text-xs text-muted-foreground">Consigne tes logs dans ton repo dédié.</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {{ \Illuminate\Support\Str::ucfirst($githubRepository['visibility'] ?? 'private') }}
+              </span>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-sm">
+              <span class="font-medium text-foreground">{{ $githubRepository['label'] }}</span>
+              <a
+                href="{{ $githubRepository['url'] }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+              >
+                Ouvrir
+                <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12.293 2.293a1 1 0 011.414 0l4 4a1 1 0 01-.707 1.707H15a1 1 0 110-2h.586L11 3.414V5a1 1 0 11-2 0V2a1 1 0 011-1h3a1 1 0 01.707.293zM5 5a3 3 0 00-3 3v7a3 3 0 003 3h7a3 3 0 003-3v-2a1 1 0 112 0v2a5 5 0 01-5 5H5a5 5 0 01-5-5V8a5 5 0 015-5h2a1 1 0 110 2H5z" clip-rule="evenodd" />
+                </svg>
+              </a>
+            </div>
+          </section>
+        @endif
+
         <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
           <h2 class="text-lg font-semibold text-foreground">Mes statistiques</h2>
           <dl class="mt-4 space-y-3 text-sm">
