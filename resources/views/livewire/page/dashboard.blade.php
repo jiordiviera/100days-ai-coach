@@ -67,6 +67,8 @@
           </a>
         </div>
 
+        <livewire:partials.github-template-setup />
+
         <div class="grid gap-4 sm:grid-cols-3">
           <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
             <p class="text-xs uppercase tracking-widest text-muted-foreground">Streak</p>

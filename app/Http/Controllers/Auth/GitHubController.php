@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as ProviderUser;
 use Laravel\Socialite\Facades\Socialite;
@@ -15,7 +16,8 @@ class GitHubController extends Controller
     public function redirect(): RedirectResponse
     {
         return Socialite::driver('github')
-            ->scopes(['read:user', 'user:email'])
+            ->scopes(['read:user', 'user:email', 'read:org', 'repo'])
+            ->with(['allow_signup' => 'false'])
             ->redirect();
     }
 
@@ -35,14 +37,18 @@ class GitHubController extends Controller
                 ->withErrors(['email' => 'GitHub n’a pas fourni d’adresse e-mail vérifiée.']);
         }
 
-        $user = $this->resolveUser($providerUser);
+        $accessToken = $providerUser->token;
+        $refreshToken = $providerUser->refreshToken;
+        $expiresIn = $providerUser->expiresIn;
+
+        $user = $this->resolveUser($providerUser, $accessToken, $refreshToken, $expiresIn);
 
         auth()->login($user, remember: true);
 
         return redirect()->intended(route('daily-challenge'));
     }
 
-    protected function resolveUser(ProviderUser $providerUser): User
+    protected function resolveUser(ProviderUser $providerUser, ?string $accessToken = null, ?string $refreshToken = null, ?int $expiresIn = null): User
     {
         $user = User::whereHas('profile', function ($query) use ($providerUser) {
             $query->where('github_id', $providerUser->getId());
@@ -88,6 +94,24 @@ class GitHubController extends Controller
             }
 
             $profile->forceFill($updates)->save();
+        }
+
+        $tokenPayload = [];
+
+        if ($accessToken) {
+            $tokenPayload['github_access_token'] = $accessToken;
+        }
+
+        if ($refreshToken) {
+            $tokenPayload['github_refresh_token'] = $refreshToken;
+        }
+
+        if ($expiresIn) {
+            $tokenPayload['github_token_expires_at'] = Carbon::now()->addSeconds($expiresIn);
+        }
+
+        if ($tokenPayload) {
+            $profile->forceFill($tokenPayload)->save();
         }
 
         return $user;

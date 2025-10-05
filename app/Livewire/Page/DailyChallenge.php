@@ -72,11 +72,24 @@ class DailyChallenge extends Component implements HasForms
 
     public ?array $previousEntry = null;
 
+    public ?array $githubRepository = null;
+
     public function mount(): void
     {
         $this->challengeDate = now()->format('Y-m-d');
         $this->allProjects = collect();
         $this->pendingInvitations = collect();
+
+        $user = auth()->user()->loadMissing('repositories');
+        $repository = $user->repositories->firstWhere('provider', 'github');
+
+        if ($repository) {
+            $this->githubRepository = [
+                'label' => $repository->repo_owner.'/'.$repository->repo_name,
+                'url' => $repository->repo_url,
+                'visibility' => $repository->visibility,
+            ];
+        }
 
         $run = $this->ensureChallengeRun();
         $this->form->fill([

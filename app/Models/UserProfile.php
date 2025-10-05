@@ -40,6 +40,9 @@ class UserProfile extends Model
         'preferences',
         'wakatime_api_key',
         'wakatime_settings',
+        'github_access_token',
+        'github_refresh_token',
+        'github_token_expires_at',
     ];
 
     protected $casts = [
@@ -47,6 +50,9 @@ class UserProfile extends Model
         'social_links' => 'array',
         'wakatime_api_key' => 'encrypted',
         'wakatime_settings' => 'array',
+        'github_access_token' => 'encrypted',
+        'github_refresh_token' => 'encrypted',
+        'github_token_expires_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
