@@ -93,7 +93,7 @@ class Leaderboard extends Component
         $sorted = $entries->sort(function (array $a, array $b) {
             if ($a['streak'] === $b['streak']) {
                 if ($a['days_active_total'] === $b['days_active_total']) {
-                    return ($b['last_log_date'] <=> $a['last_log_date']);
+                    return $b['last_log_date'] <=> $a['last_log_date'];
                 }
 
                 return $b['days_active_total'] <=> $a['days_active_total'];

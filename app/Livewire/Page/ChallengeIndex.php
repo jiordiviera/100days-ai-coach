@@ -166,7 +166,7 @@ class ChallengeIndex extends Component implements HasForms
             ->where('status', 'active')
             ->where(function ($query) use ($user) {
                 $query->where('owner_id', $user->id)
-                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+                    ->orWhereHas('participantLinks', fn ($participantQuery) => $participantQuery->where('user_id', $user->id));
             })
             ->exists();
     }
@@ -180,7 +180,7 @@ class ChallengeIndex extends Component implements HasForms
             ->where('status', 'active')
             ->where(function ($query) use ($user) {
                 $query->where('owner_id', $user->id)
-                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+                    ->orWhereHas('participantLinks', fn ($participantQuery) => $participantQuery->where('user_id', $user->id));
             })
             ->latest('start_date')
             ->first();

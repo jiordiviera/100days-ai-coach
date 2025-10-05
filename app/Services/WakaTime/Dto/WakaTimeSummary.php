@@ -14,8 +14,7 @@ class WakaTimeSummary
         public readonly array $projects,
         public readonly array $languages,
         public readonly array $raw = [],
-    ) {
-    }
+    ) {}
 
     public function totalHours(): float
     {

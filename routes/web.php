@@ -1,9 +1,17 @@
 <?php
 
-use App\Livewire\Page\{ChallengeIndex, ChallengeInsights, ChallengeShow, DailyChallenge, Dashboard, Leaderboard, ProjectManager, TaskManager, Welcome};
+use App\Http\Controllers\PublicDailyLogController;
+use App\Livewire\Page\ChallengeIndex;
+use App\Livewire\Page\ChallengeInsights;
+use App\Livewire\Page\ChallengeShow;
+use App\Livewire\Page\DailyChallenge;
+use App\Livewire\Page\Dashboard;
+use App\Livewire\Page\Leaderboard;
+use App\Livewire\Page\ProjectManager;
+use App\Livewire\Page\TaskManager;
+use App\Livewire\Page\Welcome;
 use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
-use App\Http\Controllers\PublicDailyLogController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -46,7 +54,7 @@ Route::middleware('auth')->group(function () {
             ->where('id', '!=', $run->id)
             ->where(function ($query) use ($user) {
                 $query->where('owner_id', $user->id)
-                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
+                    ->orWhereHas('participantLinks', fn ($participantQuery) => $participantQuery->where('user_id', $user->id));
             })
             ->exists();
 
@@ -84,4 +92,4 @@ Route::middleware('auth')->group(function () {
     })->name('challenges.accept');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

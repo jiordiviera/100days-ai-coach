@@ -15,8 +15,7 @@ class WakaTimeClient
     public function __construct(
         private readonly ?string $baseUri = null,
         private readonly ?int $timeout = null,
-    ) {
-    }
+    ) {}
 
     public function summary(string $apiKey, CarbonInterface $date, string $timezone): WakaTimeSummary
     {

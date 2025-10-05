@@ -28,9 +28,9 @@ use Livewire\Component;
 
 #[Title('Paramètres')]
 #[Layout('components.layouts.app')]
-class Settings extends Component implements HasForms, HasActions
+class Settings extends Component implements HasActions, HasForms
 {
-    use InteractsWithForms, InteractsWithActions;
+    use InteractsWithActions, InteractsWithForms;
 
     public ?array $data = [];
 
@@ -46,7 +46,7 @@ class Settings extends Component implements HasForms, HasActions
         $user = auth()->user();
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             $profile = $user->profile()->create([
                 'join_reason' => 'self_onboarding',
                 'focus_area' => null,
@@ -92,6 +92,7 @@ class Settings extends Component implements HasForms, HasActions
         $profile = auth()->user()->profile;
 
         $sectionHeadingClass = 'text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4';
+
         return $schema
             ->statePath('data')
             ->schema([
@@ -366,8 +367,8 @@ class Settings extends Component implements HasForms, HasActions
         ];
 
         $common = collect(\DateTimeZone::listIdentifiers())
-            ->filter(fn($tz) => Str::contains($tz, ['/']))
-            ->mapWithKeys(fn($tz) => [$tz => $tz])
+            ->filter(fn ($tz) => Str::contains($tz, ['/']))
+            ->mapWithKeys(fn ($tz) => [$tz => $tz])
             ->all();
 
         return $preferred + $common;
