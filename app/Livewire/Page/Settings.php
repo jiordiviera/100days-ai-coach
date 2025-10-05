@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\TextEntry;
@@ -35,6 +36,8 @@ class Settings extends Component implements HasForms, HasActions
 
     public array $timezones = [];
 
+    public bool $hasWakatimeKey = false;
+
     public function mount(): void
     {
         $this->timezones = $this->timezoneOptions();
@@ -52,6 +55,9 @@ class Settings extends Component implements HasForms, HasActions
         }
 
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
+        $settings = $profile->wakatime_settings ?? [];
+
+        $this->hasWakatimeKey = (bool) $profile->wakatime_api_key;
 
         $this->form->fill([
             'profile' => [
@@ -72,6 +78,11 @@ class Settings extends Component implements HasForms, HasActions
             'ai' => [
                 'provider' => $preferences['ai_provider'] ?? 'groq',
                 'tone' => $preferences['tone'] ?? 'neutral',
+            ],
+            'integrations' => [
+                'wakatime_api_key' => '',
+                'wakatime_remove_key' => false,
+                'wakatime_hide_project_names' => (bool) data_get($settings, 'hide_project_names', data_get($preferences, 'wakatime.hide_project_names', true)),
             ],
         ]);
     }
@@ -209,6 +220,29 @@ class Settings extends Component implements HasForms, HasActions
                     ])
                     ->required()
                     ->columnSpan(1),
+
+                // Section Intégrations
+                Placeholder::make('integrations_section')
+                    ->content('Intégrations')
+                    ->extraAttributes(['class' => $sectionHeadingClass]),
+
+                TextInput::make('integrations.wakatime_api_key')
+                    ->label('Clé API WakaTime')
+                    ->password()
+                    ->helperText('Collez votre clé API depuis https://wakatime.com/settings/api-key. Laisser vide pour ne pas remplacer la clé existante.')
+                    ->columnSpan(1),
+
+                Toggle::make('integrations.wakatime_hide_project_names')
+                    ->label('Masquer les noms des projets synchronisés')
+                    ->helperText('Utilise des noms génériques lors de l’affichage des données WakaTime.')
+                    ->inline(false)
+                    ->columnSpan(1),
+
+                Toggle::make('integrations.wakatime_remove_key')
+                    ->label('Supprimer la clé WakaTime enregistrée')
+                    ->helperText('Activez cette option et enregistrez pour supprimer la clé stockée.')
+                    ->inline(false)
+                    ->columnSpan(1),
             ]);
     }
 
@@ -237,13 +271,36 @@ class Settings extends Component implements HasForms, HasActions
             }
         }
 
-        $profile->forceFill([
+        $integrations = $data['integrations'] ?? [];
+        $wakatimeKeyInput = trim($integrations['wakatime_api_key'] ?? '');
+        $removeWakatimeKey = (bool) ($integrations['wakatime_remove_key'] ?? false);
+        $hideProjectNames = (bool) ($integrations['wakatime_hide_project_names'] ?? false);
+
+        $wakatimeSettings = $profile->wakatime_settings ?? [];
+        $wakatimeSettings['hide_project_names'] = $hideProjectNames;
+
+        if ($removeWakatimeKey) {
+            unset($wakatimeSettings['last_error']);
+        }
+
+        $profileUpdates = [
             'username' => $username ? Str::of($username)->lower()->slug()->value() : null,
             'focus_area' => $focusArea ? Str::limit($focusArea, 120) : null,
             'bio' => $bio ? Str::limit($bio, 160) : null,
             'avatar_url' => $avatarUrl ?: null,
             'social_links' => $socialLinksArray ?: null,
-        ])->save();
+            'wakatime_settings' => $wakatimeSettings ?: null,
+        ];
+
+        if ($removeWakatimeKey) {
+            $profileUpdates['wakatime_api_key'] = null;
+        } elseif ($wakatimeKeyInput !== '') {
+            $profileUpdates['wakatime_api_key'] = $wakatimeKeyInput;
+        }
+
+        $profile->forceFill($profileUpdates)->save();
+
+        $this->hasWakatimeKey = (bool) ($profileUpdates['wakatime_api_key'] ?? $profile->wakatime_api_key);
 
         $preferences = $profile->preferences ?? [];
 
@@ -267,6 +324,9 @@ class Settings extends Component implements HasForms, HasActions
             ], $notificationTypes),
             'ai_provider' => $data['ai']['provider'] ?? 'groq',
             'tone' => $data['ai']['tone'] ?? 'neutral',
+            'wakatime' => [
+                'hide_project_names' => $hideProjectNames,
+            ],
         ]);
 
         $profile->forceFill([
@@ -317,6 +377,7 @@ class Settings extends Component implements HasForms, HasActions
     {
         return view('livewire.page.settings', [
             'profile' => auth()->user()->profile,
+            'hasWakatimeKey' => $this->hasWakatimeKey,
         ]);
     }
 }

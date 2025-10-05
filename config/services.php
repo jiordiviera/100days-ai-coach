@@ -64,4 +64,9 @@ return [
         'redirect' => env('GITHUB_REDIRECT_URI', '/auth/github/callback'),
     ],
 
+    'wakatime' => [
+        'base_uri' => env('WAKATIME_BASE_URI', 'https://wakatime.com/api/v1'),
+        'timeout' => (int) env('WAKATIME_TIMEOUT', 10),
+    ],
+
 ];

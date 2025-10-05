@@ -41,6 +41,8 @@ class DailyLog extends Model
         'ai_latency_ms',
         'ai_cost_usd',
         'public_token',
+        'wakatime_summary',
+        'wakatime_synced_at',
     ];
 
     protected $casts = [
@@ -51,6 +53,8 @@ class DailyLog extends Model
         'ai_cost_usd' => 'decimal:3',
         'ai_latency_ms' => 'integer',
         'completed' => 'boolean',
+        'wakatime_summary' => 'array',
+        'wakatime_synced_at' => 'datetime',
     ];
 
     public function challengeRun(): BelongsTo
