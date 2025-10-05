@@ -159,6 +159,7 @@ class Settings extends Component implements HasActions, HasForms
 
                 Select::make('notifications.language')
                     ->label('Langue')
+                    ->native(false)
                     ->options([
                         'en' => 'English',
                         'fr' => 'Français',
@@ -207,6 +208,7 @@ class Settings extends Component implements HasActions, HasForms
 
                 Select::make('ai.provider')
                     ->label('Modèle préféré')
+                    ->native(false)
                     ->options([
                         'groq' => 'Groq (rapide)',
                         'openai' => 'OpenAI',
@@ -217,6 +219,7 @@ class Settings extends Component implements HasActions, HasForms
 
                 Select::make('ai.tone')
                     ->label('Ton des conseils')
+                    ->native(false)
                     ->options([
                         'neutral' => 'Neutre',
                         'fun' => 'Fun',
