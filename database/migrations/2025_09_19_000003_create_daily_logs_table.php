@@ -28,6 +28,8 @@ return new class extends Migration
             $table->integer('ai_latency_ms')->nullable();
             $table->decimal('ai_cost_usd', 6, 3)->default(0)->nullable();
             $table->char('public_token', 26)->nullable();
+            $table->json('wakatime_summary')->nullable();
+            $table->timestamp('wakatime_synced_at')->nullable();
             $table->timestamps();
 
             $table->unique(['challenge_run_id', 'user_id', 'day_number'], 'daily_logs_run_user_day_unique_v2');

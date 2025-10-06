@@ -10,10 +10,6 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (Schema::hasTable('notifications_outbox')) {
-            return;
-        }
-
         Schema::create('notifications_outbox', function (Blueprint $table): void {
             $table->ulid('id')->primary();
             $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();

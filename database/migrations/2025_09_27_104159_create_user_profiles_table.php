@@ -18,6 +18,14 @@ return new class extends Migration
             $table->string('avatar_url')->nullable();
             $table->string('bio', 160)->nullable();
             $table->string('username', 32)->nullable()->unique();
+            $table->string('github_id')->nullable()->unique();
+            $table->string('github_username')->nullable();
+            $table->text('wakatime_api_key')->nullable();
+            $table->json('wakatime_settings')->nullable();
+
+            $table->text('github_refresh_token')->nullable();
+            $table->text('github_access_token')->nullable();
+            $table->timestamp('github_token_expires_at')->nullable();
             $table->timestamps();
         });
     }
