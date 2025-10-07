@@ -9,7 +9,15 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production   # (facultatif) pour protéger la prod
+
+    # Expose les secrets via env pour pouvoir les tester dans `if:`
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,7 +30,7 @@ jobs:
       - name: Add VPS to known_hosts (strict)
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p "${{ secrets.SERVER_PORT || 22 }}" "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "${SERVER_PORT:-22}" "${SERVER_HOST}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Install Ansible (runner)
@@ -30,22 +38,25 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install ansible
 
-      # (Optionnel) pousser/MAJ tes playbooks sur le serveur
       - name: Rsync playbooks to server
         run: |
-          rsync -az --delete ./ansible_hetzner/ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/${{ secrets.SERVER_USER }}/ansible_hetzner/
+          rsync -az --delete ./ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
 
-      # (Optionnel) déposer le mot de passe Vault côté serveur sans le logger
+      # ❗️Ici on teste env.ANSIBLE_VAULT_PASS, pas secrets.*
       - name: Write Ansible Vault password on server (optional)
-        if: ${{ secrets.ANSIBLE_VAULT_PASS != '' }}
+        if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
         run: |
-          ssh -p "${{ secrets.SERVER_PORT || 22 }}" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
-            "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${{ secrets.ANSIBLE_VAULT_PASS }}' > .vault_pass.txt"
+          ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
+            "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${ANSIBLE_VAULT_PASS}' > .vault_pass.txt"
 
       - name: Run deploy playbook remotely
-        env:
-          DOMAIN: ${{ secrets.DOMAIN }}
         run: |
-          ssh -p "${{ secrets.SERVER_PORT || 22 }}" ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} <<'EOF'
+          ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" <<'EOF'
           set -eu
-          cd ~/ansi
+          cd ~/ansible_hetzner
+          if [ -n "${DOMAIN}" ]; then
+            make deploy D="${DOMAIN}"
+          else
+            make deploy D=100days.jiordiviera.me
+          fi
+          EOF
