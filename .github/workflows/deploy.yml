@@ -1,67 +1,70 @@
 name: Deploy 100days to VPS
 on:
-  push:
-    branches: [ "main" ]
+    push:
+        branches: ["main"]
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    env:
-      SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      SERVER_USER: ${{ secrets.SERVER_USER }}
-      SERVER_PORT: ${{ secrets.SERVER_PORT }}
-      DOMAIN: ${{ secrets.DOMAIN }}
-      ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
+        env:
+            SERVER_HOST: ${{ secrets.SERVER_HOST }}
+            SERVER_USER: ${{ secrets.SERVER_USER }}
+            SERVER_PORT: ${{ secrets.SERVER_PORT }}
+            DOMAIN: ${{ secrets.DOMAIN }}
+            ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
 
-    steps:
-      - name: Checkout app repo
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout app repo
+              uses: actions/checkout@v4
 
-      - name: Checkout infra repo (ansible_hetzner)
-        uses: actions/checkout@v4
-        with:
-          repository: jiordiviera/infra-ansible-hetzner
-          token: ${{ secrets.INFRA_TOKEN }}
-          path: infra/ansible_hetzner
+            - name: Checkout infra repo (ansible_hetzner)
+              uses: actions/checkout@v4
+              with:
+                  repository: jiordiviera/infra-ansible-hetzner
+                  token: ${{ secrets.INFRA_TOKEN }}
+                  path: infra/ansible_hetzner
 
-      - name: Start SSH agent with deploy key
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+            - name: Start SSH agent with deploy key
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Add VPS to known_hosts (strict)
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p "${SERVER_PORT:-22}" "${SERVER_HOST}" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+            - name: Add VPS to known_hosts (strict)
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -p "${SERVER_PORT:-22}" "${SERVER_HOST}" >> ~/.ssh/known_hosts
+                  chmod 644 ~/.ssh/known_hosts
 
-      - name: Install Ansible (runner)
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install ansible
+            - name: Install Ansible (runner)
+              run: |
+                  python3 -m pip install --upgrade pip
+                  pip install ansible
 
-      - name: Rsync playbooks to server
-        run: |
-          rsync -az --delete infra/ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
+            - name: Rsync playbooks to server
+              run: |
+                  rsync -az --delete infra/ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
 
-      - name: Write Ansible Vault password on server (optional)
-        if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
-        run: |
-          ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
-            "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${ANSIBLE_VAULT_PASS}' > .vault_pass.txt"
+            - name: Write Ansible Vault password on server (optional)
+              if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
+              run: |
+                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
+                    "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${ANSIBLE_VAULT_PASS}' > .vault_pass.txt"
 
-      - name: Run deploy playbook remotely
-        run: |
-          ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" <<'EOF'
-          set -eu
-          cd ~/ansible_hetzner
-          if [ -n "${DOMAIN}" ]; then
-            make deploy D="${DOMAIN}"
-          else
-            make deploy D=100days.jiordiviera.me
-          fi
-          EOF
+            - name: Run deploy playbook remotely
+              run: |
+                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
+                  'bash -s' -- "${DOMAIN:-}" <<'REMOTE'
+                  set -euxo pipefail
+                  cd ~/ansible_hetzner
+
+                  DOMAIN_ARG="${1:-}"
+                  if [ -n "$DOMAIN_ARG" ]; then
+                  make deploy D="$DOMAIN_ARG"
+                  else
+                  make deploy D=100days.jiordiviera.me
+                  fi
+                  REMOTE
