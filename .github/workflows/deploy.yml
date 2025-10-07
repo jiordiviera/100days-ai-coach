@@ -10,7 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Expose les secrets via env pour pouvoir les tester dans `if:`
     env:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
@@ -19,8 +18,15 @@ jobs:
       ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
 
     steps:
-      - name: Checkout
+      - name: Checkout app repo
         uses: actions/checkout@v4
+
+      - name: Checkout infra repo (ansible_hetzner)
+        uses: actions/checkout@v4
+        with:
+          repository: jiordiviera/infra-ansible-hetzner
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra/ansible_hetzner
 
       - name: Start SSH agent with deploy key
         uses: webfactory/ssh-agent@v0.9.0
@@ -40,9 +46,8 @@ jobs:
 
       - name: Rsync playbooks to server
         run: |
-          rsync -az --delete ./ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
+          rsync -az --delete infra/ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
 
-      # ❗️Ici on teste env.ANSIBLE_VAULT_PASS, pas secrets.*
       - name: Write Ansible Vault password on server (optional)
         if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
         run: |
