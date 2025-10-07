@@ -1,0 +1,3 @@
+[submodule "ansible_hetzner"]
+	path = ansible_hetzner
+	url = git@github.com:jiordiviera/infra-ansible-hetzner.git
