@@ -553,7 +553,14 @@
                 class="w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-2 text-left transition hover:border-primary/50 hover:text-primary"
               >
                 <div class="flex items-center justify-between">
-                  <span>Jour {{ $entry['day_number'] }}</span>
+                  <div class="flex items-center gap-2">
+                    <span>Jour {{ $entry['day_number'] }}</span>
+                    @if ($entry['retro'] ?? false)
+                      <span class="inline-flex items-center rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
+                        Rétro
+                      </span>
+                    @endif
+                  </div>
                   <span class="text-xs text-muted-foreground">
                     {{ $entry['date'] ? Carbon::parse($entry['date'])->translatedFormat('d/m') : '—' }}
                   </span>
