@@ -329,24 +329,42 @@ class DailyChallenge extends Component implements HasForms
 
         $run = ChallengeRun::findOrFail($this->challengeRunId);
         $date = Carbon::parse($this->challengeDate);
+        $today = Carbon::today();
         $dayNumber = Carbon::parse($run->start_date)->diffInDays($date) + 1;
 
-        $log = DailyLog::updateOrCreate(
-            [
-                'challenge_run_id' => $run->id,
-                'user_id' => auth()->id(),
-                'day_number' => $dayNumber,
-            ],
-            [
-                'date' => $date->toDateString(),
-                'hours_coded' => isset($data['hours_coded']) ? (float) $data['hours_coded'] : 1,
-                'projects_worked_on' => collect($data['projects_worked_on'] ?? [])->map(fn ($id) => (string) $id)->all(),
-                'notes' => $data['description'] ?? '',
-                'learnings' => $data['learnings'] ?? null,
-                'challenges_faced' => $data['challenges_faced'] ?? null,
-                'completed' => true,
-            ]
-        );
+        $identifier = [
+            'challenge_run_id' => $run->id,
+            'user_id' => auth()->id(),
+            'day_number' => $dayNumber,
+        ];
+
+        $existing = DailyLog::where($identifier)->first();
+
+        $retroDiff = $date->lt($today) ? $date->diffInDays($today) : 0;
+
+        if (! $existing && $date->lt($today) && $retroDiff > 2) {
+            Notification::make()
+                ->title('Rétro-complétion non autorisée')
+                ->body('Tu peux compléter au maximum les deux derniers jours. Au-delà, garde la motivation pour aujourd’hui !')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $isRetro = $date->lt($today) && $retroDiff <= 2;
+
+        $log = DailyLog::firstOrNew($identifier);
+        $log->fill([
+            'date' => $date->toDateString(),
+            'hours_coded' => isset($data['hours_coded']) ? (float) $data['hours_coded'] : 1,
+            'projects_worked_on' => collect($data['projects_worked_on'] ?? [])->map(fn ($id) => (string) $id)->all(),
+            'notes' => $data['description'] ?? '',
+            'learnings' => $data['learnings'] ?? null,
+            'challenges_faced' => $data['challenges_faced'] ?? null,
+            'completed' => true,
+            'retro' => $isRetro ? true : ($log->retro ?? false),
+        ])->save();
 
         $log->queueAiGeneration();
 
@@ -359,9 +377,12 @@ class DailyChallenge extends Component implements HasForms
         $delta = $yesterday ? $hours - (float) $yesterday->hours_coded : null;
         $deltaText = $delta === null ? '' : ($delta >= 0 ? '+' : '−').number_format(abs($delta), 2).' h vs veille';
 
+        $title = $isRetro ? 'Entrée rétro enregistrée' : 'Journal sauvegardé';
+        $retroLabel = $isRetro ? ' (J-'.($retroDiff ?: 1).')' : '';
+
         Notification::make()
-            ->title('Journal sauvegardé')
-            ->body(trim('Vous avez enregistré '.number_format($hours, 2).' h aujourd’hui. '.$deltaText))
+            ->title($title)
+            ->body(trim('Vous avez enregistré '.number_format($hours, 2).' h'.$retroLabel.' aujourd’hui. '.$deltaText))
             ->success()
             ->send();
 
@@ -542,6 +563,7 @@ class DailyChallenge extends Component implements HasForms
                 'hours' => $log->hours_coded,
                 'projects' => $log->projects_worked_on ?? [],
                 'notes' => $log->notes,
+                'retro' => (bool) $log->retro,
             ];
         })->toArray();
     }

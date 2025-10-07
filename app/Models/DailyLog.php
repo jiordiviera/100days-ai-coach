@@ -33,6 +33,7 @@ class DailyLog extends Model
         'learnings',
         'challenges_faced',
         'completed',
+        'retro',
         'summary_md',
         'tags',
         'coach_tip',
@@ -53,6 +54,7 @@ class DailyLog extends Model
         'ai_cost_usd' => 'decimal:3',
         'ai_latency_ms' => 'integer',
         'completed' => 'boolean',
+        'retro' => 'boolean',
         'wakatime_summary' => 'array',
         'wakatime_synced_at' => 'datetime',
     ];

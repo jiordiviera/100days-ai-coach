@@ -29,6 +29,7 @@ class DailyLogFactory extends Factory
             'learnings' => $this->faker->sentence(),
             'challenges_faced' => $this->faker->sentence(),
             'completed' => true,
+            'retro' => false,
             'summary_md' => '### Summary\n- '.$this->faker->sentence(),
             'tags' => $this->faker->randomElements($tagsPool, $this->faker->numberBetween(1, 3)),
             'coach_tip' => $this->faker->sentences(2, true),
