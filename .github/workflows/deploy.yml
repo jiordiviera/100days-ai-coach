@@ -54,6 +54,32 @@ jobs:
                   ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
                     "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${ANSIBLE_VAULT_PASS}' > .vault_pass.txt"
 
+            - name: Bootstrap server deps (make + ansible)
+              run: |
+                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" '
+                  set -eux
+                  # make
+                  if ! command -v make >/dev/null 2>&1; then
+                      sudo DEBIAN_FRONTEND=noninteractive apt-get update
+                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y make
+                  fi
+
+                  # ansible (si le Makefile appelle ansible localement)
+                  if ! command -v ansible-playbook >/dev/null 2>&1; then
+                      # Option A: paquet Ubuntu (simple)
+                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ansible-core || true
+
+                      # Option B fallback: pip (au cas où)
+                      if ! command -v ansible-playbook >/dev/null 2>&1; then
+                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip
+                      python3 -m pip install --user --upgrade pip
+                      python3 -m pip install --user ansible
+                      # Assure le PATH user local (ssh non-login)
+                      echo "export PATH=\$HOME/.local/bin:\$PATH" >> ~/.profile
+                      fi
+                  fi
+                  '
+
             - name: Run deploy playbook remotely
               run: |
                   ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
