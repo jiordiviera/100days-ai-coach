@@ -1,108 +1,87 @@
 name: Deploy 100days to VPS
 on:
-    push:
-        branches: ["main"]
+  push:
+    branches: ["main"]
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
+
+    steps:
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      - name: Checkout infra repo (ansible_hetzner)
+        uses: actions/checkout@v4
+        with:
+          repository: jiordiviera/infra-ansible-hetzner
+          token: ${{ secrets.INFRA_TOKEN }}
+          path: infra/ansible_hetzner
+
+      - name: Start SSH agent with deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      # known_hosts du RUNNER (ED25519 prioritaire, strict)
+      - name: Prepare SSH known_hosts (runner)
         env:
-            SERVER_HOST: ${{ secrets.SERVER_HOST }}
-            SERVER_USER: ${{ secrets.SERVER_USER }}
-            SERVER_PORT: ${{ secrets.SERVER_PORT }}
-            DOMAIN: ${{ secrets.DOMAIN }}
-            ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
+          SSH_HOST: ${{ env.SERVER_HOST }}
+          SSH_PORT: ${{ env.SERVER_PORT }}
+        run: |
+          set -euxo pipefail
+          KN=~/.ssh/known_hosts
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          # purge éventuelle
+          ssh-keygen -R "$SSH_HOST" || true
+          ssh-keygen -R "[$SSH_HOST]:${SSH_PORT:-22}" || true
+          # ajout (ed25519 d’abord, fallback si besoin)
+          touch "$KN"; chmod 600 "$KN"
+          (ssh-keyscan -p "${SSH_PORT:-22}" -t ed25519 "$SSH_HOST" 2>/dev/null || true) >> "$KN"
+          (ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" 2>/dev/null || true) >> "$KN"
+          echo "known_hosts lines: $(wc -l < "$KN")"
 
-        steps:
-            - name: Checkout app repo
-              uses: actions/checkout@v4
+      - name: Install Ansible (runner)
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ansible
 
-            - name: Checkout infra repo (ansible_hetzner)
-              uses: actions/checkout@v4
-              with:
-                  repository: jiordiviera/infra-ansible-hetzner
-                  token: ${{ secrets.INFRA_TOKEN }}
-                  path: infra/ansible_hetzner
+      # Vault côté runner (pas sur le serveur)
+      - name: Write Ansible Vault password (runner)
+        if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
+        working-directory: infra/ansible_hetzner
+        run: |
+          umask 077
+          printf '%s' "${ANSIBLE_VAULT_PASS}" > .vault_pass.txt
 
-            - name: Start SSH agent with deploy key
-              uses: webfactory/ssh-agent@v0.9.0
-              with:
-                  ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-            - name: Add VPS to known_hosts (strict)
-              run: |
-                  mkdir -p ~/.ssh
-                  ssh-keyscan -p "${SERVER_PORT:-22}" "${SERVER_HOST}" >> ~/.ssh/known_hosts
-                  chmod 644 ~/.ssh/known_hosts
-
-            - name: Install Ansible (runner)
-              run: |
-                  python3 -m pip install --upgrade pip
-                  pip install ansible
-
-            - name: Rsync playbooks to server
-              run: |
-                  rsync -az --delete infra/ansible_hetzner/ "${SERVER_USER}"@"${SERVER_HOST}":/home/"${SERVER_USER}"/ansible_hetzner/
-
-            - name: Write Ansible Vault password on server (optional)
-              if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
-              run: |
-                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
-                    "set -eu; cd ~/ansible_hetzner; umask 077; printf '%s' '${ANSIBLE_VAULT_PASS}' > .vault_pass.txt"
-
-            - name: Bootstrap server deps (make + ansible)
-              run: |
-                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" '
-                  set -eux
-                  # make
-                  if ! command -v make >/dev/null 2>&1; then
-                      sudo DEBIAN_FRONTEND=noninteractive apt-get update
-                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y make
-                  fi
-
-                  # ansible (si le Makefile appelle ansible localement)
-                  if ! command -v ansible-playbook >/dev/null 2>&1; then
-                      # Option A: paquet Ubuntu (simple)
-                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ansible-core || true
-
-                      # Option B fallback: pip (au cas où)
-                      if ! command -v ansible-playbook >/dev/null 2>&1; then
-                      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip
-                      python3 -m pip install --user --upgrade pip
-                      python3 -m pip install --user ansible
-                      # Assure le PATH user local (ssh non-login)
-                      echo "export PATH=\$HOME/.local/bin:\$PATH" >> ~/.profile
-                      fi
-                  fi
-                  '
-
-            - name: Prepare SSH known_hosts (server)
-              run: |
-                mkdir -p ~/.ssh
-                chmod 700 ~/.ssh
-                # Nettoyer d'anciennes entrées si l'IP/host a changé
-                ssh-keygen -R "[$SERVER_HOST]:${SERVER_PORT:-22}" || true
-                ssh-keygen -R "$SERVER_HOST" || true
-                # Scanner et ajouter l'empreinte (ED25519 d’abord, sinon fallback)
-                (ssh-keyscan -p "${SERVER_PORT:-22}" -t ed25519 "$SERVER_HOST" 2>/dev/null || \
-                ssh-keyscan -p "${SERVER_PORT:-22}" "$SERVER_HOST" 2>/dev/null) >> ~/.ssh/known_hosts
-                chmod 600 ~/.ssh/known_hosts
-
-            - name: Run deploy playbook remotely
-              run: |
-                  ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
-                  'bash -s' -- "${DOMAIN:-}" <<'REMOTE'
-                  set -euxo pipefail
-                  cd ~/ansible_hetzner
-
-                  DOMAIN_ARG="${1:-}"
-                  if [ -n "$DOMAIN_ARG" ]; then
-                  make deploy D="$DOMAIN_ARG"
-                  else
-                  make deploy D=100days.jiordiviera.me
-                  fi
-                  REMOTE
+      # Déploiement depuis le runner avec inventory.yml
+      - name: Deploy with Ansible (from runner)
+        working-directory: infra/ansible_hetzner
+        env:
+          # Sécurité SSH stricte et usage du known_hosts du runner
+          ANSIBLE_HOST_KEY_CHECKING: "True"
+          ANSIBLE_SSH_ARGS: "-o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes"
+          SERVER_HOST: ${{ env.SERVER_HOST }}
+          SERVER_PORT: ${{ env.SERVER_PORT }}
+          SERVER_USER: ${{ env.SERVER_USER }}
+          DOMAIN: ${{ env.DOMAIN }}
+        run: |
+          set -euxo pipefail
+          # Vérif inventory.yml présent
+          test -f inventory.yml
+          # Si vault présent, on l'utilise
+          VAULT_OPT=""
+          if [ -f ".vault_pass.txt" ]; then
+            VAULT_OPT="--vault-password-file .vault_pass.txt"
+          fi
+          ansible-playbook -i inventory.yml app_${DOMAIN}.yml -e "domain=${DOMAIN}" $VAULT_OPT
