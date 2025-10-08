@@ -80,6 +80,18 @@ jobs:
                   fi
                   '
 
+            - name: Prepare SSH known_hosts (server)
+              run: |
+                mkdir -p ~/.ssh
+                chmod 700 ~/.ssh
+                # Nettoyer d'anciennes entrées si l'IP/host a changé
+                ssh-keygen -R "[$SERVER_HOST]:${SERVER_PORT:-22}" || true
+                ssh-keygen -R "$SERVER_HOST" || true
+                # Scanner et ajouter l'empreinte (ED25519 d’abord, sinon fallback)
+                (ssh-keyscan -p "${SERVER_PORT:-22}" -t ed25519 "$SERVER_HOST" 2>/dev/null || \
+                ssh-keyscan -p "${SERVER_PORT:-22}" "$SERVER_HOST" 2>/dev/null) >> ~/.ssh/known_hosts
+                chmod 600 ~/.ssh/known_hosts
+
             - name: Run deploy playbook remotely
               run: |
                   ssh -p "${SERVER_PORT:-22}" "${SERVER_USER}"@"${SERVER_HOST}" \
