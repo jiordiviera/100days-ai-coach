@@ -12,6 +12,7 @@
     $publicJoinCode = $run->is_public && $run->public_join_code;
     $calendarColumns = 10;
     $calendarChunks = array_chunk(range(1, $targetDays), $calendarColumns);
+    $publicUrl = $run->is_public && $run->public_slug ? route('public.challenge', ['slug' => $run->public_slug]) : null;
 @endphp
 
 <div class="mx-auto max-w-6xl space-y-12 px-4 py-10 sm:px-6 lg:px-0">
@@ -131,6 +132,28 @@
             <dd class="font-medium text-foreground">{{ $run->is_public ? 'Public' : 'Privé' }}</dd>
           </div>
         </dl>
+        @if ($isOwner)
+          <div class="space-y-3">
+            <button
+              type="button"
+              wire:click="toggleVisibility"
+              wire:loading.attr="disabled"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-full {{ $run->is_public ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20' : 'bg-primary text-primary-foreground hover:bg-primary/90' }} px-4 py-2 text-xs font-semibold transition"
+            >
+              {{ $run->is_public ? 'Désactiver la page publique' : 'Activer la page publique' }}
+            </button>
+            @if ($publicUrl)
+              <a
+                href="{{ $publicUrl }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+              >
+                Voir la page publique
+              </a>
+            @endif
+          </div>
+        @endif
 
         @if (! $isOwner)
           <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-xs text-muted-foreground">

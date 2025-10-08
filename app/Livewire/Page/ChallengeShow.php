@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -229,6 +230,34 @@ class ChallengeShow extends Component implements HasForms
         }
 
         return $streak;
+    }
+
+    public function toggleVisibility(): void
+    {
+        abort_unless(auth()->id() === $this->run->owner_id, 403);
+
+        $this->run->is_public = ! $this->run->is_public;
+
+        if ($this->run->is_public) {
+            $this->run->ensurePublicSlug();
+
+            if (blank($this->run->public_join_code)) {
+                $this->run->public_join_code = Str::upper(Str::random(6));
+            }
+        }
+
+        $this->run->save();
+        $this->run->refresh();
+
+        if ($this->run->public_slug) {
+            Cache::forget('public-challenge:'.$this->run->public_slug);
+        }
+
+        Notification::make()
+            ->title($this->run->is_public ? 'Challenge rendu public' : 'Challenge privé')
+            ->body($this->run->is_public ? 'La page publique est désormais accessible.' : 'La page publique a été désactivée.')
+            ->success()
+            ->send();
     }
 
     public function render(): View

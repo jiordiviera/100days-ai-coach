@@ -38,6 +38,7 @@ class UserProfile extends Model
         'join_reason',
         'focus_area',
         'username',
+        'is_public',
         'github_id',
         'github_username',
         'preferences',
@@ -51,6 +52,7 @@ class UserProfile extends Model
     protected $casts = [
         'preferences' => 'array',
         'social_links' => 'array',
+        'is_public' => 'boolean',
         'wakatime_api_key' => 'encrypted',
         'wakatime_settings' => 'array',
         'github_access_token' => 'encrypted',

@@ -111,6 +111,14 @@ class GenerateDailyLogInsights implements ShouldQueue
             'latency_ms' => $result->latencyMs,
             'cost_usd' => $result->costUsd,
         ]);
+
+        if ($profileUsername = optional($log->user->profile)->username) {
+            Cache::forget("public-profile:{$profileUsername}");
+        }
+
+        if ($log->challengeRun?->public_slug) {
+            Cache::forget('public-challenge:'.$log->challengeRun->public_slug);
+        }
     }
 
     public static function isThrottledFor(DailyLog $log): bool
