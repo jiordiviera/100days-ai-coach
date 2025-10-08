@@ -79,9 +79,10 @@ jobs:
           set -euxo pipefail
           # Vérif inventory.yml présent
           test -f inventory.yml
+          test -f app_deploy.yml 
           # Si vault présent, on l'utilise
           VAULT_OPT=""
           if [ -f ".vault_pass.txt" ]; then
             VAULT_OPT="--vault-password-file .vault_pass.txt"
           fi
-          ansible-playbook -i inventory.yml app_${DOMAIN}.yml -e "domain=${DOMAIN}" $VAULT_OPT
+          ansible-playbook -i inventory.yml app_deploy.yml -e "domain=${DOMAIN}" $VAULT_OPT
