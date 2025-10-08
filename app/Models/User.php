@@ -64,6 +64,9 @@ class User extends Authenticatable
             'wakatime' => [
                 'hide_project_names' => true,
             ],
+            'social' => [
+                'share_hashtags' => ['#100DaysOfCode', '#buildinpublic'],
+            ],
         ];
     }
 

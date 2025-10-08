@@ -98,11 +98,26 @@
         </div>
       @endif
 
-      @if ($log->share_draft)
+      @php($templates = $log->share_templates ?? [])
+      @php($linkedinTemplate = $templates['linkedin'] ?? $log->share_draft)
+      @php($xTemplate = $templates['x'] ?? null)
+
+      @if ($linkedinTemplate || $xTemplate)
         <div class="space-y-3">
           <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Brouillon à partager</h2>
-          <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
-            <p class="whitespace-pre-line">{{ $log->share_draft }}</p>
+          <div class="space-y-3">
+            @if ($linkedinTemplate)
+              <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">LinkedIn</p>
+                <p class="mt-2 whitespace-pre-line break-words">{{ $linkedinTemplate }}</p>
+              </div>
+            @endif
+            @if ($xTemplate)
+              <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">X</p>
+                <p class="mt-2 whitespace-pre-line break-words">{{ $xTemplate }}</p>
+              </div>
+            @endif
           </div>
         </div>
       @endif

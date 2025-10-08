@@ -33,7 +33,11 @@ class DailyLogFactory extends Factory
             'summary_md' => '### Summary\n- '.$this->faker->sentence(),
             'tags' => $this->faker->randomElements($tagsPool, $this->faker->numberBetween(1, 3)),
             'coach_tip' => $this->faker->sentences(2, true),
-            'share_draft' => $this->faker->paragraph(),
+            'share_templates' => [
+                'linkedin' => 'Day '.$this->faker->numberBetween(1, 100).' recap for LinkedIn.',
+                'x' => 'Day '.$this->faker->numberBetween(1, 100).' recap for X.',
+            ],
+            'share_draft' => 'Day '.$this->faker->numberBetween(1, 100).' recap for LinkedIn.',
             'ai_model' => 'gpt-4o-mini',
             'ai_latency_ms' => $this->faker->numberBetween(120, 900),
             'ai_cost_usd' => $this->faker->randomFloat(3, 0, 5),

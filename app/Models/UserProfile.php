@@ -28,6 +28,9 @@ class UserProfile extends Model
         ],
         'ai_provider' => 'groq|openai|local',
         'tone' => 'neutral|fun',
+        'social' => [
+            'share_hashtags' => ['#100DaysOfCode', '#buildinpublic'],
+        ],
     ];
 
     protected $fillable = [

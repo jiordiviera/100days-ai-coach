@@ -3,8 +3,11 @@
 namespace App\Jobs;
 
 use App\Models\DailyLog;
-use App\Services\Ai\AiManager;
 use App\Services\Ai\Dto\DailyLogAiResult;
+use App\Services\Ai\AiManager;
+use App\Support\SocialShareTemplateBuilder;
+use Illuminate\Support\Str;
+use Throwable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,13 +31,11 @@ class GenerateDailyLogInsights implements ShouldQueue
     public function __construct(
         public readonly string $dailyLogId,
         public readonly bool $force = false,
-    ) {
-        $this->onQueue('ai');
-    }
+    ) {}
 
     public function handle(AiManager $manager): void
     {
-        $log = DailyLog::with('challengeRun')->find($this->dailyLogId);
+        $log = DailyLog::with(['challengeRun', 'user.profile'])->find($this->dailyLogId);
 
         if (! $log) {
             return;
@@ -52,7 +53,20 @@ class GenerateDailyLogInsights implements ShouldQueue
 
         try {
             $result = $manager->generateInsights($log, $this->force);
+        } catch (Throwable $exception) {
+            report($exception);
 
+            $result = $this->buildFallbackResult($log, $exception);
+
+            Log::warning('ai.daily_log.fallback', [
+                'daily_log_id' => $log->id,
+                'challenge_run_id' => $log->challenge_run_id,
+                'user_id' => $log->user_id,
+                'exception' => $exception->getMessage(),
+            ]);
+        }
+
+        try {
             $this->applyResult($log, $result);
 
             if (! $this->force) {
@@ -69,10 +83,24 @@ class GenerateDailyLogInsights implements ShouldQueue
             'summary_md' => $result->summary,
             'tags' => $result->tags,
             'coach_tip' => $result->coachTip,
-            'share_draft' => $result->shareDraft,
             'ai_model' => $result->model,
             'ai_latency_ms' => $result->latencyMs,
             'ai_cost_usd' => $result->costUsd,
+        ])->save();
+
+        $log->loadMissing(['challengeRun', 'user.profile']);
+
+        $templates = app(SocialShareTemplateBuilder::class)->build($log, [
+            'summary' => $result->summary,
+            'tags' => $result->tags,
+            'share_draft' => $result->shareDraft,
+        ]);
+
+        $shareDraft = $templates['linkedin'] ?? $result->shareDraft;
+
+        $log->forceFill([
+            'share_draft' => $shareDraft,
+            'share_templates' => $templates ?: null,
         ])->save();
 
         Log::info('ai.daily_log.generated', [
@@ -105,5 +133,70 @@ class GenerateDailyLogInsights implements ShouldQueue
     protected function lockKey(DailyLog $log): string
     {
         return sprintf('daily-log-ai:lock:%s', $log->id);
+    }
+
+    protected function buildFallbackResult(DailyLog $log, ?Throwable $exception = null): DailyLogAiResult
+    {
+        $dayNumber = (int) ($log->day_number ?? 1);
+        $targetDays = (int) ($log->challengeRun?->target_days ?? max($dayNumber, 100));
+        $dayLabel = sprintf('Jour %d/%d', max(1, $dayNumber), max($dayNumber, $targetDays));
+
+        $notes = Str::of($log->notes ?? '')
+            ->stripTags()
+            ->squish();
+
+        $learnings = Str::of($log->learnings ?? '')
+            ->stripTags()
+            ->squish();
+
+        $highlightSource = $notes->isNotEmpty() ? $notes : $learnings;
+        $body = $highlightSource->isNotEmpty()
+            ? Str::limit($highlightSource->value(), 280)
+            : 'Pas de résumé IA disponible. Voici un rappel de garder la cadence quotidienne.';
+
+        $summaryLines = [
+            "### {$dayLabel}",
+            $body,
+        ];
+
+        $projects = collect($log->projects_worked_on ?? [])
+            ->map(fn ($project) => '- Projet : '.Str::of((string) $project)->squish()->limit(80))
+            ->all();
+
+        if (! empty($projects)) {
+            $summaryLines[] = implode("\n", $projects);
+        }
+
+        $summary = implode("\n\n", array_filter($summaryLines));
+
+        $tagCandidates = collect($log->tags ?? [])
+            ->map(fn ($tag) => Str::of((string) $tag)->stripTags()->squish()->value())
+            ->filter();
+
+        if ($tagCandidates->isEmpty() && $projects) {
+            $tagCandidates = collect($projects)->map(fn ($line) => Str::of($line)->replace('- Projet : ', '')->value());
+        }
+
+        $tags = $tagCandidates->take(3)->values()->all();
+
+        $coachTip = 'Continue d’écrire tes logs même sans résumé IA — ta régularité fait la différence.';
+
+        $builder = app(SocialShareTemplateBuilder::class);
+        $templates = $builder->build($log, [
+            'summary' => $summary,
+            'tags' => $tags,
+        ]);
+
+        $shareDraft = $templates['linkedin'] ?? sprintf('%s — garder la cadence, même sans IA !', $dayLabel);
+
+        return new DailyLogAiResult(
+            summary: $summary,
+            tags: $tags,
+            coachTip: $coachTip,
+            shareDraft: $shareDraft,
+            model: 'ai.fallback.offline',
+            latencyMs: 0,
+            costUsd: 0.0,
+        );
     }
 }

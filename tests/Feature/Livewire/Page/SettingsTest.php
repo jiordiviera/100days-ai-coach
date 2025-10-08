@@ -39,6 +39,7 @@ test('settings page updates user preferences', function (): void {
         ->set('data.notifications.notification_types', ['daily_reminder'])
         ->set('data.ai.provider', 'openai')
         ->set('data.ai.tone', 'fun')
+        ->set('data.ai.share_hashtags', ['#AdaCode', ' buildinpublic '])
         ->call('save')
         ->assertHasNoErrors();
 
@@ -60,5 +61,6 @@ test('settings page updates user preferences', function (): void {
         ->and(data_get($user->profile->preferences, 'channels.slack'))->toBeTrue()
         ->and(data_get($user->profile->preferences, 'channels.push'))->toBeFalse()
         ->and(data_get($user->profile->preferences, 'ai_provider'))->toBe('openai')
-        ->and(data_get($user->profile->preferences, 'tone'))->toBe('fun');
+        ->and(data_get($user->profile->preferences, 'tone'))->toBe('fun')
+        ->and(data_get($user->profile->preferences, 'social.share_hashtags'))->toBe(['#AdaCode', '#buildinpublic']);
 });

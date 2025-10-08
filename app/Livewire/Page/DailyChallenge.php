@@ -48,6 +48,7 @@ class DailyChallenge extends Component implements HasForms
         'tags' => [],
         'coach_tip' => null,
         'share_draft' => null,
+        'share_templates' => [],
         'model' => null,
         'latency_ms' => null,
         'cost_usd' => null,
@@ -504,6 +505,7 @@ class DailyChallenge extends Component implements HasForms
                 'tags' => [],
                 'coach_tip' => null,
                 'share_draft' => null,
+                'share_templates' => [],
                 'model' => null,
                 'latency_ms' => null,
                 'cost_usd' => null,
@@ -516,13 +518,16 @@ class DailyChallenge extends Component implements HasForms
         }
 
         $status = filled($log->summary_md) ? 'ready' : 'pending';
+        $templates = is_array($log->share_templates) ? $log->share_templates : [];
+        $primaryDraft = $templates['linkedin'] ?? $log->share_draft;
 
         $this->aiPanel = [
             'status' => $status,
             'summary' => $log->summary_md,
             'tags' => $log->tags ?? [],
             'coach_tip' => $log->coach_tip,
-            'share_draft' => $log->share_draft,
+            'share_draft' => $primaryDraft,
+            'share_templates' => $templates,
             'model' => $log->ai_model,
             'latency_ms' => $log->ai_latency_ms,
             'cost_usd' => $log->ai_cost_usd,
