@@ -31,9 +31,7 @@ class SyncWakaTimeForUser implements ShouldQueue
     public function __construct(
         public readonly string $userId,
         public readonly ?string $date = null,
-    ) {
-        $this->onQueue('integrations');
-    }
+    ) {}
 
     public function handle(WakaTimeClient $client): void
     {
@@ -125,7 +123,7 @@ class SyncWakaTimeForUser implements ShouldQueue
             ->where('status', 'active')
             ->where(function ($query) use ($user) {
                 $query->where('owner_id', $user->id)
-                    ->orWhereHas('participantLinks', fn ($participantQuery) => $participantQuery->where('user_id', $user->id));
+                    ->orWhereHas('participantLinks', fn($participantQuery) => $participantQuery->where('user_id', $user->id));
             })
             ->latest('start_date')
             ->first();
@@ -171,7 +169,7 @@ class SyncWakaTimeForUser implements ShouldQueue
                 $name = Arr::get($project, 'name', 'Unknown project');
 
                 if ($hideProjectNames) {
-                    $name = 'Hidden Project #'.($index + 1);
+                    $name = 'Hidden Project #' . ($index + 1);
                 }
 
                 $seconds = (int) Arr::get($project, 'total_seconds', 0);

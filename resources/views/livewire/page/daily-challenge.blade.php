@@ -328,18 +328,42 @@
                 </p>
               </div>
               <div
-                class="flex flex-wrap gap-2"
+                class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
                 x-data="{
-                    copied: false,
-                    draft: {{ Js::from($aiPanel['share_draft'] ?? '') }},
-                    copyDraft() {
-                      if (! this.draft) {
+                    copied: null,
+                    drafts: {{ Js::from($aiPanel['share_templates'] ?? []) }},
+                    fallback: {{ Js::from($aiPanel['share_draft'] ?? '') }},
+                    content(type) {
+                      const drafts = this.drafts || {};
+                      const candidate = drafts[type] ? drafts[type].toString() : '';
+
+                      if (candidate.trim().length > 0) {
+                        return candidate;
+                      }
+
+                      if (type === 'linkedin' && this.fallback) {
+                        return this.fallback.toString();
+                      }
+
+                      return '';
+                    },
+                    has(type) {
+                      return this.content(type).trim().length > 0;
+                    },
+                    copy(type) {
+                      const value = this.content(type);
+
+                      if (! value) {
                         return;
                       }
 
-                      navigator.clipboard.writeText(this.draft);
-                      this.copied = true;
-                      setTimeout(() => this.copied = false, 2000);
+                      navigator.clipboard.writeText(value);
+                      this.copied = type;
+                      setTimeout(() => {
+                        if (this.copied === type) {
+                          this.copied = null;
+                        }
+                      }, 2000);
                     }
                 }"
               >
@@ -347,18 +371,27 @@
                   type="button"
                   wire:click="regenerateAi"
                   @disabled($aiPanel['status'] === 'pending')
-                  class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                  class="w-full rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary sm:w-auto"
                 >
                   Relancer l'IA
                 </button>
                 <button
                   type="button"
-                  @click.prevent="copyDraft()"
-                  x-bind:disabled="! draft"
-                  class="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+                  @click.prevent="copy('linkedin')"
+                  x-bind:disabled="! has('linkedin')"
+                  class="w-full rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg disabled:cursor-not-allowed disabled:bg-primary/40 sm:w-auto"
                 >
-                  <span x-show="!copied">Copier le brouillon</span>
-                  <span x-show="copied" x-cloak>Copié !</span>
+                  <span x-show="copied !== 'linkedin'">Copier LinkedIn</span>
+                  <span x-show="copied === 'linkedin'" x-cloak>Copié !</span>
+                </button>
+                <button
+                  type="button"
+                  @click.prevent="copy('x')"
+                  x-bind:disabled="! has('x')"
+                  class="w-full rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground shadow transition hover:shadow-lg disabled:cursor-not-allowed disabled:bg-secondary/40 sm:w-auto"
+                >
+                  <span x-show="copied !== 'x'">Copier X</span>
+                  <span x-show="copied === 'x'" x-cloak>Copié !</span>
                 </button>
               </div>
             </div>
@@ -402,11 +435,30 @@
                   @endif
                 </div>
                 <div>
-                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Brouillon de partage</p>
-                  @if ($aiPanel['status'] === 'ready' && $aiPanel['share_draft'])
-                    <pre class="mt-1 max-h-48 overflow-auto rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-xs">{{ $aiPanel['share_draft'] }}</pre>
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">Brouillons de partage</p>
+                  @php($templates = $aiPanel['share_templates'] ?? [])
+                  @php($linkedinTemplate = $templates['linkedin'] ?? $aiPanel['share_draft'])
+                  @php($xTemplate = $templates['x'] ?? null)
+                  @if ($aiPanel['status'] === 'ready' && ($linkedinTemplate || $xTemplate))
+                    <div class="mt-1 space-y-3">
+                      @if ($linkedinTemplate)
+                        <div>
+                          <p class="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70">LinkedIn</p>
+                          <pre class="mt-1 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-xs">{{ $linkedinTemplate }}</pre>
+                        </div>
+                      @endif
+                      @if ($xTemplate)
+                        <div>
+                          <p class="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70">X</p>
+                          <pre class="mt-1 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-xs">{{ $xTemplate }}</pre>
+                        </div>
+                      @endif
+                    </div>
                   @else
-                    <div class="h-20 rounded-2xl bg-muted/60 animate-pulse"></div>
+                    <div class="space-y-2">
+                      <div class="h-20 rounded-2xl bg-muted/60 animate-pulse"></div>
+                      <div class="h-16 rounded-2xl bg-muted/40 animate-pulse"></div>
+                    </div>
                   @endif
                 </div>
               </div>
@@ -466,12 +518,12 @@
           @if ($publicShare)
             <div class="mt-4 space-y-3">
               <div class="rounded-2xl border border-border/70 bg-background/80 p-3 text-xs">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="truncate">{{ $publicShare['url'] }}</span>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                  <span class="break-all">{{ $publicShare['url'] }}</span>
                   <button
                     type="button"
                     onclick="navigator.clipboard.writeText('{{ $publicShare['url'] }}'); this.innerText='Copié !'; setTimeout(() => this.innerText='Copier', 2000);"
-                    class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 font-semibold text-xs text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-3 py-1 font-semibold text-xs text-muted-foreground transition hover:border-primary/50 hover:text-primary sm:w-auto"
                   >
                     Copier
                   </button>
@@ -481,7 +533,7 @@
                 type="button"
                 wire:click="disablePublicShare"
                 wire:loading.attr="disabled"
-                class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive sm:w-auto"
               >
                 Désactiver le partage
               </button>

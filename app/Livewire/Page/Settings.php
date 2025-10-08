@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -20,6 +21,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -43,7 +45,7 @@ class Settings extends Component implements HasActions, HasForms
         $this->timezones = $this->timezoneOptions();
 
         /** @var User $user */
-        $user = auth()->user();
+        $user = Auth::user();
         $profile = $user->profile;
 
         if (! $profile) {
@@ -56,6 +58,7 @@ class Settings extends Component implements HasActions, HasForms
 
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
         $settings = $profile->wakatime_settings ?? [];
+        $defaultHashtags = data_get($user->profilePreferencesDefaults(), 'social.share_hashtags', ['#100DaysOfCode', '#buildinpublic']);
 
         $this->hasWakatimeKey = (bool) $profile->wakatime_api_key;
 
@@ -78,6 +81,7 @@ class Settings extends Component implements HasActions, HasForms
             'ai' => [
                 'provider' => $preferences['ai_provider'] ?? 'groq',
                 'tone' => $preferences['tone'] ?? 'neutral',
+                'share_hashtags' => array_values(data_get($preferences, 'social.share_hashtags', $defaultHashtags)),
             ],
             'integrations' => [
                 'wakatime_api_key' => '',
@@ -89,7 +93,7 @@ class Settings extends Component implements HasActions, HasForms
 
     public function form(Schema $schema): Schema
     {
-        $profile = auth()->user()->profile;
+        $profile = Auth::user()->profile;
 
         $sectionHeadingClass = 'text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4';
 
@@ -227,9 +231,17 @@ class Settings extends Component implements HasActions, HasForms
                     ->required()
                     ->columnSpan(1),
 
+                TagsInput::make('ai.share_hashtags')
+                    ->label('Hashtags de partage')
+                    ->placeholder('#100DaysOfCode')
+                    ->helperText('Jusqu’à 6 hashtags utilisés pour les brouillons LinkedIn/X.')
+                    ->separator(',')
+                    // ->maxItems(6)
+                    ->columnSpan(1),
+
                 // Section Intégrations
-                Placeholder::make('integrations_section')
-                    ->content('Intégrations')
+                TextEntry::make('integrations_section')
+                    ->state('Intégrations')
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 TextInput::make('integrations.wakatime_api_key')
@@ -257,7 +269,7 @@ class Settings extends Component implements HasActions, HasForms
         $data = $this->form->getState();
 
         /** @var User $user */
-        $user = auth()->user();
+        $user = Auth::user();
         $profile = $user->profile;
 
         $user->forceFill([
@@ -315,6 +327,15 @@ class Settings extends Component implements HasActions, HasForms
 
         $reminderTime = $this->normalizeReminderTime($data['notifications']['reminder_time'] ?? null);
 
+        $defaultHashtags = data_get($user->profilePreferencesDefaults(), 'social.share_hashtags', ['#100DaysOfCode', '#buildinpublic']);
+        $currentHashtags = data_get($preferences, 'social.share_hashtags', $defaultHashtags);
+        $rawHashtags = $data['ai']['share_hashtags'] ?? $currentHashtags;
+        $shareHashtags = $this->sanitizeHashtags($rawHashtags);
+
+        if (empty($shareHashtags)) {
+            $shareHashtags = $defaultHashtags;
+        }
+
         $updatedPreferences = array_replace_recursive($user->profilePreferencesDefaults(), $preferences, [
             'language' => $data['notifications']['language'] ?? 'en',
             'timezone' => $data['notifications']['timezone'] ?? 'Africa/Douala',
@@ -332,6 +353,9 @@ class Settings extends Component implements HasActions, HasForms
             'tone' => $data['ai']['tone'] ?? 'neutral',
             'wakatime' => [
                 'hide_project_names' => $hideProjectNames,
+            ],
+            'social' => [
+                'share_hashtags' => $shareHashtags,
             ],
         ]);
 
@@ -358,6 +382,37 @@ class Settings extends Component implements HasActions, HasForms
         }
     }
 
+    /**
+     * @param  array<string>|string|null  $value
+     * @return array<int, string>
+     */
+    protected function sanitizeHashtags($value): array
+    {
+        $items = match (true) {
+            is_array($value) => $value,
+            is_string($value) => preg_split('/[\s,]+/', $value) ?: [],
+            default => [],
+        };
+
+        return collect($items)
+            ->map(fn ($tag) => is_string($tag) ? trim($tag) : '')
+            ->filter()
+            ->map(function (string $tag) {
+                $body = preg_replace('/[^A-Za-z0-9_]/', '', ltrim($tag, "# \t\n\r\0\x0B"));
+
+                if (! $body) {
+                    return null;
+                }
+
+                return '#'.$body;
+            })
+            ->filter()
+            ->unique()
+            ->take(6)
+            ->values()
+            ->all();
+    }
+
     protected function timezoneOptions(): array
     {
         $preferred = [
@@ -382,7 +437,7 @@ class Settings extends Component implements HasActions, HasForms
     public function render(): View
     {
         return view('livewire.page.settings', [
-            'profile' => auth()->user()->profile,
+            'profile' => Auth::user()->profile,
             'hasWakatimeKey' => $this->hasWakatimeKey,
         ]);
     }
