@@ -86,13 +86,16 @@ class BadgeEvaluator
             ->orderByDesc('date')
             ->get();
 
-        $streak = $this->computeStreak($logs);
+        $streakDetails = $this->computeStreakDetails($logs);
+        $streak = $streakDetails['length'];
+        $streakStartDate = $streakDetails['start_date'];
         $totalLogs = $logs->count();
         $target = max(1, (int) $run->target_days);
         $todayDate = Carbon::today()->toDateString();
         $hasToday = $logs->contains(fn ($log) => $log->date === $todayDate);
 
         $dates = $logs->map(fn ($log) => $log->date ? Carbon::parse($log->date)->toDateString() : null)->filter();
+        $uniqueDates = $dates->unique()->sort()->values();
         $lastSeven = collect(range(0, 6))->map(fn ($offset) => Carbon::today()->copy()->subDays($offset)->toDateString());
         $perfectWeek = $lastSeven->every(fn ($day) => $dates->contains($day));
 
@@ -111,6 +114,38 @@ class BadgeEvaluator
                 'id' => 'streak_7',
                 'label' => 'Semaine en feu',
                 'color' => 'success',
+            ];
+        }
+
+        if ($streak >= 14) {
+            $badges[] = [
+                'id' => 'streak_14',
+                'label' => 'Fortnight Focus',
+                'color' => 'indigo',
+            ];
+        }
+
+        if ($streak >= 30) {
+            $badges[] = [
+                'id' => 'streak_30',
+                'label' => 'Mois Momentum',
+                'color' => 'violet',
+            ];
+        }
+
+        if ($streak >= 50) {
+            $badges[] = [
+                'id' => 'streak_50',
+                'label' => 'Cinquante Forward',
+                'color' => 'pink',
+            ];
+        }
+
+        if ($streak >= 100) {
+            $badges[] = [
+                'id' => 'streak_100',
+                'label' => 'Centenaire',
+                'color' => 'emerald',
             ];
         }
 
@@ -138,34 +173,63 @@ class BadgeEvaluator
             ];
         }
 
+        $comebackStart = $streakStartDate?->toDateString();
+        $previousActiveDay = null;
+
+        if ($comebackStart) {
+            $previousActiveDay = $uniqueDates
+                ->filter(fn (string $date) => $date < $comebackStart)
+                ->last();
+        }
+
+        if ($streak >= 2 && $comebackStart && $previousActiveDay) {
+            $breakLength = Carbon::parse($previousActiveDay)->diffInDays(Carbon::parse($comebackStart)) - 1;
+
+            if ($breakLength >= 3) {
+                $badges[] = [
+                    'id' => 'comeback',
+                    'label' => 'Comeback Kid',
+                    'color' => 'amber',
+                ];
+            }
+        }
+
         return $badges;
     }
 
-    protected function computeStreak(Collection $logs): int
+    protected function computeStreakDetails(Collection $logs): array
     {
         if ($logs->isEmpty()) {
-            return 0;
+            return [
+                'length' => 0,
+                'start_date' => null,
+            ];
         }
 
         $dates = $logs
             ->filter(fn (DailyLog $log) => $log->date)
             ->map(fn (DailyLog $log) => Carbon::parse($log->date)->startOfDay())
-            ->unique()
+            ->unique(fn (Carbon $date) => $date->toDateString())
             ->sortDesc()
             ->values();
 
         if ($dates->isEmpty()) {
-            return 0;
+            return [
+                'length' => 0,
+                'start_date' => null,
+            ];
         }
 
         $today = Carbon::today();
         $expected = $today->copy();
         $streak = 0;
+        $streakStart = null;
 
         foreach ($dates as $date) {
             if ($streak === 0) {
                 if ($date->isSameDay($expected) || $date->isSameDay($expected->copy()->subDay())) {
                     $streak++;
+                    $streakStart = $date->copy();
                     $expected = $date->copy()->subDay();
                 } else {
                     break;
@@ -176,12 +240,21 @@ class BadgeEvaluator
 
             if ($date->isSameDay($expected)) {
                 $streak++;
+                $streakStart = $date->copy();
                 $expected->subDay();
             } else {
                 break;
             }
         }
 
-        return $streak;
+        return [
+            'length' => $streak,
+            'start_date' => $streakStart,
+        ];
+    }
+
+    protected function computeStreak(Collection $logs): int
+    {
+        return $this->computeStreakDetails($logs)['length'];
     }
 }
