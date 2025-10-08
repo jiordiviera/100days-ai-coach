@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\PublicChallengeController;
 use App\Http\Controllers\PublicDailyLogController;
+use App\Http\Controllers\PublicProfileController;
+use App\Http\Controllers\PublicSitemapController;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
 use App\Livewire\Page\ChallengeShow;
@@ -18,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', Welcome::class)->name('home');
 Route::get('share/{token}', [PublicDailyLogController::class, 'show'])->name('logs.share');
+Route::get('profiles/{username}', PublicProfileController::class)->name('public.profile');
+Route::get('challenges/public/{slug}', PublicChallengeController::class)->name('public.challenge');
+Route::get('sitemap.xml', PublicSitemapController::class)->name('public.sitemap');
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');

@@ -23,6 +23,7 @@ class ChallengeRun extends Model
         'status',
         'is_public',
         'public_join_code',
+        'public_slug',
     ];
 
     protected $casts = [
@@ -32,6 +33,12 @@ class ChallengeRun extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (ChallengeRun $run): void {
+            if (blank($run->public_slug)) {
+                $run->public_slug = static::generateUniqueSlug($run->title);
+            }
+        });
+
         static::created(function (ChallengeRun $run): void {
             if (! $run->owner_id) {
                 return;
@@ -69,5 +76,29 @@ class ChallengeRun extends Model
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
+    }
+
+    protected static function generateUniqueSlug(?string $title): string
+    {
+        $base = \Illuminate\Support\Str::of($title ?? 'challenge')
+            ->slug('-')
+            ->limit(48, '')
+            ->trim('-')
+            ->value() ?: 'challenge';
+
+        do {
+            $slug = sprintf('%s-%s', $base, \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6)));
+        } while (static::where('public_slug', $slug)->exists());
+
+        return $slug;
+    }
+
+    public function ensurePublicSlug(): string
+    {
+        if (! $this->public_slug) {
+            $this->public_slug = static::generateUniqueSlug($this->title);
+        }
+
+        return $this->public_slug;
     }
 }

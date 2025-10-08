@@ -21,6 +21,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -66,6 +67,7 @@ class Settings extends Component implements HasActions, HasForms
             'profile' => [
                 'name' => $user->name,
                 'username' => $profile->username,
+                'is_public' => (bool) $profile->is_public,
                 'focus_area' => $profile->focus_area,
                 'bio' => $profile->bio,
                 'avatar_url' => $profile->avatar_url,
@@ -139,6 +141,11 @@ class Settings extends Component implements HasActions, HasForms
                     ->label('Avatar (URL)')
                     ->url()
                     ->maxLength(255)
+                    ->columnSpan(1),
+                Toggle::make('profile.is_public')
+                    ->label('Profil public')
+                    ->helperText('Autoriser une page publique pour partager tes stats. Requiert un pseudo unique.')
+                    ->inline(false)
                     ->columnSpan(1),
 
                 // Section Réseaux Sociaux
@@ -277,9 +284,23 @@ class Settings extends Component implements HasActions, HasForms
         ])->save();
 
         $username = $data['profile']['username'] ?? null;
+        $profilePublic = (bool) ($data['profile']['is_public'] ?? false);
         $focusArea = $data['profile']['focus_area'] ?? null;
         $bio = $data['profile']['bio'] ?? null;
         $avatarUrl = $data['profile']['avatar_url'] ?? null;
+        $previousUsername = $profile->username;
+
+        if ($profilePublic && blank($username)) {
+            $this->addError('data.profile.username', 'Choisis un pseudo avant de rendre ton profil public.');
+
+            Notification::make()
+                ->title('Pseudo requis')
+                ->body('Définis un pseudo unique pour activer ton profil public.')
+                ->warning()
+                ->send();
+
+            return;
+        }
 
         $socialLinksArray = [];
         foreach ($data['profile']['social_links'] ?? [] as $platform => $link) {
@@ -303,6 +324,7 @@ class Settings extends Component implements HasActions, HasForms
 
         $profileUpdates = [
             'username' => $username ? Str::of($username)->lower()->slug()->value() : null,
+            'is_public' => $profilePublic,
             'focus_area' => $focusArea ? Str::limit($focusArea, 120) : null,
             'bio' => $bio ? Str::limit($bio, 160) : null,
             'avatar_url' => $avatarUrl ?: null,
@@ -317,6 +339,19 @@ class Settings extends Component implements HasActions, HasForms
         }
 
         $profile->forceFill($profileUpdates)->save();
+
+        $cacheKeys = [];
+        if ($previousUsername) {
+            $cacheKeys[] = "public-profile:{$previousUsername}";
+        }
+
+        if ($profile->username) {
+            $cacheKeys[] = "public-profile:{$profile->username}";
+        }
+
+        foreach ($cacheKeys as $key) {
+            Cache::forget($key);
+        }
 
         $this->hasWakatimeKey = (bool) ($profileUpdates['wakatime_api_key'] ?? $profile->wakatime_api_key);
 
