@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class PublicChallengeController extends Controller
 {
@@ -27,6 +28,16 @@ class PublicChallengeController extends Controller
         if (! $data) {
             abort(404);
         }
+
+        $title = $data['meta']['title'] ?? config('app.name');
+        $description = Str::limit($data['meta']['description'] ?? '', 160);
+
+        seo()
+            ->title($title)
+            ->description($description)
+            ->tag('og:type', 'website')
+            ->twitterTitle($title)
+            ->twitterDescription($description);
 
         return view('public.challenge', $data);
     }
