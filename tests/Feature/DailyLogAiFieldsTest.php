@@ -28,6 +28,10 @@ it('persists daily log AI fields and casts tags to an array', function (): void 
         'tags' => ['laravel', 'ai'],
         'coach_tip' => 'Ship the daily recap before midnight.',
         'share_draft' => 'Today I focused on the AI coach pipeline.',
+        'share_templates' => [
+            'linkedin' => 'LinkedIn share idea',
+            'x' => 'X share idea',
+        ],
         'ai_model' => 'groq/llama-3.1-mini',
         'ai_latency_ms' => 240,
         'ai_cost_usd' => 1.234,
@@ -36,6 +40,10 @@ it('persists daily log AI fields and casts tags to an array', function (): void 
     $fresh = $log->fresh();
 
     expect($fresh->tags)->toBe(['laravel', 'ai'])
+        ->and($fresh->share_templates)->toBe([
+            'linkedin' => 'LinkedIn share idea',
+            'x' => 'X share idea',
+        ])
         ->and($fresh->ai_cost_usd)->toBe('1.234')
         ->and($fresh->ai_latency_ms)->toBe(240);
 });

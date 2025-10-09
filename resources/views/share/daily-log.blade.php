@@ -11,8 +11,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Journal partagé — {{ $displayName }}</title>
-  <meta name="description" content="Entrée #100DaysOfCode partagée par {{ $displayName }}." />
+  <title>@seo('title', 'Journal partagé — '.$displayName)</title>
+  <x-seo::meta />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
@@ -98,11 +98,26 @@
         </div>
       @endif
 
-      @if ($log->share_draft)
+      @php($templates = $log->share_templates ?? [])
+      @php($linkedinTemplate = $templates['linkedin'] ?? $log->share_draft)
+      @php($xTemplate = $templates['x'] ?? null)
+
+      @if ($linkedinTemplate || $xTemplate)
         <div class="space-y-3">
           <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Brouillon à partager</h2>
-          <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
-            <p class="whitespace-pre-line">{{ $log->share_draft }}</p>
+          <div class="space-y-3">
+            @if ($linkedinTemplate)
+              <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">LinkedIn</p>
+                <p class="mt-2 whitespace-pre-line break-words">{{ $linkedinTemplate }}</p>
+              </div>
+            @endif
+            @if ($xTemplate)
+              <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">X</p>
+                <p class="mt-2 whitespace-pre-line break-words">{{ $xTemplate }}</p>
+              </div>
+            @endif
           </div>
         </div>
       @endif

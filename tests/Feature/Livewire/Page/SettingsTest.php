@@ -33,12 +33,14 @@ test('settings page updates user preferences', function (): void {
         ->set('data.profile.social_links.twitter', 'https://x.com/ada')
         ->set('data.profile.social_links.linkedin', 'https://www.linkedin.com/in/ada')
         ->set('data.profile.social_links.website', 'https://ada.dev')
+        ->set('data.profile.is_public', true)
         ->set('data.notifications.timezone', 'Europe/Paris')
         ->set('data.notifications.reminder_time', '18:45')
         ->set('data.notifications.channels', ['email', 'slack'])
         ->set('data.notifications.notification_types', ['daily_reminder'])
         ->set('data.ai.provider', 'openai')
         ->set('data.ai.tone', 'fun')
+        ->set('data.ai.share_hashtags', ['#AdaCode', ' buildinpublic '])
         ->call('save')
         ->assertHasNoErrors();
 
@@ -54,11 +56,13 @@ test('settings page updates user preferences', function (): void {
             'linkedin' => 'https://www.linkedin.com/in/ada',
             'website' => 'https://ada.dev',
         ])
+        ->and($user->profile->is_public)->toBeTrue()
         ->and(data_get($user->profile->preferences, 'timezone'))->toBe('Europe/Paris')
         ->and(data_get($user->profile->preferences, 'reminder_time'))->toBe('18:45')
         ->and(data_get($user->profile->preferences, 'channels.email'))->toBeTrue()
         ->and(data_get($user->profile->preferences, 'channels.slack'))->toBeTrue()
         ->and(data_get($user->profile->preferences, 'channels.push'))->toBeFalse()
         ->and(data_get($user->profile->preferences, 'ai_provider'))->toBe('openai')
-        ->and(data_get($user->profile->preferences, 'tone'))->toBe('fun');
+        ->and(data_get($user->profile->preferences, 'tone'))->toBe('fun')
+        ->and(data_get($user->profile->preferences, 'social.share_hashtags'))->toBe(['#AdaCode', '#buildinpublic']);
 });

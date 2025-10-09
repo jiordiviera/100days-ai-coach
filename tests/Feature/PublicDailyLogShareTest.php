@@ -23,7 +23,11 @@ it('renders the public daily log view with limited data', function (): void {
             'summary_md' => "# Highlights\n- Built the sharing feature",
             'tags' => ['laravel', 'livewire'],
             'coach_tip' => 'Plan un thread Twitter demain.',
-            'share_draft' => 'Day 5: shipping public share pages! #100DaysOfCode',
+            'share_draft' => 'Jour 5/100 — LinkedIn draft content',
+            'share_templates' => [
+                'linkedin' => 'Jour 5/100 — LinkedIn draft content',
+                'x' => 'Day 5/100: Shipping update #100DaysOfCode',
+            ],
             'public_token' => Str::ulid(),
         ]);
 
@@ -33,6 +37,8 @@ it('renders the public daily log view with limited data', function (): void {
         ->assertSee('Jane Developer', escape: false)
         ->assertSee('Highlights', escape: false)
         ->assertSee('laravel', escape: false)
+        ->assertSee('LinkedIn', escape: false)
+        ->assertSee('Day 5/100: Shipping update', escape: false)
         ->assertDontSee('email');
 });
 

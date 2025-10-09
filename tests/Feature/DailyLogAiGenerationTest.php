@@ -66,7 +66,10 @@ it('persists AI insights when the job is handled', function (): void {
 
     expect($log->summary_md)->toStartWith('Day 3 recap')
         ->and($log->coach_tip)->not()->toBeEmpty()
-        ->and($log->share_draft)->toContain('Highlights')
+        ->and($log->share_templates)->toHaveKeys(['linkedin', 'x'])
+        ->and($log->share_draft)->toStartWith('Jour ')
+        ->and($log->share_templates['linkedin'])->toContain('Points forts')
+        ->and($log->share_templates['x'])->toContain('#100DaysOfCode')
         ->and($log->ai_model)->toBe('ai.fake-driver.v1')
         ->and($log->ai_latency_ms)->toBeGreaterThan(0)
         ->and((float) $log->ai_cost_usd)->toBeGreaterThanOrEqual(0.0);
@@ -183,11 +186,52 @@ it('polls the AI panel until insights are ready', function (): void {
         'summary_md' => '## Ready summary',
         'tags' => ['ready'],
         'coach_tip' => 'Ship it!',
-        'share_draft' => 'Day 1 ready to share',
+        'share_draft' => 'Jour 1/100 — LinkedIn template',
+        'share_templates' => [
+            'linkedin' => 'Jour 1/100 — LinkedIn template',
+            'x' => 'Day 1/100: quick update',
+        ],
     ])->save();
 
     $component->call('pollAiPanel')
         ->assertSet('shouldPollAi', false)
         ->assertSet('aiPanel.status', 'ready')
-        ->assertSet('aiPanel.summary', '## Ready summary');
+        ->assertSet('aiPanel.summary', '## Ready summary')
+        ->assertSet('aiPanel.share_templates.linkedin', 'Jour 1/100 — LinkedIn template')
+        ->assertSee('Copier LinkedIn', false)
+        ->assertSee('Copier X', false);
+});
+
+it('falls back to offline insights when the AI provider fails', function (): void {
+    $this->travelTo(Carbon::parse('2024-10-05 10:00:00'));
+
+    $user = User::factory()->create();
+    $run = ChallengeRun::factory()->for($user, 'owner')->create([
+        'status' => 'active',
+        'start_date' => now()->subDays(3),
+    ]);
+
+    $log = DailyLog::factory()->for($run, 'challengeRun')->for($user, 'user')->create([
+        'day_number' => 4,
+        'notes' => 'Adapted the UI to support social share drafts.',
+        'tags' => ['ui', 'social-share'],
+    ]);
+
+    $mock = \Mockery::mock(AiManager::class);
+    $mock->shouldReceive('generateInsights')
+        ->once()
+        ->andThrow(new \RuntimeException('Groq unavailable'));
+
+    $this->swap(AiManager::class, $mock);
+
+    $job = new GenerateDailyLogInsights($log->id);
+    $job->handle(app(AiManager::class));
+
+    $log->refresh();
+
+    expect($log->summary_md)->toContain('### Jour')
+        ->and($log->ai_model)->toBe('ai.fallback.offline')
+        ->and($log->share_templates)->toHaveKey('linkedin')
+        ->and($log->share_templates['linkedin'])->toContain('Jour')
+        ->and($log->share_templates['x'])->toContain('#100DaysOfCode');
 });
