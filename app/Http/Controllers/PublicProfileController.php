@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class PublicProfileController extends Controller
 {
@@ -29,6 +30,16 @@ class PublicProfileController extends Controller
         if (! $data) {
             abort(404);
         }
+
+        $title = $data['meta']['title'] ?? config('app.name');
+        $description = Str::limit($data['meta']['description'] ?? '', 160);
+
+        seo()
+            ->title($title)
+            ->description($description)
+            ->tag('og:type', 'profile')
+            ->twitterTitle($title)
+            ->twitterDescription($description);
 
         return view('public.profile', $data);
     }

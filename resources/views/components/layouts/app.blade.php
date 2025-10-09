@@ -6,16 +6,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Suivez votre progression du défi 100 Days of Code en gérant vos projets et tâches quotidiennes."
-    />
-    <meta
-      name="keywords"
-      content="100DaysOfCode, programmation, codage, défi de codage, développement"
-    />
-
-    <title>{{ $title ?? config("app.name", "100DaysOfCode") }}</title>
+    @isset($title)
+      @seo(['title' => $title])
+    @endisset
+    <title>@seo('title')</title>
+    
+    <x-seo::meta />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

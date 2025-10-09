@@ -4,6 +4,7 @@ use App\Console\Commands\SendDailyLogReminders;
 use App\Console\Commands\SendWeeklyDigest;
 use App\Console\Commands\SyncWakaTime;
 use App\Providers\AppServiceProvider;
+use App\Providers\SeoServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,7 @@ use Livewire\LivewireServiceProvider;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         AppServiceProvider::class,
+        SeoServiceProvider::class,
         LivewireServiceProvider::class,
         MailServiceProvider::class,
     ])
