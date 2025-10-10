@@ -68,6 +68,9 @@ class User extends Authenticatable
             'social' => [
                 'share_hashtags' => ['#100DaysOfCode', '#buildinpublic'],
             ],
+            'onboarding' => [
+                'tour_completed' => false,
+            ],
         ];
     }
 
