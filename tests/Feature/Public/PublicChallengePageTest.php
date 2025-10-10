@@ -42,7 +42,9 @@ it('renders a public challenge page', function (): void {
     $response->assertOk()
         ->assertSee($run->title, false)
         ->assertSee('JOINME', false)
-        ->assertSee('member', false);
+        ->assertSee('member', false)
+        ->assertSee('property="og:title"', false)
+        ->assertSee('name="twitter:title"', false);
 });
 
 it('returns 404 for a private challenge', function (): void {

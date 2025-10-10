@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class ChallengeRun extends Model
 {
@@ -48,6 +49,18 @@ class ChallengeRun extends Model
                 ['user_id' => $run->owner_id],
                 ['joined_at' => now()]
             );
+        });
+
+        static::saved(function (ChallengeRun $run): void {
+            $originalSlug = $run->getOriginal('public_slug');
+
+            if ($originalSlug && $originalSlug !== $run->public_slug) {
+                Cache::forget('public-challenge:'.$originalSlug);
+            }
+
+            if ($run->public_slug) {
+                Cache::forget('public-challenge:'.$run->public_slug);
+            }
         });
     }
 

@@ -22,4 +22,6 @@ seo()
 - Accueil, partages publics (`/share/{token}`)
 - Profils/challenges publics (`/profiles/{username}`, `/challenges/public/{slug}`)
 
-Pensez à invalider le cache SEO (`Cache::forget('public-…')`) si vous modifiez dynamiquement des contenus affichés sur ces pages.
+Les caches correspondants (`public-profile:{username}`, `public-challenge:{slug}`) sont invalidés automatiquement lors des opérations critiques (mise à jour challenge, génération de log). Si vous ajoutez d’autres surfaces publiques, pensez à purger les clés concernées.
+
+Des tests d’intégration (`tests/Feature/Public`) vérifient la présence des balises SEO principales sur ces routes afin d’éviter les régressions.
