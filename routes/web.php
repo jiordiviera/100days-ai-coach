@@ -6,6 +6,7 @@ use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\PublicSitemapController;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
+use App\Livewire\Onboarding\Wizard as OnboardingWizard;
 use App\Livewire\Page\ChallengeShow;
 use App\Livewire\Page\DailyChallenge;
 use App\Livewire\Page\Dashboard;
@@ -26,6 +27,7 @@ Route::get('challenges/public/{slug}', PublicChallengeController::class)->name('
 Route::get('sitemap.xml', PublicSitemapController::class)->name('public.sitemap');
 
 Route::middleware('auth')->group(function () {
+    Route::get('onboarding', OnboardingWizard::class)->name('onboarding.wizard');
     Route::get('dashboard', Dashboard::class)->name('dashboard');
     Route::get('logout', function () {
         Auth::logout();
