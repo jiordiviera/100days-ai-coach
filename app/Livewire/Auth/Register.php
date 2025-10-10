@@ -92,8 +92,7 @@ class Register extends Component implements HasForms
 
         auth()->login($user);
 
-        return redirect()->route('daily-challenge')
-            ->with('message', 'Bienvenue ! Complétez votre premier journal pour lancer votre streak.');
+        return redirect()->route('onboarding.wizard');
     }
 
     public function render(): View

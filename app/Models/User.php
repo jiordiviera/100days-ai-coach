@@ -41,6 +41,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'needs_onboarding' => 'boolean',
         ];
     }
 
@@ -128,6 +129,6 @@ class User extends Authenticatable
 
     public function needsOnboarding(): bool
     {
-        return ! $this->profile()->exists();
+        return (bool) $this->needs_onboarding;
     }
 }
