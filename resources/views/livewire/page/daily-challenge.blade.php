@@ -170,7 +170,7 @@
           </div>
         </div>
 
-        <div class="relative space-y-4 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-xl">
+        <div class="relative space-y-4 rounded-3xl border border-border/60 bg-card/90 p-3 shadow-xl">
           <div>
             <p class="text-xs uppercase tracking-widest text-muted-foreground">Raccourcis</p>
             <h2 class="mt-1 text-lg font-semibold text-foreground">Actions rapides</h2>
@@ -210,7 +210,7 @@
     </section>
 
     <section class="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-      <article class="space-y-6 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+      <article class="space-y-6 rounded-3xl border border-border/60 bg-card/90 p-3 shadow-sm">
         @if ($showReminder)
           <div class="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             Pas encore de log pour aujourd'hui. Renseigne ta journée pour conserver ta streak !

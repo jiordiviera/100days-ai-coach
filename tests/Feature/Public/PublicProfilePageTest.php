@@ -35,7 +35,9 @@ it('renders a public profile with recent logs', function (): void {
     $response->assertOk()
         ->assertSee('public-maker', false)
         ->assertSee('Jour 2', false)
-        ->assertSee('Logs publics', false);
+        ->assertSee('Logs publics', false)
+        ->assertSee('property="og:title"', false)
+        ->assertSee('name="twitter:title"', false);
 });
 
 it('returns 404 when profile is private', function (): void {

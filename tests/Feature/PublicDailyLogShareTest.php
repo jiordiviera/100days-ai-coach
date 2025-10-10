@@ -39,6 +39,8 @@ it('renders the public daily log view with limited data', function (): void {
         ->assertSee('laravel', escape: false)
         ->assertSee('LinkedIn', escape: false)
         ->assertSee('Day 5/100: Shipping update', escape: false)
+        ->assertSee('property="og:title"', false)
+        ->assertSee('name="twitter:title"', false)
         ->assertDontSee('email');
 });
 
