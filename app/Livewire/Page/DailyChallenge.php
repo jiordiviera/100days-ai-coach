@@ -127,12 +127,6 @@ class DailyChallenge extends Component implements HasForms
             $this->summary = [];
             $this->projectBreakdown = [];
 
-            Notification::make()
-                ->title('Aucun challenge actif')
-                ->body('Rejoignez ou créez un challenge pour compléter votre journal quotidien.')
-                ->warning()
-                ->send();
-
             return null;
         }
 
