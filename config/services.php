@@ -68,6 +68,12 @@ return [
             'repository' => env('GITHUB_TEMPLATE_REPO', '100DaysOfCode-Template'),
             'visibility' => env('GITHUB_TEMPLATE_VISIBILITY', 'public'), // public|private
         ],
+        'support' => [
+            'owner' => env('GITHUB_SUPPORT_REPO_OWNER'),
+            'repository' => env('GITHUB_SUPPORT_REPO'),
+            'token' => env('GITHUB_SUPPORT_TOKEN'),
+            'default_labels' => array_filter(explode(',', (string) env('GITHUB_SUPPORT_LABELS', 'support,feedback'))),
+        ],
     ],
 
     'wakatime' => [

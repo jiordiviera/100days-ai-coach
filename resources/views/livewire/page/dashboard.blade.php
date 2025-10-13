@@ -147,12 +147,12 @@
     </section>
 
     @if (! ($onboardingChecklist['all_completed'] ?? true))
-        <section class="rounded-3xl border border-amber-200/70 bg-amber-100/40 p-6 shadow-sm">
+        <section class="rounded-3xl border border-amber-200/70 bg-amber-100/30 p-6 shadow-sm">
             <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div class="max-w-xl space-y-2">
                     <p class="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Jour 0</p>
                     <h2 class="text-lg font-semibold text-foreground">Checklist de démarrage</h2>
-                    <p class="text-sm text-amber-900/80">Complète ces actions pour bien lancer ta streak. Tu peux
+                    <p class="text-sm text-amber-600">Complète ces actions pour bien lancer ta streak. Tu peux
                         revenir consulter cette checklist à tout moment.</p>
                 </div>
 

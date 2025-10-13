@@ -34,6 +34,17 @@ class GitHubClient
         return $response->json() ?? [];
     }
 
+    public function createIssue(string $accessToken, string $owner, string $repository, array $payload): array
+    {
+        $response = $this->request($accessToken)
+            ->withHeaders([
+                'Accept' => 'application/vnd.github+json',
+            ])
+            ->post("repos/{$owner}/{$repository}/issues", $payload);
+
+        return $response->json() ?? [];
+    }
+
     protected function request(string $accessToken): PendingRequest
     {
         $baseUri = rtrim($this->baseUri ?? config('services.github.base_uri', 'https://api.github.com/'), '/').'/';

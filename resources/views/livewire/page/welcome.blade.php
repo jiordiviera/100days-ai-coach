@@ -282,6 +282,10 @@
     </div>
   </section>
 
+  <section id="support" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-0">
+    <livewire:support.feedback-form />
+  </section>
+
   <section class="mx-auto max-w-5xl rounded-3xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-6 py-12 text-center shadow-lg sm:px-10">
     <div class="flex flex-col items-center gap-6">
       <span class="rounded-full border border-primary/30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-primary">Prêt pour le jour 01 ?</span>

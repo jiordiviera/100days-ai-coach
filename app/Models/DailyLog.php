@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\GenerateDailyLogInsights;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +44,9 @@ class DailyLog extends Model
         'ai_latency_ms',
         'ai_cost_usd',
         'public_token',
+        'hidden_at',
+        'moderated_by_id',
+        'moderation_notes',
         'wakatime_summary',
         'wakatime_synced_at',
     ];
@@ -59,6 +63,7 @@ class DailyLog extends Model
         'retro' => 'boolean',
         'wakatime_summary' => 'array',
         'wakatime_synced_at' => 'datetime',
+        'hidden_at' => 'datetime',
     ];
 
     public function challengeRun(): BelongsTo
@@ -69,6 +74,18 @@ class DailyLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function moderator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by_id');
+    }
+
+    public function scopePubliclyVisible(Builder $query): Builder
+    {
+        return $query
+            ->whereNotNull('public_token')
+            ->whereNull('hidden_at');
     }
 
     /**

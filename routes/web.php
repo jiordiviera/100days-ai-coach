@@ -12,6 +12,7 @@ use App\Livewire\Page\DailyChallenge;
 use App\Livewire\Page\Dashboard;
 use App\Livewire\Page\Leaderboard;
 use App\Livewire\Page\ProjectManager;
+use App\Livewire\Page\Support;
 use App\Livewire\Page\TaskManager;
 use App\Livewire\Page\Welcome;
 use App\Models\ChallengeInvitation;
@@ -25,6 +26,7 @@ Route::get('share/{token}', [PublicDailyLogController::class, 'show'])->name('lo
 Route::get('profiles/{username}', PublicProfileController::class)->name('public.profile');
 Route::get('challenges/public/{slug}', PublicChallengeController::class)->name('public.challenge');
 Route::get('sitemap.xml', PublicSitemapController::class)->name('public.sitemap');
+Route::get('support', Support::class)->name('support');
 
 Route::middleware('auth')->group(function () {
     Route::get('onboarding', OnboardingWizard::class)->name('onboarding.wizard');

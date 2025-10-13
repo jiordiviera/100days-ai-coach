@@ -49,3 +49,15 @@ it('returns 404 when the token is invalid', function (): void {
 
     $response->assertNotFound();
 });
+
+it('returns 404 when a public log is moderated and hidden', function (): void {
+    $log = DailyLog::factory()
+        ->public()
+        ->create([
+            'hidden_at' => now(),
+        ]);
+
+    $response = $this->get(route('logs.share', $log->public_token));
+
+    $response->assertNotFound();
+});

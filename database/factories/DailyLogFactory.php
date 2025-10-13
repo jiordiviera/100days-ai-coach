@@ -6,6 +6,7 @@ use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<DailyLog>
@@ -42,8 +43,18 @@ class DailyLogFactory extends Factory
             'ai_latency_ms' => $this->faker->numberBetween(120, 900),
             'ai_cost_usd' => $this->faker->randomFloat(3, 0, 5),
             'public_token' => null,
+            'hidden_at' => null,
+            'moderated_by_id' => null,
+            'moderation_notes' => null,
             'wakatime_summary' => null,
             'wakatime_synced_at' => null,
         ];
+    }
+
+    public function public(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'public_token' => (string) Str::ulid(),
+        ]);
     }
 }

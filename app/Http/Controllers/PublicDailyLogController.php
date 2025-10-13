@@ -12,6 +12,7 @@ class PublicDailyLogController extends Controller
     {
         /** @var DailyLog|null $log */
         $log = DailyLog::query()
+            ->publiclyVisible()
             ->where('public_token', $token)
             ->with(['user.profile', 'challengeRun'])
             ->first();
