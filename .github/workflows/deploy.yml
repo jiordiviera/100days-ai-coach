@@ -2,7 +2,7 @@ name: Deploy to VPS (SSH)
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -15,9 +15,9 @@ jobs:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}   # ex: 46.62.142.34
       SERVER_USER: ${{ secrets.SERVER_USER }}   # ex: jiordiviera
       SERVER_PORT: ${{ secrets.SERVER_PORT }}   # ex: 22 ou 2200
-      DOMAIN:      ${{ secrets.DOMAIN }}        # ex: api.pulse-send.jiordiviera.me
+      DOMAIN: ${{ secrets.DOMAIN }}        # ex: api.pulse-send.jiordiviera.me
       # chemin distant: /var/www/<DOMAIN>
-      APP_DIR:     /var/www/${{ secrets.DOMAIN }}
+      APP_DIR: /var/www/${{ secrets.DOMAIN }}
 
     steps:
       - name: Checkout (optional)
@@ -48,25 +48,19 @@ jobs:
           SSH_OPTS: "-o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes"
         run: |
           set -euxo pipefail
-          ssh -p "${SERVER_PORT:-22}" $SSH_OPTS "${SERVER_USER}@${SERVER_HOST}" bash <<'EOSH'
-          set -euxo pipefail
-          APP_DIR="${APP_DIR}"
-          cd "$APP_DIR"
+          ssh -p "${SERVER_PORT:-22}" $SSH_OPTS "${SERVER_USER}@${SERVER_HOST}" bash <<EOF
+          set -euo pipefail
+          # Passe APP_DIR depuis le runner au shell distant (expansion locale ici)
+          APP_DIR="${APP_DIR:-/var/www/${DOMAIN}}"
 
-          # Sécurité .env / logs
-          mkdir -p storage/logs bootstrap/cache
-          # (tu es FPM user=jiordiviera -> pas besoin de sudo)
-          chmod 775 bootstrap/cache
-          find storage -type d -exec chmod 775 {} \;
-          find storage -type f -exec chmod 664 {} \;
-          [ -f storage/logs/laravel.log ] || touch storage/logs/laravel.log
+          cd "\$APP_DIR"
 
           # Pull code
           git fetch origin main
           git reset --hard origin/main
 
           # Dépendances PHP (prod)
-          composer install --prefer-dist --optimize-autoloader -q
+          composer install --no-dev --prefer-dist --optimize-autoloader -q
 
           # Migrations & caches
           php artisan migrate --force
@@ -75,7 +69,7 @@ jobs:
           php artisan view:cache  || true
 
           echo "OK"
-          EOSH
+          EOF
 
       - name: Done
         run: echo "✅ Deploy done for $DOMAIN"
