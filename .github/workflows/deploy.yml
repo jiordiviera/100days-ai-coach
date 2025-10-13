@@ -1,4 +1,5 @@
-name: Deploy 100days to VPS
+name: Deploy to VPS (SSH)
+
 on:
   push:
     branches: ["main"]
@@ -11,78 +12,70 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      SERVER_USER: ${{ secrets.SERVER_USER }}
-      SERVER_PORT: ${{ secrets.SERVER_PORT }}
-      DOMAIN: ${{ secrets.DOMAIN }}
-      ANSIBLE_VAULT_PASS: ${{ secrets.ANSIBLE_VAULT_PASS }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}   # ex: 46.62.142.34
+      SERVER_USER: ${{ secrets.SERVER_USER }}   # ex: jiordiviera
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}   # ex: 22 ou 2200
+      DOMAIN:      ${{ secrets.DOMAIN }}        # ex: api.pulse-send.jiordiviera.me
+      # chemin distant: /var/www/<DOMAIN>
+      APP_DIR:     /var/www/${{ secrets.DOMAIN }}
 
     steps:
-      - name: Checkout app repo
+      - name: Checkout (optional)
         uses: actions/checkout@v4
 
-      - name: Checkout infra repo (ansible_hetzner)
-        uses: actions/checkout@v4
-        with:
-          repository: jiordiviera/infra-ansible-hetzner
-          token: ${{ secrets.INFRA_TOKEN }}
-          path: infra/ansible_hetzner
-
-      - name: Start SSH agent with deploy key
+      - name: Start SSH agent (with deploy key)
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      # known_hosts du RUNNER (ED25519 prioritaire, strict)
-      - name: Prepare SSH known_hosts (runner)
-        env:
-          SSH_HOST: ${{ env.SERVER_HOST }}
-          SSH_PORT: ${{ env.SERVER_PORT }}
+      - name: Prepare known_hosts (strict)
         run: |
           set -euxo pipefail
-          KN=~/.ssh/known_hosts
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          # purge éventuelle
-          ssh-keygen -R "$SSH_HOST" || true
-          ssh-keygen -R "[$SSH_HOST]:${SSH_PORT:-22}" || true
-          # ajout (ed25519 d’abord, fallback si besoin)
+          KN=~/.ssh/known_hosts
           touch "$KN"; chmod 600 "$KN"
-          (ssh-keyscan -p "${SSH_PORT:-22}" -t ed25519 "$SSH_HOST" 2>/dev/null || true) >> "$KN"
-          (ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" 2>/dev/null || true) >> "$KN"
+          # purge (si IP/port ont changé)
+          ssh-keygen -R "${SERVER_HOST}" || true
+          ssh-keygen -R "[${SERVER_HOST}]:${SERVER_PORT:-22}" || true
+          # prefer ed25519, fallback
+          ssh-keyscan -p "${SERVER_PORT:-22}" -t ed25519 "${SERVER_HOST}" 2>/dev/null >> "$KN" || true
+          ssh-keyscan -p "${SERVER_PORT:-22}"            "${SERVER_HOST}" 2>/dev/null >> "$KN" || true
           echo "known_hosts lines: $(wc -l < "$KN")"
 
-      - name: Install Ansible (runner)
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install ansible
-
-      # Vault côté runner (pas sur le serveur)
-      - name: Write Ansible Vault password (runner)
-        if: ${{ env.ANSIBLE_VAULT_PASS != '' }}
-        working-directory: infra/ansible_hetzner
-        run: |
-          umask 077
-          printf '%s' "${ANSIBLE_VAULT_PASS}" > .vault_pass.txt
-
-      # Déploiement depuis le runner avec inventory.yml
-      - name: Deploy with Ansible (from runner)
-        working-directory: infra/ansible_hetzner
+      # Déploiement: git pull + composer + artisan (en user applicatif)
+      - name: Deploy over SSH
         env:
-          # Sécurité SSH stricte et usage du known_hosts du runner
-          ANSIBLE_HOST_KEY_CHECKING: "True"
-          ANSIBLE_SSH_ARGS: "-o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes"
-          SERVER_HOST: ${{ env.SERVER_HOST }}
-          SERVER_PORT: ${{ env.SERVER_PORT }}
-          SERVER_USER: ${{ env.SERVER_USER }}
-          DOMAIN: ${{ env.DOMAIN }}
+          SSH_OPTS: "-o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes"
         run: |
           set -euxo pipefail
-          # Vérif inventory.yml présent
-          test -f inventory.yml
-          test -f app_deploy.yml 
-          # Si vault présent, on l'utilise
-          VAULT_OPT=""
-          if [ -f ".vault_pass.txt" ]; then
-            VAULT_OPT="--vault-password-file .vault_pass.txt"
-          fi
-          ansible-playbook -i inventory.yml app_deploy.yml -e "domain=${DOMAIN}" $VAULT_OPT
+          ssh -p "${SERVER_PORT:-22}" $SSH_OPTS "${SERVER_USER}@${SERVER_HOST}" bash <<'EOSH'
+          set -euxo pipefail
+          APP_DIR="${APP_DIR}"
+          cd "$APP_DIR"
+
+          # Sécurité .env / logs
+          mkdir -p storage/logs bootstrap/cache
+          # (tu es FPM user=jiordiviera -> pas besoin de sudo)
+          chmod 775 bootstrap/cache
+          find storage -type d -exec chmod 775 {} \;
+          find storage -type f -exec chmod 664 {} \;
+          [ -f storage/logs/laravel.log ] || touch storage/logs/laravel.log
+
+          # Pull code
+          git fetch origin main
+          git reset --hard origin/main
+
+          # Dépendances PHP (prod)
+          composer install --prefer-dist --optimize-autoloader -q
+
+          # Migrations & caches
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache || true
+          php artisan view:cache  || true
+
+          echo "OK"
+          EOSH
+
+      - name: Done
+        run: echo "✅ Deploy done for $DOMAIN"
