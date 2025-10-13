@@ -36,10 +36,6 @@ class DailyChallengeTour extends Component
 
         $tourCompleted = (bool) data_get($profile->preferences, 'onboarding.tour_completed', false);
 
-        if ($tourCompleted) {
-            return;
-        }
-
         $this->steps = [
             [
                 'title' => 'Consigne ton premier log',
@@ -68,11 +64,14 @@ class DailyChallengeTour extends Component
             ],
         ];
 
-        $this->visible = true;
+        if (! $tourCompleted) {
+            $this->visible = true;
+        }
     }
 
     public function show(): void
     {
+        $this->currentStep = 0;
         $this->visible = true;
     }
 
@@ -97,32 +96,12 @@ class DailyChallengeTour extends Component
 
     public function finish(): void
     {
-        $user = auth()->user();
-
-        if (! $user || ! $user->profile) {
-            $this->visible = false;
-
-            return;
-        }
-
-        $profile = $user->profile;
-        $preferences = $profile->preferences ?? [];
-        data_set($preferences, 'onboarding.tour_completed', true);
-
-        $profile->forceFill(['preferences' => $preferences])->save();
-
-        $this->visible = false;
-
-        Notification::make()
-            ->title('Bien joué !')
-            ->body('Tu maîtrises les actions clés. À toi de jouer 💪')
-            ->success()
-            ->send();
+        $this->complete(true);
     }
 
     public function skip(): void
     {
-        $this->finish();
+        $this->complete(false);
     }
 
     public function performAction(): void
@@ -143,6 +122,35 @@ class DailyChallengeTour extends Component
 
         if ($anchor) {
             $this->dispatch('tour-scroll-to', target: $anchor);
+        }
+    }
+
+    protected function complete(bool $celebrate = false): void
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->profile) {
+            $this->visible = false;
+
+            return;
+        }
+
+        $profile = $user->profile;
+        $preferences = $profile->preferences ?? [];
+        data_set($preferences, 'onboarding.tour_completed', true);
+
+        $profile->forceFill(['preferences' => $preferences])->save();
+
+        $this->visible = false;
+
+        if ($celebrate) {
+            $this->dispatch('tour-confetti');
+
+            Notification::make()
+                ->title('Bien joué !')
+                ->body('Tu maîtrises les actions clés. À toi de jouer 💪')
+                ->success()
+                ->send();
         }
     }
 }
