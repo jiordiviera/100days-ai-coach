@@ -146,6 +146,64 @@
         </div>
     </section>
 
+    @if (! ($onboardingChecklist['all_completed'] ?? true))
+        <section class="rounded-3xl border border-amber-200/70 bg-amber-100/40 p-6 shadow-sm">
+            <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+                <div class="max-w-xl space-y-2">
+                    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-amber-700">Jour 0</p>
+                    <h2 class="text-lg font-semibold text-foreground">Checklist de démarrage</h2>
+                    <p class="text-sm text-amber-900/80">Complète ces actions pour bien lancer ta streak. Tu peux
+                        revenir consulter cette checklist à tout moment.</p>
+                </div>
+
+                <ul class="flex-1 space-y-3">
+                    @foreach ($onboardingChecklist['items'] as $item)
+                        <li class="flex flex-col justify-between gap-3 rounded-2xl border border-amber-300/60 bg-amber-50/80 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center">
+                            <div class="flex items-start gap-3">
+                <span
+                    class="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full {{ $item['completed'] ? 'bg-emerald-500 text-emerald-50' : 'bg-white text-amber-600 border border-amber-200' }}">
+                  @if ($item['completed'])
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd"
+                            d="M16.704 5.29a1 1 0 010 1.415l-7.429 7.428a1 1 0 01-1.414 0L3.296 9.57A1 1 0 014.71 8.154l2.433 2.433 6.722-6.724a1 1 0 011.415 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    @else
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+                      <circle cx="10" cy="10" r="7"></circle>
+                    </svg>
+                    @endif
+                </span>
+                                <div>
+                                    <p class="font-semibold text-foreground">{{ $item['label'] }}</p>
+                                    <p class="text-xs text-background/80">{{ $item['description'] }}</p>
+                                </div>
+                            </div>
+
+                            @if ($item['completed'])
+                                <span
+                                    class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Fait</span>
+                            @else
+                                <a
+                                    href="{{ $item['url'] }}"
+                                    wire:navigate
+                                    class="inline-flex items-center gap-2 rounded-full border border-amber-400 px-4 py-1.5 text-xs font-semibold text-amber-700 transition hover:border-amber-500 hover:text-amber-900"
+                                >
+                                    Y aller
+                                    <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M3 10a.75.75 0 01.75-.75h9.69l-2.47-2.47a.75.75 0 111.06-1.06l3.75 3.75a.75.75 0 010 1.06l-3.75 3.75a.75.75 0 01-1.06-1.06l2.47-2.47H3.75A.75.75 0 013 10z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
+    @endif
+
     @if (! $active)
         <section class="space-y-4 rounded-3xl border border-dashed border-primary/40 bg-primary/5 p-8 text-center">
             <h2 class="text-2xl font-semibold text-foreground">Aucun challenge actif pour le moment</h2>
@@ -171,18 +229,18 @@
     @endif
 
     @if ($active)
-        @if (! empty($newBadges))
+        @if (!empty($newBadges))
             <section class="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-900 shadow-sm">
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div class="space-y-1">
-                        <p class="text-sm font-semibold">🎉 Nouveaux badges débloqués</p>
+                        <p class="text-sm font-semibold text-background">🎉 Nouveaux badges débloqués</p>
                         <p class="text-xs text-emerald-800">Continue sur cette lancée ! Voici les récompenses obtenues
                             depuis ta dernière visite.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         @foreach ($newBadges as $badge)
                             <span
-                                class="inline-flex items-center rounded-full bg-emerald-600/10 px-3 py-1 text-xs font-semibold">{{ $badge['label'] }}</span>
+                                class="inline-flex items-center rounded-full bg-emerald-600/10 px-3 py-1 text-xs font-semibold text-background">{{ $badge['label'] }}</span>
                         @endforeach
                     </div>
                 </div>

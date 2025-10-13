@@ -160,6 +160,7 @@ class Dashboard extends Component
 
         $run = $stats['active']['run'] ?? null;
         $dailyProgress = $this->getDailyProgress($run);
+        $onboardingChecklist = $this->getOnboardingChecklist($stats, $dailyProgress);
         $earnedBadges = [];
         $newBadges = [];
 
@@ -177,7 +178,90 @@ class Dashboard extends Component
             'dailyProgress' => $dailyProgress,
             'earnedBadges' => $earnedBadges,
             'newBadges' => $newBadges,
+            'onboardingChecklist' => $onboardingChecklist,
         ]);
+    }
+
+    protected function getOnboardingChecklist(array $stats, array $dailyProgress): array
+    {
+        $user = auth()->user();
+        $profile = $user?->profile;
+
+        $preferences = $profile?->preferences ?? $user->profilePreferencesDefaults();
+        $checklist = (array) data_get($preferences, 'onboarding.checklist', []);
+
+        $defaults = [
+            'first_log' => false,
+            'project_linked' => false,
+            'reminder_configured' => data_get($checklist, 'reminder_configured', false),
+            'public_share' => data_get($checklist, 'public_share', false),
+        ];
+
+        $checklist = array_merge($defaults, $checklist);
+        $dirty = false;
+
+        if (($dailyProgress['totalLogs'] ?? 0) > 0 && ! $checklist['first_log']) {
+            $checklist['first_log'] = true;
+            $dirty = true;
+        }
+
+        if (($stats['projectCount'] ?? 0) > 0 && ! $checklist['project_linked']) {
+            $checklist['project_linked'] = true;
+            $dirty = true;
+        }
+
+        $hasSharedLog = DailyLog::query()
+            ->where('user_id', $user->id)
+            ->whereNotNull('public_token')
+            ->exists();
+
+        if ($hasSharedLog && ! $checklist['public_share']) {
+            $checklist['public_share'] = true;
+            $dirty = true;
+        }
+
+        if ($dirty && $profile) {
+            data_set($preferences, 'onboarding.checklist', $checklist);
+            $profile->forceFill(['preferences' => $preferences])->save();
+        }
+
+        $items = [
+            [
+                'key' => 'first_log',
+                'label' => 'Consigner ta première entrée',
+                'description' => 'Rédige ton log du jour et déclenche l’IA.',
+                'completed' => $checklist['first_log'],
+                'url' => route('daily-challenge').'#daily-log-form',
+            ],
+            [
+                'key' => 'project_linked',
+                'label' => 'Associer un projet',
+                'description' => 'Structure ton défi en missions concrètes.',
+                'completed' => $checklist['project_linked'],
+                'url' => route('projects.index'),
+            ],
+            [
+                'key' => 'reminder_configured',
+                'label' => 'Configurer ton rappel quotidien',
+                'description' => 'Choisis l’heure idéale pour ne jamais manquer un log.',
+                'completed' => $checklist['reminder_configured'],
+                'url' => route('settings').'#notifications',
+            ],
+            [
+                'key' => 'public_share',
+                'label' => 'Partager ton log',
+                'description' => 'Prépare un post LinkedIn/X pour célébrer ton avancée.',
+                'completed' => $checklist['public_share'],
+                'url' => route('daily-challenge').'#share-section',
+            ],
+        ];
+
+        $allCompleted = collect($items)->every(fn ($item) => $item['completed']);
+
+        return [
+            'items' => $items,
+            'all_completed' => $allCompleted,
+        ];
     }
 
     protected function determineBadges(?ChallengeRun $run, Collection $logDates, int $streak, int $totalLogs, bool $hasEntryToday): array

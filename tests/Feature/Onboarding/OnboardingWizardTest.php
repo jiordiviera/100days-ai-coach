@@ -56,6 +56,7 @@ it('completes the onboarding wizard and creates a challenge', function (): void 
     expect(data_get($profile->preferences, 'timezone'))->toBe('Europe/Paris');
     expect(data_get($profile->preferences, 'reminder_time'))->toBe('18:00');
     expect(data_get($profile->preferences, 'channels.email'))->toBeTrue();
+    expect(data_get($profile->preferences, 'onboarding.checklist.reminder_configured'))->toBeTrue();
 
     $run = ChallengeRun::where('owner_id', $user->id)->first();
 

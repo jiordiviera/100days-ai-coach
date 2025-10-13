@@ -363,6 +363,11 @@ class DailyChallenge extends Component implements HasForms
 
         $log->queueAiGeneration();
 
+        $this->updateChecklistProgress([
+            'first_log' => true,
+            'project_linked' => ! empty($log->projects_worked_on),
+        ]);
+
         $hours = isset($data['hours_coded']) ? (float) $data['hours_coded'] : 0.0;
         $yesterday = DailyLog::where('challenge_run_id', $run->id)
             ->where('user_id', auth()->id())
@@ -419,6 +424,8 @@ class DailyChallenge extends Component implements HasForms
             ->body('Copie l’URL et partage ton journal #100DaysOfCode !')
             ->success()
             ->send();
+
+        $this->updateChecklistProgress(['public_share' => true]);
     }
 
     public function disablePublicShare(): void
@@ -818,5 +825,41 @@ class DailyChallenge extends Component implements HasForms
         );
 
         $this->refreshProjects($run);
+    }
+
+    protected function updateChecklistProgress(array $flags): void
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->profile) {
+            return;
+        }
+
+        $profile = $user->profile;
+        $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
+        $checklist = data_get($preferences, 'onboarding.checklist', []);
+
+        $defaults = [
+            'first_log' => false,
+            'project_linked' => false,
+            'reminder_configured' => data_get($checklist, 'reminder_configured', false),
+            'public_share' => data_get($checklist, 'public_share', false),
+        ];
+
+        $checklist = array_merge($defaults, $checklist);
+
+        $dirty = false;
+
+        foreach ($flags as $key => $value) {
+            if ($value && (! ($checklist[$key] ?? false))) {
+                $checklist[$key] = true;
+                $dirty = true;
+            }
+        }
+
+        if ($dirty) {
+            data_set($preferences, 'onboarding.checklist', $checklist);
+            $profile->forceFill(['preferences' => $preferences])->save();
+        }
     }
 }

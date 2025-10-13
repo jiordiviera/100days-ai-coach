@@ -165,6 +165,7 @@ class Wizard extends Component implements HasForms
 
         $preferences['channels'] = $channels;
         $preferences['reminder_time'] = $this->data['reminder_time'];
+        data_set($preferences, 'onboarding.checklist.reminder_configured', true, true);
 
         $profile->forceFill([
             'preferences' => $preferences,

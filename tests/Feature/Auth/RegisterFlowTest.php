@@ -38,5 +38,14 @@ test('user is redirected to onboarding with default preferences after registrati
         ],
         'ai_provider' => 'groq',
         'tone' => 'neutral',
+        'onboarding' => [
+            'tour_completed' => false,
+            'checklist' => [
+                'first_log' => false,
+                'project_linked' => false,
+                'reminder_configured' => false,
+                'public_share' => false,
+            ],
+        ],
     ]);
 });
