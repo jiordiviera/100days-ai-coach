@@ -24,10 +24,16 @@
                 <p class="text-sm text-muted-foreground">{{ $step['description'] }}</p>
             </div>
 
+            <nav class="flex items-center gap-3" aria-label="Progression du guide">
+                @foreach ($steps as $index => $meta)
+                    <span class="h-2 w-2 rounded-full transition-all {{ $index <= $currentStep ? 'bg-primary scale-125' : 'bg-border' }}"></span>
+                @endforeach
+            </nav>
+
             <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
                 <span>Étape {{ $currentStep + 1 }} / {{ $total }}</span>
                 <div class="mx-3 h-1 flex-1 rounded-full bg-border">
-                    <div class="h-full rounded-full bg-primary transition-all" style="width: {{ (($currentStep + 1) / $total) * 100 }}%"></div>
+                    <div class="h-full rounded-full bg-gradient-to-r from-primary via-primary/60 to-primary/30 transition-all" style="width: {{ (($currentStep + 1) / $total) * 100 }}%"></div>
                 </div>
             </div>
 
@@ -77,6 +83,20 @@
 </div>
 
     @once
+        <style>
+            @keyframes confetti-fall {
+                0% { transform: translate3d(0, -100%, 0) rotateZ(0deg); opacity: 1; }
+                100% { transform: translate3d(0, 120vh, 0) rotateZ(360deg); opacity: 0; }
+            }
+
+            .confetti-piece {
+                position: absolute;
+                width: 10px;
+                height: 16px;
+                border-radius: 2px;
+                animation: confetti-fall 2.2s ease-in forwards;
+            }
+        </style>
         <script>
             document.addEventListener('livewire:initialized', () => {
                 window.addEventListener('tour-scroll-to', event => {
@@ -97,6 +117,37 @@
                     if (url) {
                         window.open(url, '_blank');
                     }
+                });
+
+                window.addEventListener('tour-confetti', () => {
+                    if (window.confetti) {
+                        window.confetti({
+                            particleCount: 180,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                        return;
+                    }
+
+                    const container = document.createElement('div');
+                    container.className = 'pointer-events-none fixed inset-0 z-40 overflow-hidden';
+                    const colors = ['#6366F1', '#EC4899', '#F97316', '#22C55E', '#14B8A6'];
+
+                    for (let i = 0; i < 40; i++) {
+                        const piece = document.createElement('span');
+                        piece.className = 'confetti-piece';
+                        piece.style.left = Math.random() * 100 + '%';
+                        piece.style.top = '-10%';
+                        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        piece.style.animationDelay = (Math.random() * 0.75) + 's';
+                        piece.style.animationDuration = (1.6 + Math.random() * 0.6) + 's';
+                        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                        container.appendChild(piece);
+                    }
+
+                    document.body.appendChild(container);
+
+                    setTimeout(() => container.remove(), 2600);
                 });
             });
         </script>

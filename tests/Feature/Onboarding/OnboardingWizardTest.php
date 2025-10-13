@@ -3,7 +3,9 @@
 use App\Livewire\Onboarding\Wizard;
 use App\Models\ChallengeRun;
 use App\Models\User;
+use App\Notifications\OnboardingDayZeroMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -32,6 +34,8 @@ it('completes the onboarding wizard and creates a challenge', function (): void 
         'preferences' => $user->profilePreferencesDefaults(),
     ]);
 
+    NotificationFacade::fake();
+
     Livewire::actingAs($user)
         ->test(Wizard::class)
         ->set('data.username', 'new-maker')
@@ -56,10 +60,13 @@ it('completes the onboarding wizard and creates a challenge', function (): void 
     expect(data_get($profile->preferences, 'timezone'))->toBe('Europe/Paris');
     expect(data_get($profile->preferences, 'reminder_time'))->toBe('18:00');
     expect(data_get($profile->preferences, 'channels.email'))->toBeTrue();
+    expect(data_get($profile->preferences, 'onboarding.checklist.reminder_configured'))->toBeTrue();
 
     $run = ChallengeRun::where('owner_id', $user->id)->first();
 
     expect($run)->not()->toBeNull();
     expect($run->title)->toBe('Mon défi IA');
     expect($run->target_days)->toBe(50);
+
+    NotificationFacade::assertSentTo($user, OnboardingDayZeroMail::class);
 });

@@ -1,0 +1,140 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: task_manager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: false
+      APP_URL: http://localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: task_manager_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      QUEUE_CONNECTION: sync
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      BROADCAST_CONNECTION: log
+      MAIL_MAILER: log
+      AI_PROVIDER: fake
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          extensions: pgsql, pdo_pgsql
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.2.19'
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Prepare application key
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Build assets
+        run: bun run build
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      - name: Execute test suite
+        run: php artisan test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    env:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start SSH agent (with deploy key)
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Prepare known_hosts (strict)
+        run: |
+          set -euxo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          KN=~/.ssh/known_hosts
+          touch "$KN"; chmod 600 "$KN"
+          ssh-keygen -R "${SERVER_HOST}" || true
+          ssh-keygen -R "[${SERVER_HOST}]:${SERVER_PORT:-22}" || true
+          ssh-keyscan -p "${SERVER_PORT:-22}" -t ed25519 "${SERVER_HOST}" 2>/dev/null >> "$KN" || true
+          ssh-keyscan -p "${SERVER_PORT:-22}"            "${SERVER_HOST}" 2>/dev/null >> "$KN" || true
+          echo "known_hosts lines: $(wc -l < "$KN")"
+
+      - name: Deploy over SSH
+        env:
+          SSH_OPTS: "-o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o StrictHostKeyChecking=yes"
+        run: |
+          set -euxo pipefail
+          ssh -p "${SERVER_PORT:-22}" $SSH_OPTS "${SERVER_USER}@${SERVER_HOST}" bash <<'EOF'
+          set -euo pipefail
+
+          APP_DIR="${APP_DIR:-/var/www/${DOMAIN}}"
+
+          cd "$APP_DIR"
+
+          git fetch origin main
+          git reset --hard origin/main
+
+          composer install --no-dev --prefer-dist --optimize-autoloader -q
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache || true
+          php artisan view:cache  || true
+
+          echo "OK"
+          EOF
+
+      - name: Done
+        run: echo "✅ Deploy done for $DOMAIN"

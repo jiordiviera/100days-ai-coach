@@ -156,6 +156,13 @@
                             >
                                 Jour suivant
                             </button>
+                            <button
+                                type="button"
+                                wire:click="$dispatch('daily-challenge-tour-open')"
+                                class="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition hover:border-primary/60 hover:bg-primary/20"
+                            >
+                                Revoir le guide
+                            </button>
                         </div>
                     </div>
 

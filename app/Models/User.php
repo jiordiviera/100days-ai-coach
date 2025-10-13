@@ -70,6 +70,12 @@ class User extends Authenticatable
             ],
             'onboarding' => [
                 'tour_completed' => false,
+                'checklist' => [
+                    'first_log' => false,
+                    'project_linked' => false,
+                    'reminder_configured' => false,
+                    'public_share' => false,
+                ],
             ],
         ];
     }

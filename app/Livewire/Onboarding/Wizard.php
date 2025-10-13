@@ -3,6 +3,7 @@
 namespace App\Livewire\Onboarding;
 
 use App\Models\ChallengeRun;
+use App\Notifications\OnboardingDayZeroMail;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -165,12 +166,14 @@ class Wizard extends Component implements HasForms
 
         $preferences['channels'] = $channels;
         $preferences['reminder_time'] = $this->data['reminder_time'];
+        data_set($preferences, 'onboarding.checklist.reminder_configured', true, true);
 
         $profile->forceFill([
             'preferences' => $preferences,
         ])->save();
 
         $user->forceFill(['needs_onboarding' => false])->save();
+        $user->notify(new OnboardingDayZeroMail());
 
         Notification::make()
             ->title('Onboarding complété')
