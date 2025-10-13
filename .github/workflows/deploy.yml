@@ -15,9 +15,7 @@ jobs:
       SERVER_HOST: ${{ secrets.SERVER_HOST }}   # ex: 46.62.142.34
       SERVER_USER: ${{ secrets.SERVER_USER }}   # ex: jiordiviera
       SERVER_PORT: ${{ secrets.SERVER_PORT }}   # ex: 22 ou 2200
-      DOMAIN: ${{ secrets.DOMAIN }}        # ex: api.pulse-send.jiordiviera.me
-      # chemin distant: /var/www/<DOMAIN>
-      APP_DIR: /var/www/${{ secrets.DOMAIN }}
+      DOMAIN: ${{ secrets.DOMAIN }}
 
     steps:
       - name: Checkout (optional)
@@ -53,7 +51,7 @@ jobs:
           # Passe APP_DIR depuis le runner au shell distant (expansion locale ici)
           APP_DIR="${APP_DIR:-/var/www/${DOMAIN}}"
 
-          cd "\$APP_DIR"
+          cd /var/www/100days.jiordiviera.me
 
           # Pull code
           git fetch origin main
