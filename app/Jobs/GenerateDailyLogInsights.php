@@ -3,11 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\DailyLog;
-use App\Services\Ai\Dto\DailyLogAiResult;
 use App\Services\Ai\AiManager;
+use App\Services\Ai\Dto\DailyLogAiResult;
 use App\Support\SocialShareTemplateBuilder;
-use Illuminate\Support\Str;
-use Throwable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,6 +14,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class GenerateDailyLogInsights implements ShouldQueue
 {

@@ -25,8 +25,8 @@ class SiteStatsOverview extends StatsOverviewWidget
             Stat::make(
                 label: __('Total Users'),
                 value: User::query()
-                    ->when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-                    ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate))
+                    ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+                    ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
                     ->count()
             )
                 ->description(__('All registered makers'))

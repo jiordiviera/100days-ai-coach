@@ -35,7 +35,7 @@ class Wizard extends Component implements HasForms
     {
         $user = auth()->user();
 
-        if (!$user || !$user->needsOnboarding()) {
+        if (! $user || ! $user->needsOnboarding()) {
             $this->redirectRoute('daily-challenge');
 
             return;
@@ -48,7 +48,7 @@ class Wizard extends Component implements HasForms
             'username' => $profile->username,
             'focus_area' => $profile->focus_area,
             'timezone' => $preferences['timezone'] ?? config('app.timezone', 'UTC'),
-            'challenge_title' => $user->name ? 'Défi de ' . $user->name : 'Mon défi 100DaysOfCode',
+            'challenge_title' => $user->name ? 'Défi de '.$user->name : 'Mon défi 100DaysOfCode',
             'challenge_description' => $profile->focus_area,
             'challenge_start_date' => Carbon::today()->toDateString(),
             'challenge_target_days' => 100,
@@ -128,7 +128,7 @@ class Wizard extends Component implements HasForms
             'title' => $this->data['challenge_title'],
             'description' => $this->data['challenge_description'] ?: null,
             'start_date' => Carbon::parse($this->data['challenge_start_date'])->toDateString(),
-            'target_days' => (int)$this->data['challenge_target_days'],
+            'target_days' => (int) $this->data['challenge_target_days'],
             'status' => 'active',
             'owner_id' => $user->id,
             'is_public' => false,
@@ -155,7 +155,7 @@ class Wizard extends Component implements HasForms
         $profile = $user->profile;
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
 
-        if (!$this->createdRunId) {
+        if (! $this->createdRunId) {
             $this->saveChallengeStep();
         }
 
@@ -173,7 +173,7 @@ class Wizard extends Component implements HasForms
         ])->save();
 
         $user->forceFill(['needs_onboarding' => false])->save();
-        $user->notify(new OnboardingDayZeroMail());
+        $user->notify(new OnboardingDayZeroMail);
 
         Notification::make()
             ->title('Onboarding complété')
@@ -262,8 +262,8 @@ class Wizard extends Component implements HasForms
         ];
 
         $common = collect(\DateTimeZone::listIdentifiers())
-            ->filter(fn($tz) => Str::contains($tz, ['/']))
-            ->mapWithKeys(fn($tz) => [$tz => $tz])
+            ->filter(fn ($tz) => Str::contains($tz, ['/']))
+            ->mapWithKeys(fn ($tz) => [$tz => $tz])
             ->all();
 
         return $preferred + $common;

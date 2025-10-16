@@ -48,10 +48,10 @@ class DailyLogResource extends Resource
                     ->label(__('Challenge'))
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn(?string $state) => $state ?? __('N/A')),
+                    ->formatStateUsing(fn (?string $state) => $state ?? __('N/A')),
                 IconColumn::make('is_visible')
                     ->label(__('Visible'))
-                    ->state(fn(DailyLog $record): bool => blank($record->hidden_at))
+                    ->state(fn (DailyLog $record): bool => blank($record->hidden_at))
                     ->boolean()
                     ->trueIcon('heroicon-o-eye')
                     ->falseIcon('heroicon-o-eye-slash'),
@@ -68,7 +68,7 @@ class DailyLogResource extends Resource
                         'hidden' => __('Hidden'),
                     ])
                     ->query(function (Builder $query, array $state): void {
-                        match ($state["value"]) {
+                        match ($state['value']) {
                             'visible' => $query->whereNull('hidden_at'),
                             'hidden' => $query->whereNotNull('hidden_at'),
                             default => null,
@@ -76,7 +76,7 @@ class DailyLogResource extends Resource
                     }),
                 SelectFilter::make('challenge_run_id')
                     ->label(__('Challenge Run'))
-                    ->options(fn() => ChallengeRun::query()
+                    ->options(fn () => ChallengeRun::query()
                         ->orderBy('title')
                         ->pluck('title', 'id')
                         ->toArray()),
@@ -86,7 +86,7 @@ class DailyLogResource extends Resource
                     ->label(__('Hide'))
                     ->color('danger')
                     ->icon('heroicon-o-eye-slash')
-                    ->visible(fn(DailyLog $record): bool => blank($record->hidden_at))
+                    ->visible(fn (DailyLog $record): bool => blank($record->hidden_at))
                     ->form([
                         Textarea::make('moderation_notes')
                             ->label(__('Reason'))
@@ -105,7 +105,7 @@ class DailyLogResource extends Resource
                     ->label(__('Restore'))
                     ->color('success')
                     ->icon('heroicon-o-eye')
-                    ->visible(fn(DailyLog $record): bool => filled($record->hidden_at))
+                    ->visible(fn (DailyLog $record): bool => filled($record->hidden_at))
                     ->requiresConfirmation()
                     ->action(function (DailyLog $record): void {
                         $record->update([

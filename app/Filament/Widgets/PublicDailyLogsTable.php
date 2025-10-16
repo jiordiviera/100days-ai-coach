@@ -52,5 +52,4 @@ class PublicDailyLogsTable extends BaseWidget
     {
         return false;
     }
-
 }

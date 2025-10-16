@@ -12,7 +12,7 @@ class EnsureUserIsAdmin
     {
         $user = $request->user();
 
-        if (!$user?->is_admin || !in_array($user->email, ["hello@jiordiviera.me", "jiordikengne@gmail.com"])) {
+        if (! $user?->is_admin || ! in_array($user->email, ['hello@jiordiviera.me', 'jiordikengne@gmail.com'])) {
             abort(403);
         }
 

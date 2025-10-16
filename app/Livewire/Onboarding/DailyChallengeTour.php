@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Onboarding;
 
-use App\Models\UserProfile;
 use Filament\Notifications\Notification;
 use Livewire\Component;
+
 class DailyChallengeTour extends Component
 {
     public array $steps = [];

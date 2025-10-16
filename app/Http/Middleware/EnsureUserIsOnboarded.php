@@ -29,7 +29,7 @@ class EnsureUserIsOnboarded
             'register',
             'login',
             'password.*',
-            'livewire.*'
+            'livewire.*',
         ])) {
             return $next($request);
         }

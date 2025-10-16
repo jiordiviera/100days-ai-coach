@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\SupportTicketCreated;
 use App\Notifications\SupportTicketReceived;
-use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 
 class SendSupportTicketNotification

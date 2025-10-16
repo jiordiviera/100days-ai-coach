@@ -29,7 +29,7 @@ return [
                 ],
                 [
                     'question' => 'Mes données sont-elles ré-utilisées ?',
-                    'answer' => "Les contenus restent dans ton workspace. Les requêtes IA transitent uniquement chez le provider choisi et ne sont pas ré-entraînées.",
+                    'answer' => 'Les contenus restent dans ton workspace. Les requêtes IA transitent uniquement chez le provider choisi et ne sont pas ré-entraînées.',
                 ],
             ],
         ],
@@ -42,7 +42,7 @@ return [
                 ],
                 [
                     'question' => 'Puis-je suivre l’avancement de mon ticket ?',
-                    'answer' => "Tu reçois un email lorsqu’un ticket est pris en charge. S’il devient public, on t’envoie le lien GitHub.",
+                    'answer' => 'Tu reçois un email lorsqu’un ticket est pris en charge. S’il devient public, on t’envoie le lien GitHub.',
                 ],
             ],
         ],

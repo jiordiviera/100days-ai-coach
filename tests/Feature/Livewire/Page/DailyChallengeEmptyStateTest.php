@@ -17,7 +17,7 @@ it('renders onboarding empty state when no challenge run', function (): void {
     $this->actingAs($user)
         ->get(route('daily-challenge'))
         ->assertOk()
-        ->assertSee("Créer mon challenge", false)
+        ->assertSee('Créer mon challenge', false)
         ->assertSee('Rejoindre via un code', false);
 
     Livewire::actingAs($user)

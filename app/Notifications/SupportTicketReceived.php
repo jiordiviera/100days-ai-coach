@@ -12,9 +12,7 @@ class SupportTicketReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected SupportTicket $ticket)
-    {
-    }
+    public function __construct(protected SupportTicket $ticket) {}
 
     public function via(object $notifiable): array
     {

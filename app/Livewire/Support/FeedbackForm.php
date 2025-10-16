@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Support;
 
-use App\Models\SupportTicket;
 use App\Events\SupportTicketCreated;
+use App\Models\SupportTicket;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;

@@ -11,7 +11,5 @@ class SupportTicketCreated
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(public SupportTicket $ticket)
-    {
-    }
+    public function __construct(public SupportTicket $ticket) {}
 }

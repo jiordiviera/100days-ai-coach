@@ -58,7 +58,7 @@ class SupportTicketResource extends Resource
                         'idea' => 'info',
                         'bug' => 'danger',
                     ])
-                    ->formatStateUsing(fn(?string $state) => $state ? ucfirst($state) : '—'),
+                    ->formatStateUsing(fn (?string $state) => $state ? ucfirst($state) : '—'),
                 TextColumn::make('status')
                     ->label(__('Statut'))
                     ->badge()
@@ -67,7 +67,7 @@ class SupportTicketResource extends Resource
                         'in_progress' => 'info',
                         'resolved' => 'success',
                     ])
-                    ->formatStateUsing(fn(?string $state) => match ($state) {
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
                         'resolved' => 'Résolu',
                         'in_progress' => 'En cours',
                         default => 'Ouvert',
@@ -77,7 +77,7 @@ class SupportTicketResource extends Resource
                     ->boolean()
                     ->trueIcon('heroicon-o-arrow-top-right-on-square')
                     ->falseIcon('heroicon-o-minus')
-                    ->url(fn(SupportTicket $record) => $record->github_issue_url)
+                    ->url(fn (SupportTicket $record) => $record->github_issue_url)
                     ->openUrlInNewTab(),
             ])
             ->filters([
@@ -101,7 +101,7 @@ class SupportTicketResource extends Resource
                     Action::make('view')
                         ->label('Voir')
                         ->icon('heroicon-o-eye')
-                        ->modalHeading(fn(SupportTicket $record) => 'Ticket ' . $record->id)
+                        ->modalHeading(fn (SupportTicket $record) => 'Ticket '.$record->id)
                         ->modalWidth('lg')
                         ->schema([
                             TextInput::make('name')
@@ -125,7 +125,7 @@ class SupportTicketResource extends Resource
                                 ->label('Issue GitHub')
                                 ->disabled(),
                         ])
-                        ->fillForm(fn(SupportTicket $record) => [
+                        ->fillForm(fn (SupportTicket $record) => [
                             'name' => $record->name,
                             'email' => $record->email,
                             'category' => ucfirst((string) $record->category),
@@ -137,12 +137,12 @@ class SupportTicketResource extends Resource
                             'message' => $record->message,
                             'github_issue_url' => $record->github_issue_url,
                         ])
-                        ->action(fn() => null),
+                        ->action(fn () => null),
                     Action::make('create_issue')
                         ->label('Créer issue GitHub')
                         ->icon('heroicon-o-plus-circle')
                         ->color('primary')
-                        ->visible(fn(SupportTicket $record) => blank($record->github_issue_url))
+                        ->visible(fn (SupportTicket $record) => blank($record->github_issue_url))
                         ->requiresConfirmation()
                         ->modalHeading('Créer une issue GitHub')
                         ->modalDescription('Une issue sera créée dans le dépôt support configuré.')
@@ -178,8 +178,8 @@ class SupportTicketResource extends Resource
                         ->label('En cours')
                         ->icon('heroicon-o-arrow-path-rounded-square')
                         ->color('warning')
-                        ->visible(fn(SupportTicket $record) => $record->status === 'open')
-                        ->action(fn(SupportTicket $record) => $record->update([
+                        ->visible(fn (SupportTicket $record) => $record->status === 'open')
+                        ->action(fn (SupportTicket $record) => $record->update([
                             'status' => 'in_progress',
                         ])),
                     Action::make('resolve')
@@ -187,8 +187,8 @@ class SupportTicketResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->visible(fn(SupportTicket $record) => $record->status !== 'resolved')
-                        ->action(fn(SupportTicket $record) => $record->update([
+                        ->visible(fn (SupportTicket $record) => $record->status !== 'resolved')
+                        ->action(fn (SupportTicket $record) => $record->update([
                             'status' => 'resolved',
                             'resolved_at' => now(),
                         ])),
@@ -196,8 +196,8 @@ class SupportTicketResource extends Resource
                         ->label('Rouvrir')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('primary')
-                        ->visible(fn(SupportTicket $record) => $record->status === 'resolved')
-                        ->action(fn(SupportTicket $record) => $record->update([
+                        ->visible(fn (SupportTicket $record) => $record->status === 'resolved')
+                        ->action(fn (SupportTicket $record) => $record->update([
                             'status' => 'open',
                             'resolved_at' => null,
                         ])),
@@ -212,17 +212,17 @@ class SupportTicketResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ])
-                        ->fillForm(fn(SupportTicket $record) => [
+                        ->fillForm(fn (SupportTicket $record) => [
                             'github_issue_url' => $record->github_issue_url,
                         ])
-                        ->visible(fn(SupportTicket $record) => $record->status !== 'resolved')
+                        ->visible(fn (SupportTicket $record) => $record->status !== 'resolved')
                         ->action(function (SupportTicket $record, array $data): void {
                             $record->update([
                                 'github_issue_url' => $data['github_issue_url'] ?? null,
                                 'status' => 'in_progress',
                             ]);
                         }),
-                ])
+                ]),
             ])
             ->toolbarActions([
                 BulkAction::make('resolveSelected')
@@ -231,7 +231,7 @@ class SupportTicketResource extends Resource
                     ->icon('heroicon-o-check')
                     ->requiresConfirmation()
                     ->action(function ($records): void {
-                        $records->each(fn(SupportTicket $record) => $record->update([
+                        $records->each(fn (SupportTicket $record) => $record->update([
                             'status' => 'resolved',
                             'resolved_at' => now(),
                         ]));
@@ -242,7 +242,7 @@ class SupportTicketResource extends Resource
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->requiresConfirmation()
                     ->action(function ($records): void {
-                        $records->each(fn(SupportTicket $record) => $record->update([
+                        $records->each(fn (SupportTicket $record) => $record->update([
                             'status' => 'open',
                             'resolved_at' => null,
                         ]));
