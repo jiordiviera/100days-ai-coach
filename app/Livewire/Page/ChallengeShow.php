@@ -14,6 +14,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -36,7 +37,6 @@ class ChallengeShow extends Component implements HasForms
 
     public function mount(ChallengeRun $run): void
     {
-        //        dd($run);
         $this->run = $run->load('participantLinks.user', 'owner');
         abort_unless($this->canView(), 403);
 
@@ -214,7 +214,8 @@ class ChallengeShow extends Component implements HasForms
         if (! $start) {
             return 0;
         }
-        $todayDay = Carbon::now()->diffInDays(Carbon::parse($start)) + 1;
+
+        $todayDay = (int) (Carbon::parse($start)->startOfDay()->diffInDays(Carbon::now()->startOfDay()) + 1);
         // Build a set of done day_numbers
         $days = DailyLog::where('challenge_run_id', $this->run->id)
             ->where('user_id', $userId)

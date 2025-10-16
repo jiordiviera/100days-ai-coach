@@ -108,7 +108,7 @@
               <div class="mt-3 space-y-3 text-sm text-muted-foreground">
                 @if ($log->summary_md)
                   <div class="prose prose-sm max-w-none dark:prose-invert">
-                    {!! \Illuminate\Support\Str::markdown($log->summary_md) !!}
+                    {!! \Illuminate\Support\Str::markdown($log->summary_md, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                   </div>
                 @elseif ($log->notes)
                   <p>{{ $log->notes }}</p>

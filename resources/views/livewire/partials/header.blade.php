@@ -117,6 +117,9 @@
       @endif
 
       @auth
+        <form method="POST" action="{{ route('logout') }}" id="header-logout-form" class="hidden">
+          @csrf
+        </form>
         <div class="relative" x-data="{ open: false }" @keydown.escape.window="open = false">
           <button
             type="button"
@@ -171,13 +174,14 @@
               <a wire:navigate href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground" @click="open = false">Mon tableau de bord</a>
             </div>
             <div class="mt-2 border-t border-border/70 pt-2">
-              <a
-                wire:navigate
-                href="{{ route('logout') }}"
-                class="flex items-center justify-center rounded-lg bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground transition hover:brightness-95"
+              <button
+                type="submit"
+                form="header-logout-form"
+                class="flex w-full items-center justify-center rounded-lg bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground transition hover:brightness-95"
+                @click="open = false"
               >
                 Déconnexion
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -285,14 +289,14 @@
         @endif
 
         @auth
-          <a
-            wire:navigate
-            href="{{ route('logout') }}"
+          <button
+            type="submit"
+            form="header-logout-form"
             class="w-full rounded-full bg-destructive px-3 py-2 text-center text-sm font-semibold text-destructive-foreground transition hover:brightness-95"
             @click="mobileOpen = false"
           >
             Déconnexion
-          </a>
+          </button>
         @else
           @if ($loginLink)
             <a

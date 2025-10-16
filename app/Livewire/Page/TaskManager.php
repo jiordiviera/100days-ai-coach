@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
@@ -23,7 +24,7 @@ class TaskManager extends Component
     #[Validate('required|string|max:255')]
     public string $taskName = '';
 
-    public ?int $editTaskId = null;
+    public ?string $editTaskId = null;
 
     #[Validate('required|string|max:255')]
     public string $editTaskName = '';
@@ -41,6 +42,7 @@ class TaskManager extends Component
     public function mount(Project $project): void
     {
         $this->projectId = $project->id;
+        $this->ensureProjectIsAccessible($project);
         $this->refreshProject();
     }
 
@@ -54,7 +56,7 @@ class TaskManager extends Component
             return;
         }
 
-        $task = Task::create([
+        $task = Task::query()->create([
             'title' => $this->taskName,
             'project_id' => $this->project->id,
             'user_id' => auth()->id(),
@@ -69,9 +71,9 @@ class TaskManager extends Component
         $this->refreshProject();
     }
 
-    public function editTask(int $id): void
+    public function editTask(string $id): void
     {
-        $task = Task::findOrFail($id);
+        $task = $this->findTaskForUser($id);
 
         $this->editTaskId = $task->id;
         $this->editTaskName = $task->title;
@@ -82,7 +84,7 @@ class TaskManager extends Component
     {
         $this->validateOnly('editTaskName');
 
-        $task = Task::findOrFail($this->editTaskId);
+        $task = $this->findTaskForUser((string) $this->editTaskId);
         if ($this->editTaskAssigneeId && ! $this->isAssignableUser($task->project, $this->editTaskAssigneeId)) {
             $this->addError('editTaskAssigneeId', 'Choisissez un membre du challenge.');
 
@@ -102,7 +104,7 @@ class TaskManager extends Component
 
     public function deleteTask(string $id): void
     {
-        Task::findOrFail($id)->delete();
+        $this->findTaskForUser($id)->delete();
 
         unset($this->assignmentBuffer[$id], $this->commentDrafts[$id]);
 
@@ -111,7 +113,7 @@ class TaskManager extends Component
 
     public function completeTask(string $id): void
     {
-        $task = Task::findOrFail($id);
+        $task = $this->findTaskForUser($id);
         $task->update(['is_completed' => true]);
 
         $this->refreshProject();
@@ -119,7 +121,7 @@ class TaskManager extends Component
 
     public function updateTaskAssignment(string $taskId): void
     {
-        $task = Task::with('project')->findOrFail($taskId);
+        $task = $this->findTaskForUser($taskId);
         $selected = $this->assignmentBuffer[$taskId] ?? null;
 
         if (! $selected) {
@@ -147,7 +149,7 @@ class TaskManager extends Component
             return;
         }
 
-        $task = Task::with('project')->findOrFail($taskId);
+        $task = $this->findTaskForUser($taskId);
 
         if (! $this->isAssignableUser($task->project, auth()->id())) {
             $this->addError('commentDrafts.'.$taskId, 'Vous ne pouvez commenter que les tâches du challenge.');
@@ -198,7 +200,9 @@ class TaskManager extends Component
             'members',
             'challengeRun.owner',
             'challengeRun.participants',
-        ])->findOrFail($this->projectId);
+        ])
+            ->accessibleTo(Auth::user())
+            ->findOrFail($this->projectId);
 
         $this->assignableUsers = $this->buildAssignableUsers();
 
@@ -206,6 +210,23 @@ class TaskManager extends Component
             $this->assignmentBuffer[$task->id] ??= $task->assigned_user_id;
             $this->commentDrafts[$task->id] ??= '';
         }
+    }
+
+    protected function ensureProjectIsAccessible(Project $project): void
+    {
+        $accessible = Project::accessibleTo(Auth::user())
+            ->whereKey($project->id)
+            ->exists();
+
+        abort_unless($accessible, 403);
+    }
+
+    protected function findTaskForUser(string $taskId): Task
+    {
+        return Task::with(['project'])
+            ->accessibleTo(Auth::user())
+            ->whereKey($taskId)
+            ->firstOrFail();
     }
 
     public function render(): View

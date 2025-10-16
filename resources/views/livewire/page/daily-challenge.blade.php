@@ -429,7 +429,7 @@
                                 <p class="text-xs uppercase tracking-widest text-muted-foreground">Résumé</p>
                                 @if ($aiPanel['status'] === 'ready' && $aiPanel['summary'])
                                     <div class="prose prose-sm max-w-none dark:prose-invert">
-                                        {!! Str::markdown($aiPanel['summary']) !!}
+                                        {!! Str::markdown($aiPanel['summary'], ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                                     </div>
                                 @else
                                     <div class="h-20 rounded-2xl bg-muted/70 animate-pulse" aria-hidden="true"></div>

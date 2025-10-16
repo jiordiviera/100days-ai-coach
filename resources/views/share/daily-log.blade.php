@@ -65,7 +65,7 @@
         <div class="space-y-3">
           <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Résumé IA</h2>
           <div class="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-6 text-sm leading-relaxed text-slate-200">
-            {!! \Illuminate\Support\Str::markdown($log->summary_md) !!}
+            {!! \Illuminate\Support\Str::markdown($log->summary_md, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
           </div>
         </div>
       @endif

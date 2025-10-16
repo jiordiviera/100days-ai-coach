@@ -31,7 +31,7 @@ Route::get('support', Support::class)->name('support');
 Route::middleware('auth')->group(function () {
     Route::get('onboarding', OnboardingWizard::class)->name('onboarding.wizard');
     Route::get('dashboard', Dashboard::class)->name('dashboard');
-    Route::get('logout', function () {
+    Route::post('logout', function () {
         Auth::logout();
 
         return redirect()->route('home');

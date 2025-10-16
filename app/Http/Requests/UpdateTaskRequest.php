@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Task;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -12,7 +12,14 @@ class UpdateTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check();
+        $user = $this->user();
+        $task = $this->route('task');
+
+        if (! $user || ! $task instanceof Task) {
+            return false;
+        }
+
+        return Task::accessibleTo($user)->whereKey($task->id)->exists();
     }
 
     /**
@@ -26,6 +33,7 @@ class UpdateTaskRequest extends FormRequest
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['sometimes', 'string', 'nullable'],
             'is_completed' => ['sometimes', 'boolean'],
+            'assigned_user_id' => ['sometimes', 'nullable', 'exists:users,id'],
         ];
     }
 }

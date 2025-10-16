@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TaskController extends Controller
 {
@@ -14,8 +17,15 @@ class TaskController extends Controller
      */
     public function index(Project $project, Request $request)
     {
-        $tasks = $project
-            ->tasks()
+        $user = $request->user();
+
+        abort_unless(
+            $user && Project::accessibleTo($user)->whereKey($project->id)->exists(),
+            Response::HTTP_FORBIDDEN
+        );
+
+        $tasks = Task::accessibleTo($user)
+            ->where('project_id', $project->id)
             ->latest()
             ->paginate($request->get('per_page', 15));
 
@@ -25,9 +35,16 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreTaskRequest $request, Project $project)
     {
-        $task = $project->tasks()->create($request->all());
+        $data = $request->validated();
+
+        $task = $project->tasks()->create([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'user_id' => $request->user()->id,
+            'assigned_user_id' => $data['assigned_user_id'] ?? null,
+        ]);
 
         return new TaskResource($task->load('project'));
     }
@@ -37,15 +54,28 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        $user = request()->user();
+
+        abort_unless(
+            $user && Task::accessibleTo($user)->whereKey($task->id)->exists(),
+            Response::HTTP_FORBIDDEN
+        );
+
         return new TaskResource($task->load('project'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task->update($request->all());
+        $data = $request->validated();
+
+        $task = Task::accessibleTo($request->user())
+            ->whereKey($task->id)
+            ->firstOrFail();
+
+        $task->update($data);
 
         return new TaskResource($task->load('project'));
     }
@@ -55,6 +85,13 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $user = request()->user();
+
+        abort_unless(
+            $user && Task::accessibleTo($user)->whereKey($task->id)->exists(),
+            Response::HTTP_FORBIDDEN
+        );
+
         $task->delete();
 
         return response()->noContent();

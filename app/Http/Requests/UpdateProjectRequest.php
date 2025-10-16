@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProjectRequest extends FormRequest
@@ -11,7 +12,18 @@ class UpdateProjectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $user = $this->user();
+        $project = $this->route('project');
+
+        if (! $user) {
+            return false;
+        }
+
+        if ($project instanceof Project) {
+            return Project::accessibleTo($user)->whereKey($project->id)->exists();
+        }
+
+        return true;
     }
 
     /**
@@ -22,7 +34,9 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'challenge_run_id' => ['sometimes', 'nullable', 'exists:challenge_runs,id'],
         ];
     }
 }

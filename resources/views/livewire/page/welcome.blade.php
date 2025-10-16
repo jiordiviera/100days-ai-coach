@@ -56,21 +56,21 @@
 
     $testimonials = [
         [
-            'initials' => 'AL',
-            'name' => 'Anaïs Lenoir',
-            'role' => 'Product Engineer',
+            'initials' => 'JV',
+            'name' => 'Jiordi Viera',
+            'role' => 'Founder & Software Engineer',
             'quote' => "Je n'ai jamais tenu un journal de bord aussi longtemps. Les rappels et l'IA m'aident à shipper même les jours chargés.",
         ],
         [
-            'initials' => 'JD',
-            'name' => 'Jules Dubois',
-            'role' => 'Indie maker',
+            'initials' => 'CD',
+            'name' => 'Claire Deborah',
+            'role' => 'Web Developer',
             'quote' => 'Le combo log + projets m’aide à réellement mesurer mon progrès. Plus de « on verra demain ». On shippe.',
         ],
         [
-            'initials' => 'SC',
-            'name' => 'Samira Chen',
-            'role' => 'Lead dev & mentor',
+            'initials' => 'DF',
+            'name' => 'Darwin Fotso',
+            'role' => 'Backend Engineer',
             'quote' => 'On onboard toute la promo sur la plateforme. Chacun garde son rythme et on partage nos insights en fin de semaine.',
         ],
     ];

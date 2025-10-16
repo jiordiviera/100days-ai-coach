@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUlid('project_id')->constrained()->onDelete('cascade');
             $table->foreignUlid('user_id')->constrained()->onDelete('cascade');
             $table->unique(['project_id', 'user_id']);
-            $table->json('metadata');
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

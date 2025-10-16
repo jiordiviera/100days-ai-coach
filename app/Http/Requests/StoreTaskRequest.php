@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -12,7 +12,14 @@ class StoreTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check();
+        $user = $this->user();
+        $project = $this->route('project');
+
+        if (! $user || ! $project instanceof Project) {
+            return false;
+        }
+
+        return Project::accessibleTo($user)->whereKey($project->id)->exists();
     }
 
     /**
@@ -25,6 +32,7 @@ class StoreTaskRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'assigned_user_id' => ['nullable', 'exists:users,id'],
         ];
     }
 }

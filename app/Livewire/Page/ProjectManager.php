@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -95,12 +96,10 @@ class ProjectManager extends Component
             'taskName' => 'required|string|max:255',
             'taskProjectId' => 'required|exists:projects,id',
         ]);
-        $project = Project::query()
-            ->whereKey($this->taskProjectId)
-            ->where('challenge_run_id', $this->activeRunId)
-            ->first();
 
-        if (! $project) {
+        $project = $this->findProjectForUser($this->taskProjectId);
+
+        if ($project->challenge_run_id !== $this->activeRunId) {
             $this->addError('taskProjectId', 'Sélectionnez un projet lié à votre challenge actif.');
 
             return;
@@ -129,9 +128,9 @@ class ProjectManager extends Component
         $this->setFeedback('success', 'Tâche créée avec succès.');
     }
 
-    public function editProject($id): void
+    public function editProject(string $id): void
     {
-        $project = Project::findOrFail($id);
+        $project = $this->findProjectForUser($id);
         $this->editProjectId = $project->id;
         $this->editProjectName = $project->name;
     }
@@ -141,20 +140,21 @@ class ProjectManager extends Component
         $this->validate([
             'editProjectName' => 'required|string|max:255',
         ]);
-        $project = Project::findOrFail($this->editProjectId);
+        $project = $this->findProjectForUser((string) $this->editProjectId);
         $project->update(['name' => $this->editProjectName]);
         $this->editProjectId = null;
         $this->editProjectName = '';
     }
 
-    public function deleteProject($id): void
+    public function deleteProject(string $id): void
     {
-        Project::findOrFail($id)->delete();
+        $project = $this->findProjectForUser($id);
+        $project->delete();
     }
 
-    public function editTask($id): void
+    public function editTask(string $id): void
     {
-        $task = Task::findOrFail($id);
+        $task = $this->findTaskForUser($id);
         $this->editTaskId = $task->id;
         $this->editTaskName = $task->title;
         $this->taskProjectId = $task->project_id;
@@ -163,7 +163,7 @@ class ProjectManager extends Component
 
     public function updateTask(): void
     {
-        $task = Task::findOrFail($this->editTaskId);
+        $task = $this->findTaskForUser((string) $this->editTaskId);
 
         $this->validate([
             'editTaskName' => 'required|string|max:255',
@@ -185,17 +185,16 @@ class ProjectManager extends Component
         $this->editTaskAssigneeId = null;
     }
 
-    public function deleteTask($id): void
+    public function deleteTask(string $id): void
     {
-        Task::findOrFail($id)->delete();
+        $this->findTaskForUser($id)->delete();
 
         unset($this->commentDrafts[$id], $this->assignmentBuffer[$id]);
     }
 
     public function updateTaskAssignment(string $taskId): void
     {
-        $task = Task::with('project')->findOrFail($taskId);
-
+        $task = $this->findTaskForUser($taskId);
         $userId = $this->assignmentBuffer[$taskId] ?? null;
 
         if (! $userId) {
@@ -215,7 +214,6 @@ class ProjectManager extends Component
 
     public function addComment(string $taskId): void
     {
-        //        dd($taskId);
         $body = trim($this->commentDrafts[$taskId] ?? '');
 
         if ($body === '') {
@@ -224,7 +222,7 @@ class ProjectManager extends Component
             return;
         }
 
-        $task = Task::with('project')->findOrFail($taskId);
+        $task = $this->findTaskForUser($taskId);
 
         if (! $this->isAssignableUser($task->project, auth()->id())) {
             $this->addError('commentDrafts.'.$taskId, 'Vous ne pouvez commenter que les tâches de votre challenge.');
@@ -289,6 +287,7 @@ class ProjectManager extends Component
         $this->resolveActiveRun();
 
         $projects = Project::with([
+            'tasks',
             'tasks.assignee',
             'tasks.user',
             'tasks.comments.user',
@@ -297,12 +296,7 @@ class ProjectManager extends Component
             'challengeRun.owner',
             'challengeRun.participants',
         ])
-            ->where(function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->orWhereHas('members', function ($qq) use ($user) {
-                        $qq->where('users.id', $user->id);
-                    });
-            })
+            ->accessibleTo($user)
             ->when($this->activeRunId, fn ($q) => $q->where('challenge_run_id', $this->activeRunId))
             ->latest()
             ->get();
@@ -340,7 +334,7 @@ class ProjectManager extends Component
             return;
         }
 
-        $project = Project::findOrFail($projectId);
+        $project = $this->findProjectForUser($projectId);
 
         $this->applyTemplate($project, $templateId);
         $this->templateSelection[$projectId] = '';
@@ -372,12 +366,27 @@ class ProjectManager extends Component
                 continue;
             }
 
-            Task::create([
+            Task::query()->create([
                 'title' => $title,
                 'project_id' => $project->id,
                 'user_id' => auth()->id(),
                 'assigned_user_id' => null,
             ]);
         }
+    }
+
+    protected function findProjectForUser(string $projectId): Project
+    {
+        return Project::accessibleTo(Auth::user())
+            ->whereKey($projectId)
+            ->firstOrFail();
+    }
+
+    protected function findTaskForUser(string $taskId): Task
+    {
+        return Task::with('project')
+            ->accessibleTo(Auth::user())
+            ->whereKey($taskId)
+            ->firstOrFail();
     }
 }
