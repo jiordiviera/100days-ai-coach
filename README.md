@@ -1,88 +1,41 @@
 # 100DaysOfCode AI Coach
 
-**Liens rapides :** [Vision](#vision) · [Tech Stack](#tech-stack-mvp) · [Roadmap](#roadmap-work-in-progress) · [Admin Panel](#admin-panel) · [Liste des fonctionnalités](docs/features-list.md)
-
-**Work in progress** — This project is being developed publicly as part of my [#100DaysOfCode](https://www.100daysofcode.com/) journey.
-
-The goal is simple: turn the challenge into an **AI-augmented experience** that makes it easier, more motivating, and more social to complete the 100 days.
+Application Laravel/Livewire qui accompagne un défi #100DaysOfCode : journal quotidien, IA pour résumer, gestion de projets/tasks et intégrations GitHub/WakaTime.
 
 ---
 
-## Vision
+## Stack technique
 
-Many developers start #100DaysOfCode but drop out quickly due to lack of motivation, writer’s block, or not knowing what to do next.  
-**100DaysOfCode AI Coach** is designed to solve these issues by:
-
-- Automatic summaries of your daily logs (Markdown + tags).
-- A small AI-generated challenge suggestion for the next day.
-- A draft post for LinkedIn/Twitter to share your progress.
-- Motivational badges to celebrate milestones.
-- Public pages to share your journey with others.
+- **Backend** : Laravel 12, Redis, Horizon, PostgreSQL
+- **Frontend** : Blade, Livewire, TailwindCSS
+- **IA** : Groq (Mixtral) par défaut, OpenAI GPT-4o-mini en secours
+- **Intégrations** : GitHub OAuth + template de repository, WakaTime (clé API personnelle)
 
 ---
 
-## Tech Stack (MVP)
+## Fonctionnalités livrées
 
-- **Backend**: Laravel 11, Redis/Horizon, PostgreSQL
-- **Frontend**: Livewire + TailwindCSS
-- **AI Providers**:
-    - [Groq](https://groq.com) (Mixtral) – fast and free
-    - [OpenAI GPT-4o-mini](https://openai.com) – high-quality fallback
-    - (Optional) [Mistral](https://mistral.ai) self-hosted with `llama.cpp` or TGI
-
----
-
-## Roadmap (Work in Progress)
-
-### v0.1 — MVP
-- [ ] Daily log → AI summary + tags
-- [ ] Coach Tip (small next-day challenge)
-- [ ] Shareable draft (LinkedIn/Twitter)
-- [ ] 7-day badge
-
-### v0.2 — Beta
-- [ ] Weekly summaries
-- [ ] Leaderboard (streak + active days)
-- [ ] Multi-language support (EN/FR)
-
-### v1.0 — Future
-- [ ] Integration with [Codepit](https://codepit.jiordiviera.me) for code snippets
-- [ ] Public API for third-party apps
-- [ ] Easy self-hosting (Docker, Kubernetes)
+- **Daily Challenge** : formulaire structuré, génération IA (résumé Markdown, tags, coach tip, brouillons LinkedIn/X), édition du log du jour, notifications visuelles pendant la génération.
+- **Streak & stats** : cartes de progression, historique récent, heures totales/cette semaine, avancement vs objectif du challenge.
+- **Onboarding** : wizard en trois étapes (profil public, configuration du challenge, rappels quotidiens) + tour guidé interactif sur la page journal.
+- **Projets & tâches** : création de projets, application de templates, assignations, commentaires, complétion, vue Task Manager avec filtres rapides.
+- **Challenges** : catalogue des runs, création de run privé, invitations par code/lien, leaderboard et panneau Insights.
+- **GitHub** : provisionnement d’un repository template, mémorisation du repo lié, actions rapides depuis le dashboard.
+- **WakaTime** : synchronisation quotidienne (heures codées, projets), gestion des clés, notifications en cas d’erreur, option de masquage des noms de projets.
+- **Rappels quotidiens** : notifications e-mail timezone-aware déclenchées si aucun log n’est créé avant l’heure de rappel.
+- **Partage public** : génération/expiration d’un lien en lecture seule pour un log, boutons de copie, drafts réseaux sociaux prêts à diffuser.
+- **Support** : page d’aide, formulaire feedback (Livewire) avec création optionnelle d’issues GitHub, notifications utilisateur.
 
 ---
 
-## Contributing
+## Contribuer
 
-This project is **open source** and still in its early stage.
-- Follow the daily progress via my [100DaysOfCode log](https://github.com/jiordiviera/100DaysOfCode).
-- Issues are open for feedback, feature ideas, or bug reports.
-- Pull requests are welcome once the MVP foundation is in place.
+- Consulter ce dépôt public : <https://github.com/jiordiviera/100days-ai-coach>.
+- Ouvrir des issues pour feedbacks ou signaler des bugs.
+- Proposer des PR après avoir reproduit localement (`composer install`, `bun install`, `php artisan migrate:fresh --seed`, `composer run dev`).
 
 ---
 
-## License
+## Licence
 
-[MIT](LICENSE) — free to use, modify, and redistribute.  
-Created by [Jiordi Viera](https://github.com/jiordiviera) as part of the #100DaysOfCode challenge.
-
-## Admin Panel
-
-L’application embarque un panneau d’administration Filament accessible depuis `/admin`.
-
-- **Accès** : seuls les utilisateurs possédant `is_admin = true` peuvent s’y connecter.  
-  Pour promouvoir un compte local existant :
-
-  ```bash
-  php artisan tinker
-  >>> App\Models\User::where('email', 'test@example.com')->update(['is_admin' => true]);
-  ```
-
-- **Fonctionnalités principales** :
-  - gestion des utilisateurs, des challenges, des logs et des notifications via les resources Filament existantes ;
-  - consultation des métriques IA (latence/coût, taux d’échec) via le dashboard `viewAiMetrics`;
-  - accès aux jobs (Horizon), files et paramètres techniques.
-
-- **Authentification** : utilise la même session que l’app principale ; aucune inscription séparée n’est nécessaire.
-
-Pensez à exécuter `php artisan config:cache` ou à redémarrer Horizon après toute modification de rôles pour refléter les droits côté files et métriques.
+[MIT](LICENSE)

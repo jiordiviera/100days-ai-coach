@@ -2,10 +2,14 @@
     $isAuthenticated = auth()->check();
     $user = auth()->user();
     $primaryLinks = $isAuthenticated
-        ? [
+        ? collect([
             ['label' => __('Home'), 'route' => route('home'), 'active' => ['home']],
             ['label' => __('Dashboard'), 'route' => route('dashboard'), 'active' => ['dashboard']],
-        ]
+        ])->when(optional($user)->is_admin, function ($links) {
+            $links[] = ['label' => __('Admin'), 'route' => url(config('app.admin_path', 'admin')), 'active' => []];
+
+            return $links;
+        })->all()
         : [
             ['label' => __('Home'), 'route' => route('home'), 'active' => ['home']],
         ];
