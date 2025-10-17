@@ -1,4 +1,8 @@
-<div class="w-full max-w-md border border-border rounded-xl shadow-2xs bg-background">
+<div
+    x-data="githubAuthPopup('{{ route('daily-challenge') }}')"
+    x-init="init()"
+    class="w-full max-w-md border border-border rounded-xl shadow-2xs bg-background"
+>
     <div class="p-6 sm:p-8">
         <div class="mb-6">
             <x-filament::link
@@ -21,6 +25,12 @@
             </p>
         </div>
 
+        @if (session('auth.github.error'))
+            <div class="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {{ session('auth.github.error') }}
+            </div>
+        @endif
+
         <div class="mt-6">
             <x-filament::button
                 tag="a"
@@ -28,6 +38,7 @@
                 class="w-full justify-center"
                 color="gray"
                 outlined
+                x-on:click.prevent="open('{{ route('auth.github.redirect', ['popup' => '1']) }}')"
             >
                 @include('components.ui.icons.github')
                 <span>{{ __('Sign up with GitHub') }}</span>
@@ -55,3 +66,7 @@
         </p>
     </div>
 </div>
+
+@once
+    @include('components.ui.github-auth-popup-script')
+@endonce
