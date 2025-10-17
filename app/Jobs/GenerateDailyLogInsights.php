@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Events\DailyLogAiFailed;
+use App\Events\DailyLogAiGenerated;
 use App\Models\DailyLog;
 use App\Services\Ai\AiManager;
 use App\Services\Ai\Dto\DailyLogAiResult;
@@ -64,6 +66,8 @@ class GenerateDailyLogInsights implements ShouldQueue
                 'user_id' => $log->user_id,
                 'exception' => $exception->getMessage(),
             ]);
+
+            event(new DailyLogAiFailed($log->id, $exception->getMessage()));
         }
 
         try {
@@ -79,15 +83,6 @@ class GenerateDailyLogInsights implements ShouldQueue
 
     protected function applyResult(DailyLog $log, DailyLogAiResult $result): void
     {
-        $log->forceFill([
-            'summary_md' => $result->summary,
-            'tags' => $result->tags,
-            'coach_tip' => $result->coachTip,
-            'ai_model' => $result->model,
-            'ai_latency_ms' => $result->latencyMs,
-            'ai_cost_usd' => $result->costUsd,
-        ])->save();
-
         $log->loadMissing(['challengeRun', 'user.profile']);
 
         $templates = app(SocialShareTemplateBuilder::class)->build($log, [
@@ -98,7 +93,16 @@ class GenerateDailyLogInsights implements ShouldQueue
 
         $shareDraft = $templates['linkedin'] ?? $result->shareDraft;
 
+        $metadata = $this->buildMetadataPayload($result);
+
         $log->forceFill([
+            'summary_md' => $result->summary,
+            'tags' => $result->tags,
+            'coach_tip' => $result->coachTip,
+            'ai_model' => $result->model,
+            'ai_latency_ms' => $result->latencyMs,
+            'ai_cost_usd' => $result->costUsd,
+            'ai_metadata' => $metadata ?: null,
             'share_draft' => $shareDraft,
             'share_templates' => $templates ?: null,
         ])->save();
@@ -112,6 +116,14 @@ class GenerateDailyLogInsights implements ShouldQueue
             'cost_usd' => $result->costUsd,
         ]);
 
+        event(new DailyLogAiGenerated(
+            dailyLogId: $log->id,
+            model: $result->model,
+            latencyMs: $result->latencyMs,
+            costUsd: $result->costUsd,
+            metadata: $metadata,
+        ));
+
         if ($profileUsername = optional($log->user->profile)->username) {
             Cache::forget("public-profile:{$profileUsername}");
         }
@@ -119,6 +131,28 @@ class GenerateDailyLogInsights implements ShouldQueue
         if ($log->challengeRun?->public_slug) {
             Cache::forget('public-challenge:'.$log->challengeRun->public_slug);
         }
+    }
+
+    protected function buildMetadataPayload(DailyLogAiResult $result): array
+    {
+        $metadata = $result->metadata ?? [];
+
+        $payload = [
+            'generated_at' => Carbon::now()->toIso8601String(),
+            'force' => $this->force,
+            'request' => $metadata['request'] ?? null,
+            'response' => $metadata['response'] ?? null,
+        ];
+
+        if (! empty($metadata['fallback'])) {
+            $payload['fallback'] = true;
+        }
+
+        if (! empty($metadata['error'])) {
+            $payload['error'] = $metadata['error'];
+        }
+
+        return array_filter($payload, fn ($value) => $value !== null && $value !== []);
     }
 
     public static function isThrottledFor(DailyLog $log): bool
@@ -205,6 +239,10 @@ class GenerateDailyLogInsights implements ShouldQueue
             model: 'ai.fallback.offline',
             latencyMs: 0,
             costUsd: 0.0,
+            metadata: [
+                'fallback' => true,
+                'error' => $exception?->getMessage(),
+            ],
         );
     }
 }

@@ -61,6 +61,16 @@ class OpenAiAiDriver implements AiDriver
             model: (string) $config['model'],
             latencyMs: $latency,
             costUsd: $cost,
+            metadata: [
+                'request' => [
+                    'model' => $payload['model'],
+                    'temperature' => $payload['temperature'],
+                ],
+                'response' => [
+                    'id' => $body['id'] ?? null,
+                    'usage' => Arr::get($body, 'usage'),
+                ],
+            ],
         );
     }
 }

@@ -421,7 +421,10 @@ class DailyChallenge extends Component implements HasForms
 
         Notification::make()
             ->title('Lien de partage prêt')
-            ->body('Copie l’URL et partage ton journal #100DaysOfCode !')
+            ->body(sprintf(
+                'Copie l’URL et partage ton journal #100DaysOfCode ! Le lien restera actif %d jours.',
+                max(1, (int) config('sharing.public_log_ttl_days', 14))
+            ))
             ->success()
             ->send();
 
@@ -440,7 +443,10 @@ class DailyChallenge extends Component implements HasForms
             return;
         }
 
-        $log->forceFill(['public_token' => null])->save();
+        $log->forceFill([
+            'public_token' => null,
+            'public_token_expires_at' => null,
+        ])->save();
         $this->todayEntry = $log;
         $this->refreshShareLink(null);
 
@@ -549,6 +555,8 @@ class DailyChallenge extends Component implements HasForms
         $this->publicShare = [
             'token' => $log->public_token,
             'url' => route('logs.share', ['token' => $log->public_token]),
+            'expires_at' => $log->public_token_expires_at,
+            'expired' => $log->hasExpiredPublicToken(),
         ];
     }
 

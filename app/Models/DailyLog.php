@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class DailyLog extends Model
@@ -43,7 +44,9 @@ class DailyLog extends Model
         'ai_model',
         'ai_latency_ms',
         'ai_cost_usd',
+        'ai_metadata',
         'public_token',
+        'public_token_expires_at',
         'hidden_at',
         'moderated_by_id',
         'moderation_notes',
@@ -64,6 +67,8 @@ class DailyLog extends Model
         'wakatime_summary' => 'array',
         'wakatime_synced_at' => 'datetime',
         'hidden_at' => 'datetime',
+        'public_token_expires_at' => 'datetime',
+        'ai_metadata' => 'array',
     ];
 
     public function challengeRun(): BelongsTo
@@ -85,7 +90,12 @@ class DailyLog extends Model
     {
         return $query
             ->whereNotNull('public_token')
-            ->whereNull('hidden_at');
+            ->whereNull('hidden_at')
+            ->where(function (Builder $visibility) {
+                $visibility
+                    ->whereNull('public_token_expires_at')
+                    ->orWhere('public_token_expires_at', '>', Carbon::now());
+            });
     }
 
     /**
@@ -101,6 +111,25 @@ class DailyLog extends Model
             }
         }
 
+        $this->refreshPublicTokenExpiration();
+
         return $this->public_token;
+    }
+
+    public function refreshPublicTokenExpiration(): void
+    {
+        $days = max(1, (int) config('sharing.public_log_ttl_days', 14));
+        $expiration = Carbon::now()->addDays($days);
+
+        $this->public_token_expires_at = $expiration;
+
+        if ($this->exists) {
+            $this->save();
+        }
+    }
+
+    public function hasExpiredPublicToken(): bool
+    {
+        return $this->public_token && $this->public_token_expires_at && Carbon::now()->greaterThanOrEqualTo($this->public_token_expires_at);
     }
 }

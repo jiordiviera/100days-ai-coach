@@ -548,16 +548,19 @@
                             <p class="text-xs text-muted-foreground">Génère un lien public en lecture seule pour ton
                                 journal.</p>
                         </div>
-                        @if ($publicShare)
+                        @if ($publicShare && empty($publicShare['expired']))
                             <span
                                 class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Actif</span>
+                        @elseif ($publicShare && ! empty($publicShare['expired']))
+                            <span
+                                class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Expiré</span>
                         @else
                             <span
                                 class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Inactif</span>
                         @endif
                     </div>
 
-                    @if ($publicShare)
+                    @if ($publicShare && empty($publicShare['expired']))
                         <div class="mt-4 space-y-3">
                             <div class="rounded-2xl border border-border/70 bg-background/80 p-3 text-xs">
                                 <div
@@ -571,6 +574,11 @@
                                         Copier
                                     </button>
                                 </div>
+                                @if (! empty($publicShare['expires_at']))
+                                    <p class="mt-2 text-[11px] text-muted-foreground">
+                                        Expire le {{ optional($publicShare['expires_at'])->translatedFormat('d F Y à H\hi') }}.
+                                    </p>
+                                @endif
                             </div>
                             <button
                                 type="button"
@@ -579,6 +587,20 @@
                                 class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive sm:w-auto"
                             >
                                 Désactiver le partage
+                            </button>
+                        </div>
+                    @elseif ($publicShare && ! empty($publicShare['expired']))
+                        <div class="mt-4 space-y-3">
+                            <p class="text-xs text-muted-foreground">
+                                Ce lien a expiré. Génère un nouveau lien pour partager à nouveau ton entrée.
+                            </p>
+                            <button
+                                type="button"
+                                wire:click="enablePublicShare"
+                                wire:loading.attr="disabled"
+                                class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
+                            >
+                                Régénérer un lien public
                             </button>
                         </div>
                     @else

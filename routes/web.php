@@ -4,6 +4,7 @@ use App\Http\Controllers\PublicChallengeController;
 use App\Http\Controllers\PublicDailyLogController;
 use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\PublicSitemapController;
+use App\Http\Controllers\AiMetricsController;
 use App\Livewire\Onboarding\Wizard as OnboardingWizard;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
 
         return redirect()->route('home');
     })->name('logout');
+
+    Route::middleware('can:viewAiMetrics')->group(function () {
+        Route::get('metrics/ai', [AiMetricsController::class, 'index'])->name('metrics.ai');
+    });
     // Routes Livewire pour la gestion des projets et des tâches
     Route::get('projects', ProjectManager::class)->name('projects.index');
     Route::get('projects/{project}/tasks', TaskManager::class)->name('projects.tasks.index');

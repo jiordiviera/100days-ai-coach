@@ -9,6 +9,7 @@ use App\Models\TaskComment;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -230,10 +231,28 @@ class ProjectManager extends Component
             return;
         }
 
+        $cleanBody = Str::of($body)
+            ->replace(["\r\n", "\r"], "\n")
+            ->stripTags()
+            ->replaceMatches('/[^\S\n]+/', ' ')
+            ->trim();
+
+        if ($cleanBody->isEmpty()) {
+            $this->addError('commentDrafts.'.$taskId, 'Le commentaire doit contenir du texte lisible.');
+
+            return;
+        }
+
+        if ($cleanBody->length() > 1000) {
+            $this->addError('commentDrafts.'.$taskId, 'Le commentaire ne doit pas dépasser 1000 caractères.');
+
+            return;
+        }
+
         TaskComment::create([
             'task_id' => $task->id,
             'user_id' => auth()->id(),
-            'body' => $body,
+            'body' => (string) $cleanBody,
         ]);
 
         $this->commentDrafts[$taskId] = '';

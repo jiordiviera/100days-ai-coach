@@ -61,7 +61,7 @@ class PublicProfileController extends Controller
         $publicLogs = DailyLog::query()
             ->with('challengeRun:id,title,target_days')
             ->where('user_id', $user->id)
-            ->whereNotNull('public_token')
+            ->publiclyVisible()
             ->latest('date')
             ->latest('created_at')
             ->limit(10)

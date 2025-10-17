@@ -7,7 +7,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProjectController extends Controller
 {
@@ -19,6 +19,8 @@ class ProjectController extends Controller
         $user = $request->user();
 
         abort_unless($user, Response::HTTP_UNAUTHORIZED);
+
+        $this->authorize('viewAny', Project::class);
 
         $projects = Project::accessibleTo($user)
             ->latest()
@@ -35,6 +37,8 @@ class ProjectController extends Controller
         $data = $request->validated();
         $user = $request->user();
 
+        $this->authorize('create', Project::class);
+
         $project = Project::create([
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
@@ -50,9 +54,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $user = request()->user();
-
-        abort_unless($user && Project::accessibleTo($user)->whereKey($project->id)->exists(), Response::HTTP_FORBIDDEN);
+        $this->authorize('view', $project);
 
         return new ProjectResource($project->fresh());
     }
@@ -64,9 +66,7 @@ class ProjectController extends Controller
     {
         $data = $request->validated();
 
-        $project = Project::accessibleTo($request->user())
-            ->whereKey($project->id)
-            ->firstOrFail();
+        $this->authorize('update', $project);
 
         $project->update($data);
 
@@ -78,9 +78,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $user = request()->user();
-
-        abort_unless($user && Project::accessibleTo($user)->whereKey($project->id)->exists(), Response::HTTP_FORBIDDEN);
+        $this->authorize('delete', $project);
 
         $project->delete();
 

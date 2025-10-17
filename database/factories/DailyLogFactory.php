@@ -42,7 +42,9 @@ class DailyLogFactory extends Factory
             'ai_model' => 'gpt-4o-mini',
             'ai_latency_ms' => $this->faker->numberBetween(120, 900),
             'ai_cost_usd' => $this->faker->randomFloat(3, 0, 5),
+            'ai_metadata' => ['request' => ['model' => 'gpt-4o-mini']],
             'public_token' => null,
+            'public_token_expires_at' => null,
             'hidden_at' => null,
             'moderated_by_id' => null,
             'moderation_notes' => null,
@@ -55,6 +57,7 @@ class DailyLogFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'public_token' => (string) Str::ulid(),
+            'public_token_expires_at' => now()->addDays(7),
         ]);
     }
 }

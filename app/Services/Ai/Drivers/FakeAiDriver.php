@@ -42,6 +42,12 @@ class FakeAiDriver implements AiDriver
             model: 'ai.fake-driver.v1',
             latencyMs: random_int(120, 480),
             costUsd: round(random_int(5, 25) / 1000, 3),
+            metadata: [
+                'request' => [
+                    'simulated' => true,
+                ],
+                'response' => null,
+            ],
         );
     }
 }

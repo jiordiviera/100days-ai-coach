@@ -8,7 +8,7 @@ use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class TaskController extends Controller
 {
@@ -19,10 +19,9 @@ class TaskController extends Controller
     {
         $user = $request->user();
 
-        abort_unless(
-            $user && Project::accessibleTo($user)->whereKey($project->id)->exists(),
-            Response::HTTP_FORBIDDEN
-        );
+        abort_unless($user, Response::HTTP_UNAUTHORIZED);
+
+        $this->authorize('view', $project);
 
         $tasks = Task::accessibleTo($user)
             ->where('project_id', $project->id)
@@ -39,6 +38,8 @@ class TaskController extends Controller
     {
         $data = $request->validated();
 
+        $this->authorize('create', [Task::class, $project]);
+
         $task = $project->tasks()->create([
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
@@ -54,12 +55,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $user = request()->user();
-
-        abort_unless(
-            $user && Task::accessibleTo($user)->whereKey($task->id)->exists(),
-            Response::HTTP_FORBIDDEN
-        );
+        $this->authorize('view', $task);
 
         return new TaskResource($task->load('project'));
     }
@@ -71,9 +67,7 @@ class TaskController extends Controller
     {
         $data = $request->validated();
 
-        $task = Task::accessibleTo($request->user())
-            ->whereKey($task->id)
-            ->firstOrFail();
+        $this->authorize('update', $task);
 
         $task->update($data);
 
@@ -85,12 +79,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $user = request()->user();
-
-        abort_unless(
-            $user && Task::accessibleTo($user)->whereKey($task->id)->exists(),
-            Response::HTTP_FORBIDDEN
-        );
+        $this->authorize('delete', $task);
 
         $task->delete();
 
