@@ -102,5 +102,3 @@ Parcours principal pour saisir la journée :
 - **Problèmes AI** : vérifier `.env` et la table `failed_jobs`.
 
 ---
-
-Ce guide peut être partagé aux développeurs qui tiennent le rôle de démonstrateurs / QA lors du lancement. Ajustez selon les features activées sur votre instance (certains modules restent expérimentaux). Bon lancement !
