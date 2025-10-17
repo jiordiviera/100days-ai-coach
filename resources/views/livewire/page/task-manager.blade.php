@@ -89,7 +89,7 @@
                 @endif
 
                 <x-filament::button
-                  wire:click="editTask({{ $task->id }})"
+                  wire:click="editTask('{{ $task->id }}')"
                   size="sm"
                   type="button"
                 >
@@ -98,7 +98,7 @@
 
                 <x-filament::button
                   wire:confirm="{{ __('Delete this task?') }}"
-                  wire:click="deleteTask({{ $task->id }})"
+                  wire:click="deleteTask('{{ $task->id }}')"
                   size="sm"
                   color="danger"
                   type="button"
