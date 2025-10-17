@@ -98,9 +98,8 @@
             }
         </style>
         <script>
-            document.addEventListener('livewire:initialized', () => {
-                window.addEventListener('tour-scroll-to', event => {
-                    const { target } = event.detail || {};
+            document.addEventListener('livewire:init', () => {
+                Livewire.on('tour-scroll-to', ({ target }) => {
                     if (!target) {
                         return;
                     }
@@ -112,20 +111,20 @@
                     }
                 });
 
-                window.addEventListener('tour-open-external', event => {
-                    const { url } = event.detail || {};
+                Livewire.on('tour-open-external', ({ url }) => {
                     if (url) {
-                        window.open(url, '_blank');
+                        window.open(url, '_blank', 'noopener');
                     }
                 });
 
-                window.addEventListener('tour-confetti', () => {
-                    if (window.confetti) {
+                Livewire.on('tour-confetti', () => {
+                    if (typeof window.confetti === 'function') {
                         window.confetti({
                             particleCount: 180,
                             spread: 70,
-                            origin: { y: 0.6 }
+                            origin: { y: 0.6 },
                         });
+
                         return;
                     }
 

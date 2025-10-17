@@ -38,29 +38,29 @@ class DailyChallengeTour extends Component
 
         $this->steps = [
             [
-                'title' => 'Consigne ton premier log',
-                'description' => 'Renseigne ce que tu as shippé aujourd’hui et déclenche l’IA pour obtenir un résumé.',
+                'title' => __('Log your first entry'),
+                'description' => __('Tell the coach what you shipped today and trigger the AI recap.'),
                 'anchor' => 'daily-log-form',
-                'action_label' => 'Aller au formulaire',
+                'action_label' => __('Go to the form'),
             ],
             [
-                'title' => 'Associe un projet ou des tâches',
-                'description' => 'Relie ton shipment à un projet pour mieux suivre tes objectifs sur la durée.',
+                'title' => __('Link a project or tasks'),
+                'description' => __('Attach your shipment to a project so you can track long-term goals.'),
                 'anchor' => 'project-section',
-                'action_label' => 'Afficher mes projets',
+                'action_label' => __('Show my projects'),
             ],
             [
-                'title' => 'Active le rappel quotidien',
-                'description' => 'Définis l’heure idéale pour recevoir un rappel et ne jamais casser ta streak.',
+                'title' => __('Schedule the daily reminder'),
+                'description' => __('Pick the perfect time for your reminder and keep the streak alive.'),
                 'anchor' => 'reminder-settings',
-                'action_label' => 'Ouvrir les paramètres',
+                'action_label' => __('Open settings'),
                 'external' => route('settings'),
             ],
             [
-                'title' => 'Partage ton log public',
-                'description' => 'Génère un lien public ou un post LinkedIn/X pour célébrer ton avancée.',
+                'title' => __('Share your public log'),
+                'description' => __('Generate a public link or a LinkedIn/X draft to celebrate progress.'),
                 'anchor' => 'share-section',
-                'action_label' => 'Prévisualiser le partage',
+                'action_label' => __('Preview sharing options'),
             ],
         ];
 
@@ -147,8 +147,8 @@ class DailyChallengeTour extends Component
             $this->dispatch('tour-confetti');
 
             Notification::make()
-                ->title('Bien joué !')
-                ->body('Tu maîtrises les actions clés. À toi de jouer 💪')
+                ->title(__('Nice work!'))
+                ->body(__('You\'re ready to log and ship. Keep the momentum going! 💪'))
                 ->success()
                 ->send();
         }
