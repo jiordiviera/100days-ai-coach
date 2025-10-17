@@ -20,13 +20,11 @@
                     <div class="space-y-2">
             <span
                 class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-              Journal quotidien
+              {{ __('Daily journal') }}
             </span>
-                        <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">Aucun challenge actif pour
-                            l'instant</h1>
+                        <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">{{ __('No active challenge right now') }}</h1>
                         <p class="max-w-xl text-sm text-muted-foreground sm:text-base">
-                            Rejoins un run #100DaysOfCode ou crée ton propre challenge pour commencer à consigner
-                            tes shipments et débloquer des badges.
+                            {{ __('Join a #100DaysOfCode run or launch your own to start logging shipments and unlock badges.') }}
                         </p>
                     </div>
 
@@ -36,30 +34,29 @@
                             href="{{ route('challenges.index') }}"
                             class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:shadow-xl hover:shadow-primary/30"
                         >
-                            Explorer les challenges
+                            {{ __('Explore challenges') }}
                         </a>
                         <a
                             wire:navigate
                             href="{{ route('challenges.index') }}#create"
                             class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                         >
-                            Créer mon challenge
+                            {{ __('Create my challenge') }}
                         </a>
                     </div>
                 </div>
 
                 <div class="space-y-5 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-xl">
                     <div>
-                        <p class="text-xs uppercase tracking-widest text-muted-foreground">Rejoindre via un code</p>
-                        <p class="text-sm text-muted-foreground">Colle ici un code public ou une invitation privée
-                            pour démarrer immédiatement.</p>
+                        <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Join with a code') }}</p>
+                        <p class="text-sm text-muted-foreground">{{ __('Paste a public code or private invite to get started instantly.') }}</p>
                     </div>
                     <form wire:submit.prevent="joinWithCode" class="space-y-3">
                         <div class="flex flex-col gap-3 sm:flex-row">
                             <input
                                 type="text"
                                 wire:model.defer="inviteCode"
-                                placeholder="Code d'invitation ou challenge public"
+                                placeholder="{{ __('Invitation code or public challenge') }}"
                                 class="flex-1 rounded-2xl border border-border/70 bg-background px-4 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
                             >
                             <button
@@ -67,21 +64,20 @@
                                 wire:loading.attr="disabled"
                                 class="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow transition hover:shadow-lg"
                             >
-                                Rejoindre
+                                {{ __('Join') }}
                             </button>
                         </div>
                     </form>
 
                     @if ($pendingInvitations->isNotEmpty())
                         <div class="space-y-3 rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
-                            <h3 class="text-sm font-semibold text-foreground">Invitations en attente</h3>
+                            <h3 class="text-sm font-semibold text-foreground">{{ __('Pending invitations') }}</h3>
                             <ul class="space-y-2 text-sm">
                                 @foreach ($pendingInvitations as $invitation)
                                     <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-background px-3 py-2">
                                         <div>
                                             <p class="font-medium text-foreground">{{ $invitation->run->title }}</p>
-                                            <p class="text-xs text-muted-foreground">Invité
-                                                par {{ $invitation->run->owner?->name ?? 'un membre' }}</p>
+                                            <p class="text-xs text-muted-foreground">{{ __('Invited by :name', ['name' => $invitation->run->owner?->name ?? __('a member')]) }}</p>
                                         </div>
                                         <button
                                             type="button"
@@ -89,7 +85,7 @@
                                             wire:loading.attr="disabled"
                                             class="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow hover:shadow-lg"
                                         >
-                                            Accepter
+                                            {{ __('Accept') }}
                                         </button>
                                     </li>
                                 @endforeach
@@ -105,7 +101,7 @@
         @php
             $challengeDateParsed = Carbon::parse($challengeDate);
             $formattedDate = $challengeDateParsed->translatedFormat('d F Y');
-            $dayLabel = "Jour {$currentDayNumber} sur {$run->target_days}";
+            $dayLabel = __('Day :current of :total', ['current' => $currentDayNumber, 'total' => $run->target_days]);
             $progressPercent = $summary['completion'] ?? 0;
         @endphp
 
@@ -127,8 +123,10 @@
               </span>
                             <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">{{ $formattedDate }}</h1>
                             <p class="max-w-xl text-sm text-muted-foreground sm:text-base">
-                                Challenge « {{ $run->title ?? '100DaysOfCode' }} » animé par {{ $run->owner->name }}.
-                                Consigne ton shipment pour garder ta streak.
+                                {{ __('Challenge “:title” hosted by :owner. Log today’s shipment to keep your streak alive.', [
+                                    'title' => $run->title ?? __('100DaysOfCode'),
+                                    'owner' => $run->owner->name,
+                                ]) }}
                             </p>
                         </div>
                         <div class="flex flex-wrap gap-2">
@@ -142,7 +140,7 @@
                                 ])
                                 @disabled(! $canGoPrevious)
                             >
-                                Jour précédent
+                                {{ __('Previous day') }}
                             </button>
                             <button
                                 type="button"
@@ -154,52 +152,73 @@
                                 ])
                                 @disabled(! $canGoNext)
                             >
-                                Jour suivant
+                                {{ __('Next day') }}
                             </button>
                             <button
                                 type="button"
                                 wire:click="$dispatch('daily-challenge-tour-open')"
                                 class="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition hover:border-primary/60 hover:bg-primary/20"
                             >
-                                Revoir le guide
+                                {{ __('Open the tour again') }}
                             </button>
                         </div>
                     </div>
 
+                    @php($currentStreak = max(0, $summary['streak'] ?? 0))
+                    @php($displayFlames = min($currentStreak, 7))
+
                     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-                            <p class="text-xs uppercase tracking-widest text-muted-foreground">Streak actuel</p>
-                            <p class="mt-2 text-2xl font-semibold text-foreground">{{ $summary['streak'] ?? 0 }} {{ Str::plural('jour', $summary['streak'] ?? 0) }}</p>
-                            <p class="text-xs text-muted-foreground">Ne casse pas la série</p>
+                        <div class="rounded-2xl border border-border/70 bg-gradient-to-br from-amber-500/10 via-orange-400/10 to-primary/10 p-4">
+                            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Current streak') }}</p>
+                            <div class="mt-3 flex items-center gap-4">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-400 text-3xl shadow-inner shadow-amber-500/40">
+                                    🔥
+                                </div>
+                                <div>
+                                    <p class="text-3xl font-semibold text-foreground">{{ $currentStreak }}</p>
+                                    <p class="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+                                        {{ __('days in a row') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center gap-1">
+                                @for ($i = 0; $i < $displayFlames; $i++)
+                                    <span class="text-lg leading-none">🔥</span>
+                                @endfor
+                                @if ($currentStreak > 7)
+                                    <span class="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+                                        +{{ $currentStreak - 7 }}
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="mt-3 text-xs text-muted-foreground">{{ __('Log today to keep the fire alive.') }}</p>
                         </div>
                         <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-                            <p class="text-xs uppercase tracking-widest text-muted-foreground">Logs enregistrés</p>
+                            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Logs recorded') }}</p>
                             <p class="mt-2 text-2xl font-semibold text-foreground">{{ $summary['totalLogs'] ?? 0 }}</p>
-                            <p class="text-xs text-muted-foreground">Depuis le début du run</p>
+                            <p class="text-xs text-muted-foreground">{{ __('Since the run started') }}</p>
                         </div>
                         <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-                            <p class="text-xs uppercase tracking-widest text-muted-foreground">Heures cumulées</p>
-                            <p class="mt-2 text-2xl font-semibold text-foreground">{{ $formatHours($summary['totalHours'] ?? 0) }}
-                                h</p>
-                            <p class="text-xs text-muted-foreground">{{ $formatHours($summary['hoursThisWeek'] ?? 0) }}
-                                h cette semaine</p>
+                            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Total hours') }}</p>
+                            <p class="mt-2 text-2xl font-semibold text-foreground">{{ $formatHours($summary['totalHours'] ?? 0) }} {{ __('h') }}</p>
+                            <p class="text-xs text-muted-foreground">{{ __(':hours h this week', ['hours' => $formatHours($summary['hoursThisWeek'] ?? 0)]) }}</p>
                         </div>
                         <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-                            <p class="text-xs uppercase tracking-widest text-muted-foreground">Progression</p>
+                            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Progress') }}</p>
                             <p class="mt-2 text-2xl font-semibold text-foreground">{{ $progressPercent }}%</p>
-                            <p class="text-xs text-muted-foreground">Objectif : {{ $run->target_days }} jours</p>
+                            <p class="text-xs text-muted-foreground">{{ __('Target: :days days', ['days' => $run->target_days]) }}</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="relative space-y-4 rounded-3xl border border-border/60 bg-card/90 p-3 shadow-xl">
+                    <div class="relative space-y-4 rounded-3xl border border-border/60 bg-card/90 p-3 shadow-xl">
                     <div>
-                        <p class="text-xs uppercase tracking-widest text-muted-foreground">Raccourcis</p>
-                        <h2 class="mt-1 text-lg font-semibold text-foreground">Actions rapides</h2>
+                        <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Shortcuts') }}</p>
+                        <h2 class="mt-1 text-lg font-semibold text-foreground">{{ __('Quick actions') }}</h2>
                     </div>
                     <dl class="space-y-3 text-sm text-muted-foreground">
                         <div class="flex items-center justify-between">
-                            <dt>Dernier log</dt>
+                            <dt>{{ __('Last log') }}</dt>
                             <dd>
                                 @if ($summary['lastLogAt'] ?? false)
                                     {{ $summary['lastLogAt']->translatedFormat('d/m/Y') }}
@@ -209,22 +228,22 @@
                             </dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Projets actifs</dt>
+                            <dt>{{ __('Active projects') }}</dt>
                             <dd>{{ count($projectBreakdown) }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Entrées restantes</dt>
+                            <dt>{{ __('Entries remaining') }}</dt>
                             <dd>{{ max(0, $run->target_days - ($summary['totalLogs'] ?? 0)) }}</dd>
                         </div>
                     </dl>
                     @if (auth()->id() !== $run->owner_id)
                         <button
                             type="button"
-                            wire:confirm="Quitter le challenge ?"
+                            wire:confirm="{{ __('Leave this challenge?') }}"
                             wire:click="leave"
                             class="w-full rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                         >
-                            Quitter le challenge
+                            {{ __('Leave challenge') }}
                         </button>
                     @endif
                 </div>
@@ -235,7 +254,7 @@
             <article class="space-y-6 rounded-3xl border border-border/60 bg-card/90 p-3 shadow-sm">
                 @if ($showReminder)
                     <div class="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                        Pas encore de log pour aujourd'hui. Renseigne ta journée pour conserver ta streak !
+                        {{ __('No log yet today. Fill it in to keep your streak alive!') }}
                     </div>
                 @endif
                 @if (session()->has('message'))
@@ -249,20 +268,20 @@
                         <div class="flex flex-wrap items-center justify-between gap-3">
               <span
                   class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">
-                Entrée complétée pour ce jour
+                {{ __('Entry completed for today') }}
               </span>
                             <button
                                 type="button"
                                 wire:click="startEditing"
                                 class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                             >
-                                Modifier mon entrée
+                                {{ __('Edit my entry') }}
                             </button>
                         </div>
 
                         <div class="space-y-4">
                             <div>
-                                <p class="text-xs uppercase tracking-widest text-muted-foreground">Description</p>
+                                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Description') }}</p>
                                 <p class="mt-1 whitespace-pre-line rounded-2xl border border-border/70 bg-background/80 px-4 py-3 text-sm">
                                     {{ $todayEntry->notes ?: '—' }}
                                 </p>
@@ -270,31 +289,29 @@
 
                             <div class="grid gap-3 sm:grid-cols-3">
                                 <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
-                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">Heures codées</p>
+                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Hours coded') }}</p>
                                     <p class="mt-1 text-base font-semibold text-foreground">{{ $formatHours($todayEntry->hours_coded) }}</p>
                                 </div>
                                 <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
-                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">
-                                        Apprentissages</p>
+                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Learnings') }}</p>
                                     <p class="mt-1 text-sm text-foreground">{{ $todayEntry->learnings ?: '—' }}</p>
                                 </div>
                                 <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
-                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">Difficultés</p>
+                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Challenges faced') }}</p>
                                     <p class="mt-1 text-sm text-foreground">{{ $todayEntry->challenges_faced ?: '—' }}</p>
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-xs uppercase tracking-widest text-muted-foreground">Projets
-                                    travaillés</p>
+                                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Projects worked on') }}</p>
                                 <div class="mt-2 flex flex-wrap gap-2">
                                     @php($projects = collect($todayEntry->projects_worked_on ?? []))
                                     @forelse ($projects as $pid)
                                         @php($project = $allProjects->firstWhere('id', $pid))
                                         <span
-                                            class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $project?->name ?? 'Projet supprimé' }}</span>
+                                            class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $project?->name ?? __('Deleted project') }}</span>
                                     @empty
-                                        <span class="text-sm text-muted-foreground">Aucun projet associé.</span>
+                                        <span class="text-sm text-muted-foreground">{{ __('No project linked.') }}</span>
                                     @endforelse
                                 </div>
                             </div>
@@ -305,7 +322,7 @@
                         {{ $this->form }}
 
                         <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                            <span>Raccourcis :</span>
+                            <span>{{ __('Shortcuts:') }}</span>
                             @foreach ([0.5, 1, 2, 3, 4] as $preset)
                                 @php($label = rtrim(rtrim(number_format($preset, 1, '.', ' '), '0'), '.'))
                                 <button
@@ -313,7 +330,7 @@
                                     wire:click="$set('dailyForm.hours_coded', {{ $preset }})"
                                     class="rounded-full border border-border/70 px-3 py-1 text-foreground transition hover:border-primary hover:text-primary"
                                 >
-                                    {{ $label }} h
+                                    {{ $label }} {{ __('h') }}
                                 </button>
                             @endforeach
                         </div>
@@ -323,7 +340,7 @@
                                 type="submit"
                                 class="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground shadow transition hover:shadow-lg"
                             >
-                                Sauvegarder ma progression
+                                {{ __('Save my progress') }}
                             </button>
                             @if ($todayEntry)
                                 <button
@@ -331,7 +348,7 @@
                                     wire:click="cancelEditing"
                                     class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                                 >
-                                    Annuler
+                                    {{ __('Cancel') }}
                                 </button>
                             @endif
                         </div>
@@ -343,15 +360,14 @@
                          @if($shouldPollAi) wire:poll.7s="pollAiPanel" @endif>
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div>
-                                <h2 class="text-lg font-semibold text-foreground">Insights IA</h2>
+                                <h2 class="text-lg font-semibold text-foreground">{{ __('AI insights') }}</h2>
                                 <p class="text-xs text-muted-foreground">
                                     @if ($aiPanel['status'] === 'pending')
-                                        Génération en cours...
+                                        {{ __('Generation in progress...') }}
                                     @elseif ($aiPanel['updated_at'])
-                                        Mis à jour
-                                        le {{ optional($aiPanel['updated_at'])->translatedFormat('d/m/Y à H\hi') }}
+                                        {{ __('Updated on :date', ['date' => optional($aiPanel['updated_at'])->translatedFormat('d/m/Y à H\hi')]) }}
                                     @else
-                                        En attente d'une première génération.
+                                        {{ __('Awaiting first generation.') }}
                                     @endif
                                 </p>
                             </div>
@@ -401,7 +417,7 @@
                                     @disabled($aiPanel['status'] === 'pending')
                                     class="w-full rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary sm:w-auto"
                                 >
-                                    Relancer l'IA
+                                    {{ __('Regenerate AI') }}
                                 </button>
                                 <button
                                     type="button"
@@ -409,8 +425,8 @@
                                     x-bind:disabled="! has('linkedin')"
                                     class="w-full rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg disabled:cursor-not-allowed disabled:bg-primary/40 sm:w-auto"
                                 >
-                                    <span x-show="copied !== 'linkedin'">Copier LinkedIn</span>
-                                    <span x-show="copied === 'linkedin'" x-cloak>Copié !</span>
+                                    <span x-show="copied !== 'linkedin'">{{ __('Copy LinkedIn draft') }}</span>
+                                    <span x-show="copied === 'linkedin'" x-cloak>{{ __('Copied!') }}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -418,15 +434,15 @@
                                     x-bind:disabled="! has('x')"
                                     class="w-full rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground shadow transition hover:shadow-lg disabled:cursor-not-allowed disabled:bg-secondary/40 sm:w-auto"
                                 >
-                                    <span x-show="copied !== 'x'">Copier X</span>
-                                    <span x-show="copied === 'x'" x-cloak>Copié !</span>
+                                    <span x-show="copied !== 'x'">{{ __('Copy X draft') }}</span>
+                                    <span x-show="copied === 'x'" x-cloak>{{ __('Copied!') }}</span>
                                 </button>
                             </div>
                         </div>
 
                         <div class="mt-4 space-y-4">
                             <div>
-                                <p class="text-xs uppercase tracking-widest text-muted-foreground">Résumé</p>
+                                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Summary') }}</p>
                                 @if ($aiPanel['status'] === 'ready' && $aiPanel['summary'])
                                     <div class="prose prose-sm max-w-none dark:prose-invert">
                                         {!! Str::markdown($aiPanel['summary'], ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
@@ -437,7 +453,7 @@
                             </div>
 
                             <div>
-                                <p class="text-xs uppercase tracking-widest text-muted-foreground">Tags</p>
+                                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Tags') }}</p>
                                 @if ($aiPanel['status'] === 'ready' && filled($aiPanel['tags']))
                                     <div class="mt-2 flex flex-wrap gap-2">
                                         @foreach ($aiPanel['tags'] as $tag)
@@ -456,8 +472,7 @@
 
                             <div class="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">Conseil du
-                                        coach</p>
+                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Coach tip') }}</p>
                                     @if ($aiPanel['status'] === 'ready' && $aiPanel['coach_tip'])
                                         <p class="mt-1 rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-sm">{{ $aiPanel['coach_tip'] }}</p>
                                     @else
@@ -465,8 +480,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">Brouillons de
-                                        partage</p>
+                                    <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Share drafts') }}</p>
                                     @php($templates = $aiPanel['share_templates'] ?? [])
                                     @php($linkedinTemplate = $templates['linkedin'] ?? $aiPanel['share_draft'])
                                     @php($xTemplate = $templates['x'] ?? null)
@@ -500,7 +514,7 @@
 
                             @if ($aiPanel['status'] === 'ready' && $aiPanel['model'])
                                 <p class="text-xs text-muted-foreground">
-                                    Généré avec {{ $aiPanel['model'] }} · {{ $aiPanel['latency_ms'] ?? '—' }} ms ·
+                                    {{ __('Generated with :model · :latency ms', ['model' => $aiPanel['model'], 'latency' => $aiPanel['latency_ms'] ?? '—']) }} ·
                                     ${{ number_format((float) ($aiPanel['cost_usd'] ?? 0), 3) }}
                                 </p>
                             @endif
@@ -514,8 +528,8 @@
                     <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <h2 class="text-lg font-semibold text-foreground">Repository GitHub</h2>
-                                <p class="text-xs text-muted-foreground">Consigne tes logs dans ton repo dédié.</p>
+                                <h2 class="text-lg font-semibold text-foreground">{{ __('GitHub repository') }}</h2>
+                                <p class="text-xs text-muted-foreground">{{ __('Log everything in your dedicated repo.') }}</p>
                             </div>
                             <span
                                 class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -530,7 +544,7 @@
                                 rel="noopener noreferrer"
                                 class="inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-1 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                             >
-                                Ouvrir
+                                {{ __('Open') }}
                                 <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
                                           d="M12.293 2.293a1 1 0 011.414 0l4 4a1 1 0 01-.707 1.707H15a1 1 0 110-2h.586L11 3.414V5a1 1 0 11-2 0V2a1 1 0 011-1h3a1 1 0 01.707.293zM5 5a3 3 0 00-3 3v7a3 3 0 003 3h7a3 3 0 003-3v-2a1 1 0 112 0v2a5 5 0 01-5 5H5a5 5 0 01-5-5V8a5 5 0 015-5h2a1 1 0 110 2H5z"
@@ -544,19 +558,18 @@
                 <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm" id="project-section">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <h2 class="text-lg font-semibold text-foreground">Partage public</h2>
-                            <p class="text-xs text-muted-foreground">Génère un lien public en lecture seule pour ton
-                                journal.</p>
+                            <h2 class="text-lg font-semibold text-foreground">{{ __('Public sharing') }}</h2>
+                            <p class="text-xs text-muted-foreground">{{ __('Generate a read-only public link for your journal.') }}</p>
                         </div>
                         @if ($publicShare && empty($publicShare['expired']))
                             <span
-                                class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Actif</span>
+                                class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">{{ __('Active') }}</span>
                         @elseif ($publicShare && ! empty($publicShare['expired']))
                             <span
-                                class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Expiré</span>
+                                class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">{{ __('Expired') }}</span>
                         @else
                             <span
-                                class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">Inactif</span>
+                                class="inline-flex items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-600">{{ __('Inactive') }}</span>
                         @endif
                     </div>
 
@@ -568,15 +581,15 @@
                                     <span class="break-all">{{ $publicShare['url'] }}</span>
                                     <button
                                         type="button"
-                                        onclick="navigator.clipboard.writeText('{{ $publicShare['url'] }}'); this.innerText='Copié !'; setTimeout(() => this.innerText='Copier', 2000);"
+                                        onclick="navigator.clipboard.writeText('{{ $publicShare['url'] }}'); this.innerText='{{ __('Copied!') }}'; setTimeout(() => this.innerText='{{ __('Copy') }}', 2000);"
                                         class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-3 py-1 font-semibold text-xs text-muted-foreground transition hover:border-primary/50 hover:text-primary sm:w-auto"
                                     >
-                                        Copier
+                                        {{ __('Copy') }}
                                     </button>
                                 </div>
                                 @if (! empty($publicShare['expires_at']))
                                     <p class="mt-2 text-[11px] text-muted-foreground">
-                                        Expire le {{ optional($publicShare['expires_at'])->translatedFormat('d F Y à H\hi') }}.
+                                        {{ __('Expires on :date.', ['date' => optional($publicShare['expires_at'])->translatedFormat('d F Y à H\hi')]) }}
                                     </p>
                                 @endif
                             </div>
@@ -586,13 +599,13 @@
                                 wire:loading.attr="disabled"
                                 class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive/50 hover:text-destructive sm:w-auto"
                             >
-                                Désactiver le partage
+                                {{ __('Disable sharing') }}
                             </button>
                         </div>
                     @elseif ($publicShare && ! empty($publicShare['expired']))
                         <div class="mt-4 space-y-3">
                             <p class="text-xs text-muted-foreground">
-                                Ce lien a expiré. Génère un nouveau lien pour partager à nouveau ton entrée.
+                                {{ __('This link has expired. Generate a new one to share your entry again.') }}
                             </p>
                             <button
                                 type="button"
@@ -600,14 +613,13 @@
                                 wire:loading.attr="disabled"
                                 class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
                             >
-                                Régénérer un lien public
+                                {{ __('Regenerate public link') }}
                             </button>
                         </div>
                     @else
                         <div class="mt-4 space-y-3">
                             <p class="text-xs text-muted-foreground">
-                                Enregistre ton entrée du jour puis génère un lien public pour la partager sur les
-                                réseaux.
+                                {{ __('Save today’s entry, then generate a public link to share it on social media.') }}
                             </p>
                             <button
                                 type="button"
@@ -615,41 +627,41 @@
                                 wire:loading.attr="disabled"
                                 class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow transition hover:shadow-lg"
                             >
-                                Générer le lien public
+                                {{ __('Generate public link') }}
                             </button>
                         </div>
                     @endif
                 </section>
 
                 <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm" id="share-section">
-                    <h2 class="text-lg font-semibold text-foreground">Mes statistiques</h2>
+                    <h2 class="text-lg font-semibold text-foreground">{{ __('My stats') }}</h2>
                     <dl class="mt-4 space-y-3 text-sm">
                         <div class="flex items-center justify-between">
-                            <dt>Streak actuel</dt>
-                            <dd>{{ $summary['streak'] ?? 0 }} {{ Str::plural('jour', $summary['streak'] ?? 0) }}</dd>
+                            <dt>{{ __('Current streak') }}</dt>
+                            <dd>{{ $summary['streak'] ?? 0 }} {{ trans_choice(':count day|:count days', $summary['streak'] ?? 0, ['count' => $summary['streak'] ?? 0]) }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Entrées totales</dt>
+                            <dt>{{ __('Total entries') }}</dt>
                             <dd>{{ $summary['totalLogs'] ?? 0 }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Heures cumulées</dt>
-                            <dd>{{ $formatHours($summary['totalHours'] ?? 0) }} h</dd>
+                            <dt>{{ __('Total hours') }}</dt>
+                            <dd>{{ $formatHours($summary['totalHours'] ?? 0) }} {{ __('h') }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Heures moyennes / log</dt>
-                            <dd>{{ $formatHours($summary['averageHours'] ?? 0) }} h</dd>
+                            <dt>{{ __('Average hours per log') }}</dt>
+                            <dd>{{ $formatHours($summary['averageHours'] ?? 0) }} {{ __('h') }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Heures cette semaine</dt>
-                            <dd>{{ $formatHours($summary['hoursThisWeek'] ?? 0) }} h</dd>
+                            <dt>{{ __('Hours this week') }}</dt>
+                            <dd>{{ $formatHours($summary['hoursThisWeek'] ?? 0) }} {{ __('h') }}</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Progression</dt>
+                            <dt>{{ __('Progress') }}</dt>
                             <dd>{{ $summary['completion'] ?? 0 }}%</dd>
                         </div>
                         <div class="flex items-center justify-between">
-                            <dt>Dernier log</dt>
+                            <dt>{{ __('Last log') }}</dt>
                             <dd>
                                 @if ($summary['lastLogAt'] ?? false)
                                     {{ $summary['lastLogAt']->translatedFormat('d/m/Y') }}
@@ -662,7 +674,7 @@
                 </section>
 
                 <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
-                    <h2 class="text-lg font-semibold text-foreground">Historique récent</h2>
+                    <h2 class="text-lg font-semibold text-foreground">{{ __('Recent history') }}</h2>
                     <div class="mt-3 space-y-2 text-sm">
                         @forelse ($history as $entry)
                             <button
@@ -672,11 +684,11 @@
                             >
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <span>Jour {{ $entry['day_number'] }}</span>
+                                        <span>{{ __('Day :day', ['day' => $entry['day_number']]) }}</span>
                                         @if ($entry['retro'] ?? false)
                                             <span
                                                 class="inline-flex items-center rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
-                        Rétro
+                        {{ __('Retro') }}
                       </span>
                                         @endif
                                     </div>
@@ -685,29 +697,28 @@
                   </span>
                                 </div>
                                 <div class="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                                    <span>{{ $formatHours($entry['hours']) }} h</span>
-                                    <span>{{ count($entry['projects']) }} {{ Str::plural('projet', count($entry['projects'])) }}</span>
+                                    <span>{{ $formatHours($entry['hours']) }} {{ __('h') }}</span>
+                                    <span>{{ count($entry['projects']) }} {{ trans_choice(':count project|:count projects', count($entry['projects']), ['count' => count($entry['projects'])]) }}</span>
                                 </div>
                             </button>
                         @empty
-                            <p class="text-xs text-muted-foreground">Pas encore d'historique à afficher.</p>
+                            <p class="text-xs text-muted-foreground">{{ __('No history to display yet.') }}</p>
                         @endforelse
                     </div>
                 </section>
 
                 <section class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
-                    <h2 class="text-lg font-semibold text-foreground">Projets les plus actifs</h2>
+                    <h2 class="text-lg font-semibold text-foreground">{{ __('Most active projects') }}</h2>
                     <div class="mt-3 space-y-2 text-sm">
                         @forelse ($projectBreakdown as $project)
                             <div
                                 class="flex items-center justify-between rounded-2xl border border-border/60 bg-background/80 px-3 py-2">
                                 <span>{{ $project['name'] }}</span>
                                 <span
-                                    class="text-xs text-muted-foreground">{{ $project['count'] }} {{ Str::plural('jour', $project['count']) }}</span>
+                                    class="text-xs text-muted-foreground">{{ $project['count'] }} {{ trans_choice(':count day|:count days', $project['count'], ['count' => $project['count']]) }}</span>
                             </div>
                         @empty
-                            <p class="text-xs text-muted-foreground">Associe ton journal à un projet pour voir ici la
-                                répartition.</p>
+                            <p class="text-xs text-muted-foreground">{{ __('Link your journal to a project to see the breakdown here.') }}</p>
                         @endforelse
                     </div>
                 </section>

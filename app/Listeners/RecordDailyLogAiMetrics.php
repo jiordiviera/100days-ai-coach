@@ -20,10 +20,10 @@ class RecordDailyLogAiMetrics
 
     public function handleGenerated(DailyLogAiGenerated $event): void
     {
-        $date = Carbon::today();
+        $date = Carbon::today()->startOfDay();
 
         $metric = AiGenerationMetric::query()->firstOrNew([
-            'date' => $date->toDateString(),
+            'date' => $date,
             'model' => $event->model,
         ]);
 
@@ -41,10 +41,10 @@ class RecordDailyLogAiMetrics
         $log = DailyLog::find($event->dailyLogId);
 
         $model = $log?->ai_model ?: 'unknown';
-        $date = Carbon::today();
+        $date = Carbon::today()->startOfDay();
 
         $metric = AiGenerationMetric::query()->firstOrNew([
-            'date' => $date->toDateString(),
+            'date' => $date,
             'model' => $model,
         ]);
 

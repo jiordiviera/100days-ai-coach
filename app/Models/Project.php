@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Pivots\ProjectMember;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,8 @@ class Project extends Model
         return $this->belongsToMany(
             User::class,
             'project_user',
-        )->withTimestamps();
+        )->using(ProjectMember::class)
+            ->withTimestamps();
     }
 
     public function challengeRun(): BelongsTo

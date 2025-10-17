@@ -1,5 +1,5 @@
 @php
-  $displayName = $user->profile?->username ?? $user->name ?? 'Participant';
+  $displayName = $user->profile?->username ?? $user->name ?? __('Participant');
   $minutes = isset($meta['hours']) ? (int) round(((float) $meta['hours']) * 60) : null;
   $entryDate = isset($meta['date']) && $meta['date'] ? \Illuminate\Support\Carbon::parse($meta['date'])->translatedFormat('d F Y') : null;
   $challengeTitle = $challenge?->title ?? '#100DaysOfCode';
@@ -11,7 +11,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>@seo('title', 'Journal partagé — '.$displayName)</title>
+  <title>@seo('title', __('Shared log — :name', ['name' => $displayName]))</title>
   <x-seo::meta />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,15 +35,16 @@
             #100DaysOfCode
           </span>
           <div class="space-y-1">
-            <h1 class="text-3xl font-semibold text-slate-50 sm:text-4xl">{{ $displayName }} · Jour
-              {{ $log->day_number }}</h1>
+            <h1 class="text-3xl font-semibold text-slate-50 sm:text-4xl">
+              {{ __(':name · Day :day', ['name' => $displayName, 'day' => $log->day_number]) }}
+            </h1>
             <p class="text-sm text-slate-400">
               {{ $challengeTitle }}
               @if ($entryDate)
                 · {{ $entryDate }}
               @endif
               @if ($minutes !== null)
-                · {{ $minutes }} min codées
+                · {{ __(':minutes min coded', ['minutes' => $minutes]) }}
               @endif
             </p>
           </div>
@@ -56,14 +57,14 @@
                 d="M9.707 3.293a1 1 0 010 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 11-1.414 1.414l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 0z"
                 clip-rule="evenodd" />
             </svg>
-            Découvrir {{ config('app.name') }}
+            {{ __('Discover :app', ['app' => config('app.name')]) }}
           </a>
         </div>
       </header>
 
       @if ($log->summary_md)
         <div class="space-y-3">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Résumé IA</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">{{ __('AI summary') }}</h2>
           <div class="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-6 text-sm leading-relaxed text-slate-200">
             {!! \Illuminate\Support\Str::markdown($log->summary_md, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
           </div>
@@ -72,7 +73,7 @@
 
       @if (!empty($log->tags))
         <div class="space-y-3">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Mots-clés</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">{{ __('Keywords') }}</h2>
           <div class="flex flex-wrap gap-2">
             @foreach ($log->tags as $tag)
               <span
@@ -91,7 +92,7 @@
 
       @if ($log->coach_tip)
         <div class="space-y-3">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Conseil du coach</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">{{ __('Coach tip') }}</h2>
           <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
             {{ $log->coach_tip }}
           </div>
@@ -104,7 +105,7 @@
 
       @if ($linkedinTemplate || $xTemplate)
         <div class="space-y-3">
-          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Brouillon à partager</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">{{ __('Share draft') }}</h2>
           <div class="space-y-3">
             @if ($linkedinTemplate)
               <div class="rounded-2xl border border-slate-700/60 bg-slate-900/60 p-5 text-sm text-slate-200">
@@ -124,8 +125,8 @@
 
       <footer
         class="flex flex-col items-center justify-between gap-3 border-t border-slate-700/60 pt-6 text-xs text-slate-500 sm:flex-row">
-        <span>Partagé via {{ config('app.name') }}.</span>
-        <span>Rejoins le challenge et construis ta propre streak !</span>
+        <span>{{ __('Shared via :app.', ['app' => config('app.name')]) }}</span>
+        <span>{{ __('Join the challenge and build your own streak!') }}</span>
       </footer>
     </section>
   </main>

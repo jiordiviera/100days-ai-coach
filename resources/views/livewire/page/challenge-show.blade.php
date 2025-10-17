@@ -82,10 +82,29 @@
                         <p class="mt-2 text-2xl font-semibold text-foreground">{{ $globalPercent }}%</p>
                         <p class="text-xs text-muted-foreground">{{ __('Total logs versus collective target') }}</p>
                     </div>
-                    <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
+                    <div class="rounded-2xl border border-border/70 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-rose-400/10 p-4">
                         <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Your streak') }}</p>
-                        <p class="mt-2 text-2xl font-semibold text-foreground">{{ $myStreak }} 🔥</p>
-                        <p class="text-xs text-muted-foreground">{{ __('Log today to keep the fire alive.') }}</p>
+                        <div class="mt-3 flex items-center gap-4">
+                            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-400 text-3xl shadow-inner shadow-amber-500/40">
+                                🔥
+                            </div>
+                            <div>
+                                <p class="text-3xl font-semibold text-foreground">{{ $myStreak }}</p>
+                                <p class="text-xs uppercase tracking-[0.28em] text-muted-foreground">{{ __('days in a row') }}</p>
+                            </div>
+                        </div>
+                        @php($streakFlames = min($myStreak, 7))
+                        <div class="mt-4 flex items-center gap-1">
+                            @for ($i = 0; $i < $streakFlames; $i++)
+                                <span class="text-lg leading-none">🔥</span>
+                            @endfor
+                            @if ($myStreak > 7)
+                                <span class="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+                                    +{{ $myStreak - 7 }}
+                                </span>
+                            @endif
+                        </div>
+                        <p class="mt-3 text-xs text-muted-foreground">{{ __('Log today to keep the fire alive.') }}</p>
                     </div>
                     <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
                         <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Days remaining') }}</p>
@@ -174,8 +193,11 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span class="rounded-full bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-600">{{ __('Streak :count', ['count' => $item['streak']]) }}</span>
-                                <span>{{ $item['done'] }} / {{ $targetDays }} ({{ $item['percent'] }}%)</span>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 font-semibold text-amber-600">
+                                    <span class="text-base leading-none">🔥</span>
+                                    <span>{{ __('Streak :count', ['count' => $item['streak']]) }}</span>
+                                </span>
+                                <span>{{ __(':done / :total (:percent%)', ['done' => $item['done'], 'total' => $targetDays, 'percent' => $item['percent']]) }}</span>
                             </div>
                         </div>
                         <div class="h-2 overflow-hidden rounded-full bg-muted">

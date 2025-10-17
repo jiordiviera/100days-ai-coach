@@ -24,10 +24,11 @@ class SetLocale
 
             if ($preferred && in_array($preferred, $available, true)) {
                 $locale = $preferred;
+                session(['locale' => $locale]);
             }
         }
 
-        if (! session()->has('locale')) {
+        if (! session()->has('locale') && ! Auth::check()) {
             $browserLocale = $request->getPreferredLanguage($available);
             if ($browserLocale) {
                 $locale = $browserLocale;

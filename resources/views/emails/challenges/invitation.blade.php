@@ -1,21 +1,19 @@
 @php($expiresAt = $invitation->expires_at?->timezone(config('app.timezone')))
 
 <div>
-  <p>Bonjour,</p>
+  <p>{{ __('Hello,') }}</p>
 
   <p>
     @if ($ownerName)
       {{ $ownerName }}
     @else
-      Un membre de l'équipe
+      {{ __('A member of the team') }}
     @endif
-    vous invite à rejoindre le challenge
-    <strong>{{ $run?->title ?? '100 Days of Code' }}</strong>.
+    {{ __('invites you to join the challenge :name.', ['name' => $run?->title ?? __('100 Days of Code')]) }}
   </p>
 
   <p>
-    Pour accepter l'invitation et rejoindre l'espace de suivi, cliquez sur le lien
-    ci-dessous ou copiez-le dans votre navigateur :
+    {{ __('To accept the invitation and join the workspace, click the link below or copy it into your browser:') }}
   </p>
 
   <p>
@@ -25,11 +23,10 @@
   </p>
 
   @if ($expiresAt)
-    <p>Attention : ce lien expirera le {{ $expiresAt->format('d/m/Y à H:i') }}.</p>
+    <p>{{ __('Note: this link will expire on :date.', ['date' => $expiresAt->format('d/m/Y à H:i')]) }}</p>
   @endif
 
-  <p>À bientôt !</p>
+  <p>{{ __('See you soon!') }}</p>
 
   <p>{{ config('app.name') }}</p>
 </div>
-

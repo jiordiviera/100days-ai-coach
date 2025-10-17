@@ -7,16 +7,16 @@
                 class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
             >
                 <span aria-hidden="true">&larr;</span>
-                <span>Retour à l'accueil</span>
+                <span>{{ __('Back to home') }}</span>
             </x-filament::link>
         </div>
 
         <div class="text-center">
-            <h1 class="block text-2xl font-bold">Créer un compte</h1>
+            <h1 class="block text-2xl font-bold">{{ __('Create an account') }}</h1>
             <p class="mt-2 text-sm text-muted-foreground">
-                Vous avez déjà un compte ?
+                {{ __('Already have an account?') }}
                 <x-filament::link href="{{ route('login') }}" wire:navigate>
-                    Se connecter
+                    {{ __('Sign in') }}
                 </x-filament::link>
             </p>
         </div>
@@ -30,13 +30,13 @@
                 outlined
             >
                 @include('components.ui.icons.github')
-                <span>S'inscrire avec GitHub</span>
+                <span>{{ __('Sign up with GitHub') }}</span>
             </x-filament::button>
         </div>
 
         <div class="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-xs text-muted-foreground">
             <span class="h-px bg-border"></span>
-            <span>ou</span>
+            <span>{{ __('or') }}</span>
             <span class="h-px bg-border"></span>
         </div>
 
@@ -45,13 +45,13 @@
                 {{ $this->form }}
 
                 <x-filament::button class="w-full" type="submit" wire:loading.attr="disabled">
-                    Créer le compte
+                    {{ __('Create account') }}
                 </x-filament::button>
             </form>
         </div>
 
         <p class="mt-6 text-xs text-muted-foreground text-center">
-            Une fois le compte créé, vous serez redirigé directement vers le journal quotidien pour lancer votre streak.
+            {{ __('Once created, you will be redirected to the daily journal to start your streak.') }}
         </p>
     </div>
 </div>

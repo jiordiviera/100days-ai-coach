@@ -9,19 +9,19 @@
                 class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
             >
                 <span aria-hidden="true">&larr;</span>
-                <span>Retour à l'accueil</span>
+                <span>{{ __('Back to home') }}</span>
             </x-filament::link>
         </div>
 
         <div class="text-center">
-            <h1 class="block text-2xl font-bold">Connexion</h1>
+            <h1 class="block text-2xl font-bold">{{ __('Sign in') }}</h1>
             <p class="mt-2 text-sm text-muted-foreground">
-                Pas encore de compte ?
+                {{ __('Don’t have an account?') }}
                 <x-filament::link
                     href="{{ route('register') }}"
                     wire:navigate
                 >
-                    Créer un compte
+                    {{ __('Create an account') }}
                 </x-filament::link>
             </p>
         </div>
@@ -35,7 +35,7 @@
                 outlined
             >
                 @include('components.ui.icons.github')
-                <span>Continuer avec GitHub</span>
+                <span>{{ __('Continue with GitHub') }}</span>
             </x-filament::button>
         </div>
 
@@ -43,7 +43,7 @@
             class="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-xs text-muted-foreground"
         >
             <span class="h-px bg-border"></span>
-            <span>ou</span>
+            <span>{{ __('or') }}</span>
             <span class="h-px bg-border"></span>
         </div>
 
@@ -54,12 +54,12 @@
 
                 <div class="flex items-center justify-between">
                     <x-filament::link href="{{ route('password.request') }}" wire:navigate>
-                        Mot de passe oublié ?
+                        {{ __('Forgot your password?') }}
                     </x-filament::link>
                 </div>
 
                 <x-filament::button class="w-full" type="submit" wire:loading.attr="disabled">
-                    Se connecter
+                    {{ __('Sign in') }}
                 </x-filament::button>
             </form>
         </div>

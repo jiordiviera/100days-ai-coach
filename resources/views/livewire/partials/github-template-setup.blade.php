@@ -1,15 +1,15 @@
 <div class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
     <div class="flex items-start justify-between gap-4">
         <div>
-            <h2 class="text-lg font-semibold text-foreground">Repository #100DaysOfCode</h2>
+            <h2 class="text-lg font-semibold text-foreground">{{ __('Repository #100DaysOfCode') }}</h2>
             <p class="text-xs text-muted-foreground">
-                Clone le template GitHub officiel pour suivre ta progression jour après jour.
+                {{ __('Clone the official GitHub template to track your progress day after day.') }}
             </p>
         </div>
         @if ($repository)
             <span
                 class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">
-        Prêt
+        {{ __('Ready') }}
       </span>
         @endif
     </div>
@@ -23,7 +23,7 @@
     @if ($repository)
         <div class="mt-5 space-y-3 text-sm">
             <div class="flex items-center justify-between">
-                <span class="text-muted-foreground">Repository</span>
+                <span class="text-muted-foreground">{{ __('Repository') }}</span>
                 <a
                     href="{{ $repository->repo_url }}"
                     target="_blank"
@@ -39,7 +39,7 @@
                 </a>
             </div>
             <div class="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Visibilité</span>
+                <span>{{ __('Visibility') }}</span>
                 <span
                     class="font-medium text-foreground">{{ \Illuminate\Support\Str::ucfirst($repository->visibility) }}</span>
             </div>
@@ -56,10 +56,11 @@
                 >
                     <span wire:loading wire:target="createRepository"
                           class="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/70 border-t-transparent"></span>
-                    <span>{{ $isProcessing ? 'Création...' : 'Créer le repository' }}</span>
+                    <span>{{ $isProcessing ? __('Creating...') : __('Create repository') }}</span>
                 </x-filament::button>
-                <p class="text-xs text-muted-foreground">Le template {{ config('services.github.template.repository') }}
-                    sera cloné sur le compte sélectionné.</p>
+                <p class="text-xs text-muted-foreground">
+                    {{ __('The template :name will be cloned to the selected account.', ['name' => config('services.github.template.repository')]) }}
+                </p>
             </div>
         </form>
     @endif
