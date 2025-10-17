@@ -61,7 +61,7 @@ class ProjectManager extends Component
         $this->resolveActiveRun();
 
         if (! $this->activeRunId) {
-            $this->setFeedback('error', "Vous devez d'abord rejoindre ou créer un challenge actif avant d'ajouter un projet.");
+            $this->setFeedback('error', __('You must join or create an active challenge before adding a project.'));
 
             return;
         }
@@ -80,7 +80,7 @@ class ProjectManager extends Component
         $this->projectTemplate = null;
 
         $this->resetErrorBag();
-        $this->setFeedback('success', 'Projet créé avec succès.');
+        $this->setFeedback('success', __('Project created successfully.'));
     }
 
     public function createTask(): void
@@ -88,7 +88,7 @@ class ProjectManager extends Component
         $this->resolveActiveRun();
 
         if (! $this->activeRunId) {
-            $this->setFeedback('error', "Vous devez d'abord rejoindre ou créer un challenge actif avant d'ajouter une tâche.");
+            $this->setFeedback('error', __('You must join or create an active challenge before adding a task.'));
 
             return;
         }
@@ -101,13 +101,13 @@ class ProjectManager extends Component
         $project = $this->findProjectForUser($this->taskProjectId);
 
         if ($project->challenge_run_id !== $this->activeRunId) {
-            $this->addError('taskProjectId', 'Sélectionnez un projet lié à votre challenge actif.');
+            $this->addError('taskProjectId', __('Select a project linked to your active challenge.'));
 
             return;
         }
 
         if ($this->taskAssigneeId && ! $this->isAssignableUser($project, $this->taskAssigneeId)) {
-            $this->addError('taskAssigneeId', 'Choisissez un membre du challenge pour l’assignation.');
+            $this->addError('taskAssigneeId', __('Choose a member of the challenge for the assignment.'));
 
             return;
         }
@@ -126,7 +126,7 @@ class ProjectManager extends Component
         $this->commentDrafts[$task->id] = $this->commentDrafts[$task->id] ?? '';
 
         $this->resetErrorBag();
-        $this->setFeedback('success', 'Tâche créée avec succès.');
+        $this->setFeedback('success', __('Task created successfully.'));
     }
 
     public function editProject(string $id): void
@@ -171,7 +171,7 @@ class ProjectManager extends Component
         ]);
 
         if ($this->editTaskAssigneeId && ! $this->isAssignableUser($task->project, $this->editTaskAssigneeId)) {
-            $this->addError('editTaskAssigneeId', 'Choisissez un membre du challenge pour l’assignation.');
+            $this->addError('editTaskAssigneeId', __('Choose a member of the challenge for the assignment.'));
 
             return;
         }
@@ -205,7 +205,7 @@ class ProjectManager extends Component
         }
 
         if (! $this->isAssignableUser($task->project, $userId)) {
-            $this->addError('assignmentBuffer.'.$taskId, 'Membre invalide.');
+            $this->addError('assignmentBuffer.'.$taskId, __('Invalid member.'));
 
             return;
         }
@@ -218,7 +218,7 @@ class ProjectManager extends Component
         $body = trim($this->commentDrafts[$taskId] ?? '');
 
         if ($body === '') {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire ne peut pas être vide.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment cannot be empty.'));
 
             return;
         }
@@ -226,7 +226,7 @@ class ProjectManager extends Component
         $task = $this->findTaskForUser($taskId);
 
         if (! $this->isAssignableUser($task->project, auth()->id())) {
-            $this->addError('commentDrafts.'.$taskId, 'Vous ne pouvez commenter que les tâches de votre challenge.');
+            $this->addError('commentDrafts.'.$taskId, __('You can only comment on tasks within your challenge.'));
 
             return;
         }
@@ -238,13 +238,13 @@ class ProjectManager extends Component
             ->trim();
 
         if ($cleanBody->isEmpty()) {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire doit contenir du texte lisible.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment must contain readable text.'));
 
             return;
         }
 
         if ($cleanBody->length() > 1000) {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire ne doit pas dépasser 1000 caractères.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment must not exceed 1000 characters.'));
 
             return;
         }
@@ -348,7 +348,7 @@ class ProjectManager extends Component
         $templateId = $this->templateSelection[$projectId] ?? null;
 
         if (! $templateId) {
-            $this->addError('templateSelection.'.$projectId, 'Sélectionnez un modèle.');
+            $this->addError('templateSelection.'.$projectId, __('Select a template.'));
 
             return;
         }
@@ -358,7 +358,7 @@ class ProjectManager extends Component
         $this->applyTemplate($project, $templateId);
         $this->templateSelection[$projectId] = '';
 
-        $this->setFeedback('success', 'Modèle appliqué au projet « '.$project->name.' ».');
+        $this->setFeedback('success', __('Template applied to project :name.', ['name' => $project->name]));
     }
 
     protected function getTemplates(): Collection

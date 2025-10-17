@@ -52,7 +52,7 @@ class TaskManager extends Component
         $this->validateOnly('taskName');
 
         if ($this->taskAssigneeId && ! $this->isAssignableUser($this->project, $this->taskAssigneeId)) {
-            $this->addError('taskAssigneeId', 'Choisissez un membre du challenge.');
+            $this->addError('taskAssigneeId', __('Choose a member of the challenge.'));
 
             return;
         }
@@ -87,7 +87,7 @@ class TaskManager extends Component
 
         $task = $this->findTaskForUser((string) $this->editTaskId);
         if ($this->editTaskAssigneeId && ! $this->isAssignableUser($task->project, $this->editTaskAssigneeId)) {
-            $this->addError('editTaskAssigneeId', 'Choisissez un membre du challenge.');
+            $this->addError('editTaskAssigneeId', __('Choose a member of the challenge.'));
 
             return;
         }
@@ -132,7 +132,7 @@ class TaskManager extends Component
         }
 
         if (! $this->isAssignableUser($task->project, $selected)) {
-            $this->addError('assignmentBuffer.'.$taskId, 'Membre invalide.');
+            $this->addError('assignmentBuffer.'.$taskId, __('Invalid member.'));
 
             return;
         }
@@ -145,7 +145,7 @@ class TaskManager extends Component
         $body = trim($this->commentDrafts[$taskId] ?? '');
 
         if ($body === '') {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire ne peut pas être vide.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment cannot be empty.'));
 
             return;
         }
@@ -153,7 +153,7 @@ class TaskManager extends Component
         $task = $this->findTaskForUser($taskId);
 
         if (! $this->isAssignableUser($task->project, auth()->id())) {
-            $this->addError('commentDrafts.'.$taskId, 'Vous ne pouvez commenter que les tâches du challenge.');
+            $this->addError('commentDrafts.'.$taskId, __('You can only comment on tasks within the challenge.'));
 
             return;
         }
@@ -165,13 +165,13 @@ class TaskManager extends Component
             ->trim();
 
         if ($cleanBody->isEmpty()) {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire doit contenir du texte lisible.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment must contain readable text.'));
 
             return;
         }
 
         if ($cleanBody->length() > 1000) {
-            $this->addError('commentDrafts.'.$taskId, 'Le commentaire ne doit pas dépasser 1000 caractères.');
+            $this->addError('commentDrafts.'.$taskId, __('The comment must not exceed 1000 characters.'));
 
             return;
         }

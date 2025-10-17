@@ -5,6 +5,7 @@ use App\Console\Commands\SendDailyLogReminders;
 use App\Console\Commands\SendWeeklyDigest;
 use App\Console\Commands\SyncWakaTime;
 use App\Http\Middleware\EnsureUserIsOnboarded;
+use App\Http\Middleware\SetLocale;
 use App\Providers\AppServiceProvider;
 use App\Providers\AuthServiceProvider;
 use App\Providers\SeoServiceProvider;
@@ -41,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('web', SetLocale::class);
         $middleware->appendToGroup('web', EnsureUserIsOnboarded::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

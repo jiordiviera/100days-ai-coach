@@ -1,19 +1,19 @@
 <div class="mx-auto max-w-5xl space-y-6 py-6">
     <x-filament::section>
         <x-slot name="heading">
-            Gestion des projets
+            {{ __('Project management') }}
         </x-slot>
         <x-slot name="description">
             @if ($activeRun)
-                Challenge actuel&nbsp;:
+                {{ __('Current challenge:') }}
                 <x-filament::link wire:navigate href="{{ route('challenges.show', $activeRun->id) }}">
                     {{ $activeRun->title ?? '100 Days of Code' }}
                 </x-filament::link>
-                &mdash; démarré le {{ $activeRun->start_date->translatedFormat('d F Y') }}
+                &mdash; {{ __('started on :date', ['date' => $activeRun->start_date->translatedFormat('F j, Y')]) }}
             @else
-                Aucun challenge actif pour l'instant.
+                {{ __('No active challenge at the moment.') }}
                 <x-filament::link wire:navigate href="{{ route('challenges.index') }}">
-                    Créez ou rejoignez un challenge pour collaborer sur vos projets.
+                    {{ __('Create or join a challenge to collaborate on your projects.') }}
                 </x-filament::link>
             @endif
         </x-slot>
@@ -27,27 +27,27 @@
 
             @if (! $activeRun)
                 <x-filament::card>
-                    <x-slot name="heading">Aucun challenge actif</x-slot>
+                    <x-slot name="heading">{{ __('No active challenge') }}</x-slot>
                     <p class="text-sm text-muted-foreground">
-                        Créez ou rejoignez d'abord un challenge pour pouvoir ajouter des projets et leurs tâches associées.
+                        {{ __('Create or join a challenge first to add projects and tasks.') }}
                     </p>
                     <x-filament::button tag="a" href="{{ route('challenges.index') }}" class="mt-4">
-                        Voir les challenges
+                        {{ __('Browse challenges') }}
                     </x-filament::button>
                 </x-filament::card>
             @else
                 <div class="grid gap-4 md:grid-cols-2">
                     <x-filament::card>
-                        <x-slot name="heading">Créer un projet</x-slot>
+                        <x-slot name="heading">{{ __('Create a project') }}</x-slot>
 
                         <form wire:submit.prevent="createProject" class="space-y-4">
                             <div class="space-y-2">
-                                <label class="text-sm font-medium" for="project_name">Nom du projet</label>
+                                <label class="text-sm font-medium" for="project_name">{{ __('Project name') }}</label>
                                 <input
                                     id="project_name"
                                     type="text"
                                     wire:model="projectName"
-                                    placeholder="Mon super projet"
+                                    placeholder="{{ __('My awesome project') }}"
                                     class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                 />
                                 @error('projectName')
@@ -57,13 +57,13 @@
 
                             @if ($templates->isNotEmpty())
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium" for="project_template">Modèle</label>
+                                    <label class="text-sm font-medium" for="project_template">{{ __('Template') }}</label>
                                     <select
                                         id="project_template"
                                         wire:model="projectTemplate"
                                         class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                     >
-                                        <option value="">-- Sans modèle --</option>
+                                        <option value="">-- {{ __('No template') }} --</option>
                                         @foreach ($templates as $template)
                                             <option value="{{ $template->id }}">{{ $template->name }}</option>
                                         @endforeach
@@ -75,7 +75,7 @@
                                         @php($selectedTemplate = $templates->firstWhere('id', $projectTemplate))
                                         @if ($selectedTemplate)
                                             <p class="text-xs text-muted-foreground">
-                                                {{ $selectedTemplate->description }} ({{ count($selectedTemplate->tasks ?? []) }} tâches précréées)
+                                                {{ $selectedTemplate->description }} ({{ count($selectedTemplate->tasks ?? []) }} {{ __('pre-created tasks') }})
                                             </p>
                                         @endif
                                     @endif
@@ -83,26 +83,26 @@
                             @endif
 
                             <x-filament::button type="submit">
-                                Créer le projet
+                                {{ __('Create project') }}
                             </x-filament::button>
 
                             <p class="text-xs text-muted-foreground">
-                                Le projet sera rattaché au challenge &laquo;&nbsp;{{ $activeRun->title ?? '100 Days of Code' }}&nbsp;&raquo;.
+                                {{ __('The project will be attached to the challenge “:title”.', ['title' => $activeRun->title ?? '100 Days of Code']) }}
                             </p>
                         </form>
                     </x-filament::card>
 
                     <x-filament::card>
-                        <x-slot name="heading">Créer une tâche</x-slot>
+                        <x-slot name="heading">{{ __('Create a task') }}</x-slot>
 
                         <form wire:submit.prevent="createTask" class="space-y-4">
                             <div class="space-y-2">
-                                <label class="text-sm font-medium" for="task_name">Nom de la tâche</label>
+                                <label class="text-sm font-medium" for="task_name">{{ __('Task name') }}</label>
                                 <input
                                     id="task_name"
                                     type="text"
                                     wire:model="taskName"
-                                    placeholder="Nouvelle tâche"
+                                    placeholder="{{ __('New task') }}"
                                     class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                 />
                                 @error('taskName')
@@ -111,13 +111,13 @@
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-sm font-medium" for="task_project">Projet associé</label>
+                                <label class="text-sm font-medium" for="task_project">{{ __('Related project') }}</label>
                                 <select
                                     id="task_project"
                                     wire:model="taskProjectId"
                                     class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                 >
-                                    <option value="">-- Choisir un projet --</option>
+                                    <option value="">-- {{ __('Select a project') }} --</option>
                                     @foreach ($projects as $project)
                                         <option value="{{ $project->id }}">{{ $project->name }}</option>
                                     @endforeach
@@ -131,13 +131,13 @@
                                 @php($assignable = ($assignableByProject[$taskProjectId] ?? collect()))
                                 @if ($assignable->isNotEmpty())
                                     <div class="space-y-2">
-                                        <label class="text-sm font-medium" for="task_assignee">Assigner à</label>
+                                        <label class="text-sm font-medium" for="task_assignee">{{ __('Assign to') }}</label>
                                         <select
                                             id="task_assignee"
                                             wire:model="taskAssigneeId"
                                             class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                         >
-                                            <option value="">-- Assigner plus tard --</option>
+                                            <option value="">-- {{ __('Assign later') }} --</option>
                                             @foreach ($assignable as $member)
                                                 <option value="{{ $member->id }}">{{ $member->name }}</option>
                                             @endforeach
@@ -150,7 +150,7 @@
                             @endif
 
                             <x-filament::button type="submit">
-                                Créer la tâche
+                                {{ __('Create task') }}
                             </x-filament::button>
                         </form>
                     </x-filament::card>
@@ -161,13 +161,13 @@
 
     <x-filament::section>
         <x-slot name="heading">
-            Mes projets
+            {{ __('My projects') }}
         </x-slot>
         <x-slot name="description">
             @if ($projects->isEmpty())
-                Créez votre premier projet pour suivre vos objectifs 100DaysOfCode.
+                {{ __('Create your first project to track your 100DaysOfCode goals.') }}
             @else
-                Gérez vos projets, leurs membres et leurs tâches quotidiennes.
+                {{ __('Manage your projects, members, and daily tasks.') }}
             @endif
         </x-slot>
 
@@ -180,10 +180,10 @@
                                 <p class="text-base font-semibold">{{ $project->name }}</p>
                                 <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                     <x-filament::badge color="primary">
-                                        {{ $project->tasks->count() }} {{ \Illuminate\Support\Str::plural('tâche', $project->tasks->count()) }}
+                                        {{ $project->tasks->count() }} {{ \Illuminate\Support\Str::plural('task', $project->tasks->count()) }}
                                     </x-filament::badge>
                                     @if ($project->created_at)
-                                        <span>Créé le {{ $project->created_at->translatedFormat('d F Y') }}</span>
+                                        <span>{{ __('Created on :date', ['date' => $project->created_at->translatedFormat('F j, Y')]) }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -195,40 +195,40 @@
                                         size="sm"
                                         color="gray"
                                 >
-                                    Voir les tâches
+                                    {{ __('View tasks') }}
                                 </x-filament::button>
                                 <x-filament::button
                                         type="button"
                                         wire:click="editProject({{ $project->id }})"
                                         size="sm"
                                 >
-                                    Éditer
+                                    {{ __('Edit') }}
                                 </x-filament::button>
                                 <x-filament::button
                                         type="button"
                                         wire:click="deleteProject({{ $project->id }})"
-                                        wire:confirm="Supprimer ce projet ?"
+                                        wire:confirm="{{ __('Delete this project?') }}"
                                         color="danger"
                                         size="sm"
                                 >
-                                    Supprimer
+                                    {{ __('Delete') }}
                                 </x-filament::button>
                             </div>
                             @if ($templates->isNotEmpty())
                                 <form wire:submit.prevent="applyTemplateToProject(@js($project->id))" class="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                                    <label class="font-medium" for="project-template-{{ $project->id }}">Appliquer un modèle :</label>
+                                    <label class="font-medium" for="project-template-{{ $project->id }}">{{ __('Apply a template:') }}</label>
                                     <select
                                         id="project-template-{{ $project->id }}"
                                         wire:model="templateSelection.{{ $project->id }}"
                                         class="rounded-lg border border-border bg-background px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                     >
-                                        <option value="">-- Sélectionner --</option>
+                                        <option value="">-- {{ __('Select') }} --</option>
                                         @foreach ($templates as $template)
                                             <option value="{{ $template->id }}">{{ $template->name }}</option>
                                         @endforeach
                                     </select>
                                     <x-filament::button size="xs" type="submit">
-                                        Ajouter les tâches
+                                        {{ __('Add tasks') }}
                                     </x-filament::button>
                                     @error('templateSelection.'.$project->id)
                                         <p class="text-xs text-destructive">{{ $message }}</p>
@@ -248,7 +248,7 @@
                                         class="w-full min-w-[12rem] flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                 />
                                 <x-filament::button size="sm" type="submit">
-                                    Valider
+                                    {{ __('Save') }}
                                 </x-filament::button>
                                 <x-filament::button
                                         size="sm"
@@ -257,7 +257,7 @@
                                         outlined
                                         wire:click="$set('editProjectId', null)"
                                 >
-                                    Annuler
+                                    {{ __('Cancel') }}
                                 </x-filament::button>
                                 @error('editProjectName')
                                 <p class="text-xs text-destructive">{{ $message }}</p>
@@ -267,26 +267,26 @@
 
                         <div class="grid gap-3 text-sm md:grid-cols-2">
                             <div class="space-y-1">
-                                <p class="text-xs font-semibold uppercase text-muted-foreground">Créateur</p>
+                                <p class="text-xs font-semibold uppercase text-muted-foreground">{{ __('Owner') }}</p>
                                 <p>{{ $project->user->name ?? 'N/A' }}</p>
                             </div>
 
                             <div class="space-y-1">
-                                <p class="text-xs font-semibold uppercase text-muted-foreground">Membres</p>
+                                <p class="text-xs font-semibold uppercase text-muted-foreground">{{ __('Members') }}</p>
                                 <div class="flex flex-wrap gap-2">
                                     @forelse ($project->members as $member)
                                         <span class="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                       {{ $member->name }}
                     </span>
                                     @empty
-                                        <span class="text-xs text-muted-foreground">Aucun membre</span>
+                                        <span class="text-xs text-muted-foreground">{{ __('No members yet') }}</span>
                                     @endforelse
                                 </div>
                             </div>
                         </div>
 
                         <div class="space-y-3">
-                            <p class="text-xs font-semibold uppercase text-muted-foreground">Tâches</p>
+                            <p class="text-xs font-semibold uppercase text-muted-foreground">{{ __('Tasks') }}</p>
                             <div class="space-y-3">
                                 @forelse ($project->tasks as $task)
                                     <div class="space-y-2 rounded-lg border border-border/70 bg-background p-3"
@@ -297,10 +297,10 @@
                                                     {{ $task->title }}
                                                 </p>
                                                 <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                                    <span>Créée par {{ $task->user->name ?? 'N/A' }}</span>
+                                                    <span>{{ __('Created by :name', ['name' => $task->user->name ?? 'N/A']) }}</span>
                                                     @if ($task->assignee)
                                                         <span>•</span>
-                                                        <span>Assignée à {{ $task->assignee->name }}</span>
+                                                        <span>{{ __('Assigned to :name', ['name' => $task->assignee->name]) }}</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -309,7 +309,7 @@
                                             <div class="flex flex-wrap items-center gap-2">
                                                 @if ($task->is_completed)
                                                     <x-filament::badge color="success">
-                                                        Terminée
+                                                        {{ __('Completed') }}
                                                     </x-filament::badge>
                                                 @endif
 
@@ -318,16 +318,16 @@
                                                     wire:click="editTask('{{ $task->id }}')"
                                                     size="xs"
                                                 >
-                                                    Éditer
+                                                    {{ __('Edit') }}
                                                 </x-filament::button>
                                                 <x-filament::button
                                                     type="button"
                                                     wire:click="deleteTask('{{ $task->id }}')"
-                                                    wire:confirm="Supprimer cette tâche ?"
+                                                    wire:confirm="{{ __('Delete this task?') }}"
                                                     color="danger"
                                                     size="xs"
                                                 >
-                                                    Supprimer
+                                                    {{ __('Delete') }}
                                                 </x-filament::button>
                                             </div>
                                         </div>
@@ -335,7 +335,7 @@
                                         @if (($assignableByProject[$project->id] ?? collect())->isNotEmpty())
                                             <div class="flex flex-wrap items-center gap-2">
                                                 <label class="text-xs uppercase text-muted-foreground" for="assignment-{{ $task->id }}">
-                                                    Assigner
+                                                    {{ __('Assign') }}
                                                 </label>
                                                 <select
                                                     id="assignment-{{ $task->id }}"
@@ -343,7 +343,7 @@
                                                     wire:change="updateTaskAssignment('{{ $task->id }}')"
                                                     class="rounded-lg border border-border bg-background px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                                 >
-                                                    <option value="">Non assignée</option>
+                                                    <option value="">{{ __('Unassigned') }}</option>
                                                     @foreach ($assignableByProject[$project->id] as $member)
                                                         <option value="{{ $member->id }}">{{ $member->name }}</option>
                                                     @endforeach
@@ -367,13 +367,13 @@
                                                     wire:model="editTaskAssigneeId"
                                                     class="w-full min-w-[10rem] rounded-lg border border-border bg-background px-2 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                                 >
-                                                    <option value="">Non assignée</option>
+                                                    <option value="">{{ __('Unassigned') }}</option>
                                                     @foreach ($assignableByProject[$project->id] ?? [] as $member)
                                                         <option value="{{ $member->id }}">{{ $member->name }}</option>
                                                     @endforeach
                                                 </select>
                                                 <x-filament::button size="sm" type="submit">
-                                                    Valider
+                                                    {{ __('Save') }}
                                                 </x-filament::button>
                                                 <x-filament::button
                                                     size="sm"
@@ -382,7 +382,7 @@
                                                     outlined
                                                     wire:click="$set('editTaskId', null)"
                                                 >
-                                                    Annuler
+                                                    {{ __('Cancel') }}
                                                 </x-filament::button>
                                                 @error('editTaskName')
                                                     <p class="text-xs text-destructive">{{ $message }}</p>
@@ -394,17 +394,17 @@
                                         @endif
 
                                         <div class="space-y-2 pt-2">
-                                            <p class="text-xs uppercase text-muted-foreground">Commentaires</p>
+                                            <p class="text-xs uppercase text-muted-foreground">{{ __('Comments') }}</p>
                                             <div class="space-y-2">
                                                 @forelse ($task->comments as $comment)
                                                     <div class="rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-sm">
                                                         <p class="text-xs text-muted-foreground">
-                                                            {{ $comment->user->name ?? 'Utilisateur inconnu' }} · {{ $comment->created_at?->diffForHumans() }}
+                                                            {{ $comment->user->name ?? __('Unknown user') }} · {{ $comment->created_at?->diffForHumans() }}
                                                         </p>
                                                         <p>{{ $comment->body }}</p>
                                                     </div>
                                                 @empty
-                                                    <p class="text-xs text-muted-foreground">Pas encore de commentaire.</p>
+                                                    <p class="text-xs text-muted-foreground">{{ __('No comments yet.') }}</p>
                                                 @endforelse
                                             </div>
 
@@ -412,12 +412,12 @@
                                                 <x-filament::input
                                                     id="comment_{{ $task->id }}"
                                                     type="text"
-                                                    placeholder="Ajouter un commentaire"
+                                                    placeholder="{{ __('Add a comment') }}"
                                                     wire:model.defer="commentDrafts.{{ $task->id }}"
                                                     class="w-full flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                                                 />
                                                 <x-filament::button size="xs" type="submit">
-                                                    Envoyer
+                                                    {{ __('Send') }}
                                                 </x-filament::button>
                                                 @error('commentDrafts.'.$task->id)
                                                     <p class="text-xs text-destructive">{{ $message }}</p>
@@ -426,7 +426,7 @@
                                         </div>
                                     </div>
                                 @empty
-                                    <p class="text-sm text-muted-foreground">Aucune tâche pour ce projet.</p>
+                                    <p class="text-sm text-muted-foreground">{{ __('No tasks for this project yet.') }}</p>
                                 @endforelse
                             </div>
                         </div>
@@ -434,9 +434,9 @@
                 </x-filament::card>
             @empty
                 <x-filament::card>
-                    <x-slot name="heading">Aucun projet</x-slot>
+                    <x-slot name="heading">{{ __('No projects') }}</x-slot>
                     <p class="text-sm text-muted-foreground">
-                        Lancez votre premier projet pour documenter vos progrès.
+                        {{ __('Start your first project to document your progress.') }}
                     </p>
                 </x-filament::card>
             @endforelse

@@ -3,69 +3,69 @@
     $user = auth()->user();
     $cta = $isAuthenticated
         ? [
-            'eyebrow' => 'On garde le rythme',
-            'title' => 'Rédige ton log du jour',
-            'description' => 'Capture ton apprentissage et garde ta streak vivante.',
+            'eyebrow' => __('Stay on pace'),
+            'title' => __('Write today’s log'),
+            'description' => __('Capture your learning and keep your streak alive.'),
             'route' => route('daily-challenge'),
-            'label' => 'Ouvrir le Daily Challenge',
+            'label' => __('Open the Daily Challenge'),
         ]
         : [
             'eyebrow' => '#100DaysOfCode',
-            'title' => 'Rejoins la communauté des expéditeurs',
-            'description' => 'Fixe ton objectif, suis ta progression, partage tes victoires.',
+            'title' => __('Join the shipping community'),
+            'description' => __('Set your focus, track your progress, and celebrate your wins.'),
             'route' => Route::has('register') ? route('register') : route('home'),
-            'label' => Route::has('register') ? 'Commencer maintenant' : 'Explorer le défi',
+            'label' => Route::has('register') ? __('Start now') : __('Explore the challenge'),
         ];
 
     $ctaSecondary = $isAuthenticated
-        ? ['label' => 'Voir mes projets', 'route' => route('projects.index')]
-        : ['label' => 'Voir la démo', 'route' => '#how-it-works'];
+        ? ['label' => __('View my projects'), 'route' => route('projects.index')]
+        : ['label' => __('See the demo'), 'route' => '#how-it-works'];
 
     $ctaSecondarySupportsNavigate = ! str_starts_with($ctaSecondary['route'], '#');
 
     $ctaBullets = $isAuthenticated
         ? [
-            'Sauvegarde ta streak quotidienne en moins d’une minute.',
-            'Active le coach IA pour résumer et partager ton apprentissage.',
-            'Débloque des badges à chaque étape clé du run.',
+            __('Log your streak in under a minute.'),
+            __('Activate the AI coach to summarise and share your learning.'),
+            __('Unlock badges at every milestone of your run.'),
         ]
         : [
-            'Planifie tes 100 prochains jours avec un journal guidé.',
-            'Reçois rappels et tips IA pour tenir la cadence.',
-            'Suis ta progression et décroche des badges visibles.',
+            __('Plan your next 100 days with a guided journal.'),
+            __('Receive reminders and AI tips to keep the pace.'),
+            __('Track your progress and unlock visible badges.'),
         ];
 
     $navigationSections = [
         [
-            'title' => 'Produit',
+            'title' => __('Product'),
             'links' => [
-                ['label' => 'Accueil', 'route' => route('home'), 'visible' => true],
-                ['label' => 'Dashboard', 'route' => route('dashboard'), 'visible' => $isAuthenticated],
-                ['label' => 'Daily Challenge', 'route' => route('daily-challenge'), 'visible' => $isAuthenticated],
+                ['label' => __('Home'), 'route' => route('home'), 'visible' => true],
+                ['label' => __('Dashboard'), 'route' => route('dashboard'), 'visible' => $isAuthenticated],
+                ['label' => __('Daily Challenge'), 'route' => route('daily-challenge'), 'visible' => $isAuthenticated],
             ],
         ],
         [
-            'title' => 'Parcours',
+            'title' => __('Journey'),
             'links' => [
-                ['label' => 'Challenges', 'route' => route('challenges.index'), 'visible' => $isAuthenticated],
-                ['label' => 'Projets', 'route' => route('projects.index'), 'visible' => $isAuthenticated],
+                ['label' => __('Challenges'), 'route' => route('challenges.index'), 'visible' => $isAuthenticated],
+                ['label' => __('Projects'), 'route' => route('projects.index'), 'visible' => $isAuthenticated],
                 ['label' => '#100DaysOfCode', 'route' => config('app.url'), 'visible' => true, 'external' => true],
             ],
         ],
         [
-            'title' => 'Support',
+            'title' => __('Support'),
             'links' => [
-                ['label' => 'Mentions légales', 'route' => '#', 'visible' => true],
-                ['label' => 'Politique de confidentialité', 'route' => '#', 'visible' => true],
-                ['label' => 'Contact', 'route' => 'mailto:hello@jiordiviera.me', 'visible' => true, 'external' => true],
+                ['label' => __('Legal notice'), 'route' => '#', 'visible' => true],
+                ['label' => __('Privacy policy'), 'route' => '#', 'visible' => true],
+                ['label' => __('Contact'), 'route' => 'mailto:hello@jiordiviera.me', 'visible' => true, 'external' => true],
             ],
         ],
         [
-            'title' => 'Ressources',
+            'title' => __('Resources'),
             'links' => [
                 ['label' => 'GitHub', 'route' => 'https://github.com/jiordiviera/100DaysOfCode', 'visible' => true, 'external' => true],
-                ['label' => 'Community hashtag', 'route' => 'https://x.com/hashtag/100DaysOfCode', 'visible' => true, 'external' => true],
-                ['label' => 'Docs fil rouge', 'route' => route('home') . '#how-it-works', 'visible' => true],
+                ['label' => __('Community hashtag'), 'route' => 'https://x.com/hashtag/100DaysOfCode', 'visible' => true, 'external' => true],
+                ['label' => __('Guided docs'), 'route' => route('home') . '#how-it-works', 'visible' => true],
             ],
         ],
     ];
@@ -125,7 +125,7 @@
           </div>
         </div>
         <p class="text-sm leading-relaxed text-muted-foreground">
-          Un coach IA pour tenir la cadence, garder ta streak et célébrer chaque shipment.
+          {{ __('An AI coach to keep the pace, maintain your streak, and celebrate every shipment.') }}
         </p>
         <div class="flex items-center gap-3">
           @foreach ($socials as $social)
@@ -190,14 +190,14 @@
 
     <div class="border-t border-border/70 py-6">
       <div class="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row sm:text-sm">
-        <p>&copy; {{ now()->year }} {{ config('app.name') }}. Tous droits réservés.</p>
+        <p>&copy; {{ now()->year }} {{ config('app.name') }}. {{ __('All rights reserved.') }}</p>
         @if ($isAuthenticated && $user)
           <p class="flex items-center gap-1">
             <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-[0.7rem] font-semibold text-primary">{{ mb_substr($user->name, 0, 1) }}</span>
-            <span>Connecté en tant que <span class="font-semibold text-foreground">{{ $user->name }}</span></span>
+            <span>{{ __('Signed in as') }} <span class="font-semibold text-foreground">{{ $user->name }}</span></span>
           </p>
         @else
-          <p>Prêt à commencer ? <a wire:navigate href="{{ route('home') }}" class="font-semibold text-primary">Découvre le défi</a></p>
+          <p>{{ __('Ready to start?') }} <a wire:navigate href="{{ route('home') }}" class="font-semibold text-primary">{{ __('Discover the challenge') }}</a></p>
         @endif
       </div>
     </div>

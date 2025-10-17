@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PublicChallengeController;
 use App\Http\Controllers\PublicDailyLogController;
 use App\Http\Controllers\PublicProfileController;
@@ -28,6 +29,7 @@ Route::get('profiles/{username}', PublicProfileController::class)->name('public.
 Route::get('challenges/public/{slug}', PublicChallengeController::class)->name('public.challenge');
 Route::get('sitemap.xml', PublicSitemapController::class)->name('public.sitemap');
 Route::get('support', Support::class)->name('support');
+Route::post('locale', LocaleController::class)->name('locale.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('onboarding', OnboardingWizard::class)->name('onboarding.wizard');

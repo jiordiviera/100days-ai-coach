@@ -218,11 +218,11 @@ class DailyChallenge extends Component implements HasForms
                     ->minLength(10)
                     ->columnSpanFull(),
                 CheckboxList::make('projects_worked_on')
-                    ->label('Projets travaillés')
+                    ->label(__('Projects worked on'))
                     ->options(fn () => $this->allProjects?->pluck('name', 'id')->mapWithKeys(fn ($label, $id) => [(string) $id => $label])->toArray() ?? [])
                     ->columnSpanFull(),
                 TextInput::make('hours_coded')
-                    ->label('Heures codées')
+                    ->label(__('Hours coded'))
                     ->numeric()
                     ->minValue(0.25)
                     ->step(0.25)
@@ -233,7 +233,7 @@ class DailyChallenge extends Component implements HasForms
                     ->rows(3)
                     ->columnSpanFull(),
                 Textarea::make('challenges_faced')
-                    ->label('Difficultés rencontrées')
+                    ->label(__('Challenges faced'))
                     ->rows(3)
                     ->columnSpanFull(),
             ]);
@@ -339,8 +339,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (! $existing && $date->lt($today) && $retroDiff > 2) {
             Notification::make()
-                ->title('Rétro-complétion non autorisée')
-                ->body('Tu peux compléter au maximum les deux derniers jours. Au-delà, garde la motivation pour aujourd’hui !')
+                ->title(__('Retro completion not allowed'))
+                ->body(__('You can fill in at most the previous two days. Stay motivated for today!'))
                 ->warning()
                 ->send();
 
@@ -375,18 +375,22 @@ class DailyChallenge extends Component implements HasForms
             ->first();
 
         $delta = $yesterday ? $hours - (float) $yesterday->hours_coded : null;
-        $deltaText = $delta === null ? '' : ($delta >= 0 ? '+' : '−').number_format(abs($delta), 2).' h vs veille';
+        $deltaText = $delta === null ? '' : ($delta >= 0 ? '+' : '−').number_format(abs($delta), 2).' h vs '.strtolower(__('yesterday'));
 
-        $title = $isRetro ? 'Entrée rétro enregistrée' : 'Journal sauvegardé';
-        $retroLabel = $isRetro ? ' (J-'.($retroDiff ?: 1).')' : '';
+        $title = $isRetro ? __('Retro entry saved') : __('Daily log saved');
+        $retroLabel = $isRetro ? ' (D-'.($retroDiff ?: 1).')' : '';
 
         Notification::make()
             ->title($title)
-            ->body(trim('Vous avez enregistré '.number_format($hours, 2).' h'.$retroLabel.' aujourd’hui. '.$deltaText))
+            ->body(trim(__('You logged :hours h:retro today. :delta', [
+                'hours' => number_format($hours, 2),
+                'retro' => $retroLabel,
+                'delta' => $deltaText,
+            ])))
             ->success()
             ->send();
 
-        session()->flash('message', 'Entrée quotidienne sauvegardée !');
+        session()->flash('message', __('Daily log saved!'));
         $this->isEditing = false;
         $this->loadTodayEntry($run);
     }
@@ -395,8 +399,8 @@ class DailyChallenge extends Component implements HasForms
     {
         if (! $this->todayEntry) {
             Notification::make()
-                ->title('Aucun journal à partager')
-                ->body('Enregistre ton entrée du jour pour générer un lien de partage.')
+                ->title(__('No log to share'))
+                ->body(__('Save today’s entry to generate a shareable link.'))
                 ->warning()
                 ->send();
 
@@ -407,8 +411,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (! $log) {
             Notification::make()
-                ->title('Entrée introuvable')
-                ->body('Rafraîchis la page et réessaie.')
+                ->title(__('Entry not found'))
+                ->body(__('Refresh the page and try again.'))
                 ->danger()
                 ->send();
 
@@ -420,9 +424,9 @@ class DailyChallenge extends Component implements HasForms
         $this->refreshShareLink($log);
 
         Notification::make()
-            ->title('Lien de partage prêt')
+            ->title(__('Share link ready'))
             ->body(sprintf(
-                'Copie l’URL et partage ton journal #100DaysOfCode ! Le lien restera actif %d jours.',
+                __('Copy the URL and share your #100DaysOfCode journal! The link remains active for %d days.'),
                 max(1, (int) config('sharing.public_log_ttl_days', 14))
             ))
             ->success()
@@ -451,8 +455,8 @@ class DailyChallenge extends Component implements HasForms
         $this->refreshShareLink(null);
 
         Notification::make()
-            ->title('Partage désactivé')
-            ->body('Ce journal n’est plus accessible publiquement.')
+            ->title(__('Public sharing disabled'))
+            ->body(__('This journal is no longer publicly accessible.'))
             ->info()
             ->send();
     }
@@ -461,8 +465,8 @@ class DailyChallenge extends Component implements HasForms
     {
         if (! $this->todayEntry) {
             Notification::make()
-                ->title('Aucun journal à régénérer')
-                ->body("Créez d'abord votre entrée du jour avant de relancer l'IA.")
+                ->title(__('No log to regenerate'))
+                ->body(__('Create today’s entry before launching the AI again.'))
                 ->warning()
                 ->send();
 
@@ -473,8 +477,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (! $log) {
             Notification::make()
-                ->title('Entrée introuvable')
-                ->body('Veuillez recharger la page et réessayer.')
+                ->title(__('Entry not found'))
+                ->body(__('Please reload the page and try again.'))
                 ->danger()
                 ->send();
 
@@ -483,8 +487,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (GenerateDailyLogInsights::isThrottledFor($log)) {
             Notification::make()
-                ->title('Régénération IA limitée')
-                ->body("Une génération IA a déjà été effectuée aujourd'hui. Réessayez demain.")
+                ->title(__('AI regeneration limited'))
+                ->body(__('An AI generation has already been run today. Try again tomorrow.'))
                 ->info()
                 ->send();
 
@@ -494,8 +498,8 @@ class DailyChallenge extends Component implements HasForms
         $log->queueAiGeneration();
 
         Notification::make()
-            ->title('Régénération planifiée')
-            ->body('Le résumé IA sera mis à jour dans les prochaines minutes.')
+            ->title(__('Regeneration scheduled'))
+            ->body(__('The AI summary will be refreshed in the next few minutes.'))
             ->send();
 
         $this->refreshAiPanel($log);
@@ -629,7 +633,7 @@ class DailyChallenge extends Component implements HasForms
 
                 return [
                     'id' => $projectId,
-                    'name' => $project?->name ?? 'Projet supprimé',
+                    'name' => $project?->name ?? __('Deleted project'),
                     'count' => $count,
                 ];
             })
@@ -715,8 +719,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (! $invitation) {
             Notification::make()
-                ->title('Invitation introuvable')
-                ->body('Cette invitation a déjà été utilisée ou a expiré.')
+                ->title(__('Invitation not found'))
+                ->body(__('This invitation has already been used or has expired.'))
                 ->warning()
                 ->send();
 
@@ -730,8 +734,8 @@ class DailyChallenge extends Component implements HasForms
         $this->loadTodayEntry($run);
 
         Notification::make()
-            ->title('Invitation acceptée')
-            ->body("Vous avez rejoint le challenge « {$run->title} ». Bon courage !")
+            ->title(__('Invitation accepted'))
+            ->body(__('You have joined the challenge “:title”. Keep up the momentum!', ['title' => $run->title]))
             ->success()
             ->send();
     }
@@ -742,8 +746,8 @@ class DailyChallenge extends Component implements HasForms
 
         if ($code === '') {
             Notification::make()
-                ->title('Code requis')
-                ->body('Saisissez un code d’invitation ou de challenge public.')
+                ->title(__('Code required'))
+                ->body(__('Enter an invitation code or a public challenge code.'))
                 ->warning()
                 ->send();
 
@@ -759,8 +763,8 @@ class DailyChallenge extends Component implements HasForms
         if ($invitation) {
             if ($invitation->email !== auth()->user()->email) {
                 Notification::make()
-                    ->title('Invitation réservée')
-                    ->body('Ce code est associé à une autre adresse email.')
+                    ->title(__('Reserved invitation'))
+                    ->body(__('This code is associated with another email address.'))
                     ->danger()
                     ->send();
 
@@ -774,8 +778,8 @@ class DailyChallenge extends Component implements HasForms
             $this->refreshPendingInvitations();
 
             Notification::make()
-                ->title('Invitation acceptée')
-                ->body("Vous avez rejoint le challenge « {$run->title} ». Bon courage !")
+                ->title(__('Invitation accepted'))
+                ->body(__('You have joined the challenge “:title”. Keep up the momentum!', ['title' => $run->title]))
                 ->success()
                 ->send();
 
@@ -789,8 +793,8 @@ class DailyChallenge extends Component implements HasForms
 
         if (! $run) {
             Notification::make()
-                ->title('Code invalide')
-                ->body('Impossible de trouver un challenge pour ce code.')
+                ->title(__('Invalid code'))
+                ->body(__('No challenge could be found for this code.'))
                 ->danger()
                 ->send();
 
@@ -804,8 +808,8 @@ class DailyChallenge extends Component implements HasForms
         $this->refreshPendingInvitations();
 
         Notification::make()
-            ->title('Challenge rejoint')
-            ->body("Vous avez rejoint « {$run->title} ». Bon challenge !")
+            ->title(__('Challenge joined'))
+            ->body(__('You have joined “:title”. Have a great challenge!', ['title' => $run->title]))
             ->success()
             ->send();
     }

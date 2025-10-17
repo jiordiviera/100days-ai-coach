@@ -3,26 +3,29 @@
     $user = auth()->user();
     $primaryLinks = $isAuthenticated
         ? [
-            ['label' => 'Accueil', 'route' => route('home'), 'active' => ['home']],
-            ['label' => 'Dashboard', 'route' => route('dashboard'), 'active' => ['dashboard']],
+            ['label' => __('Home'), 'route' => route('home'), 'active' => ['home']],
+            ['label' => __('Dashboard'), 'route' => route('dashboard'), 'active' => ['dashboard']],
         ]
         : [
-            ['label' => 'Accueil', 'route' => route('home'), 'active' => ['home']],
+            ['label' => __('Home'), 'route' => route('home'), 'active' => ['home']],
         ];
     $secondaryLinks = $isAuthenticated
         ? [
-            ['label' => 'Challenges', 'route' => route('challenges.index'), 'active' => ['challenges.*']],
-            ['label' => 'Projets', 'route' => route('projects.index'), 'active' => ['projects.*']],
-            ['label' => 'Leaderboard', 'route' => route('leaderboard'), 'active' => ['leaderboard']],
-            ['label' => 'Paramètres', 'route' => route('settings'), 'active' => ['settings']],
+            ['label' => __('Challenges'), 'route' => route('challenges.index'), 'active' => ['challenges.*']],
+            ['label' => __('Projects'), 'route' => route('projects.index'), 'active' => ['projects.*']],
+            ['label' => __('Leaderboard'), 'route' => route('leaderboard'), 'active' => ['leaderboard']],
+            ['label' => __('Settings'), 'route' => route('settings'), 'active' => ['settings']],
         ]
         : [];
     $ctaLink = $isAuthenticated
         ? ['label' => 'Daily Challenge', 'route' => route('daily-challenge')]
-        : (Route::has('register') ? ['label' => 'Commencer', 'route' => route('register')] : null);
+        : (Route::has('register') ? ['label' => __('Get started'), 'route' => route('register')] : null);
     $loginLink = Route::has('login') ? route('login') : null;
     $avatarUrl = $isAuthenticated ? optional(optional($user)->profile)->avatar_url : null;
-    $initial = $isAuthenticated ? mb_strtoupper(mb_substr($user->name ?? 'Invité', 0, 1)) : null;
+    $initial = $isAuthenticated ? mb_strtoupper(mb_substr($user->name ?? __('Guest'), 0, 1)) : null;
+    $availableLocales = config('app.available_locales', ['en', 'fr']);
+    $currentLocale = app()->getLocale();
+//    dd($currentLocale);
 @endphp
 
 <header
@@ -66,7 +69,7 @@
             :aria-expanded="open"
             aria-controls="header-more-menu"
           >
-            <span>Parcours</span>
+            <span>{{ __('Explore') }}</span>
             <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
             </svg>
@@ -106,6 +109,22 @@
     </nav>
 
     <div class="hidden items-center gap-3 md:flex">
+      <form method="POST" action="{{ route('locale.update') }}" class="relative">
+        @csrf
+        <label class="sr-only" for="desktop-locale">{{ __('Language') }}</label>
+        <select
+          id="desktop-locale"
+          name="locale"
+          class="rounded-full border border-border/70 bg-background px-3 py-1 text-xs font-semibold text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+          onchange="this.form.submit()"
+        >
+          @foreach ($availableLocales as $locale)
+            <option value="{{ $locale }}" @selected($locale === $currentLocale)>
+              {{ strtoupper($locale) }}
+            </option>
+          @endforeach
+        </select>
+      </form>
       @if ($ctaLink)
         <a
           wire:navigate
@@ -129,14 +148,14 @@
             aria-controls="header-user-menu"
           >
             @if ($avatarUrl)
-              <img src="{{ $avatarUrl }}" alt="Avatar utilisateur" class="h-8 w-8 rounded-full object-cover" />
+              <img src="{{ $avatarUrl }}" alt="{{ __('User avatar') }}" class="h-8 w-8 rounded-full object-cover" />
             @else
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
                 {{ $initial }}
               </span>
             @endif
             <span class="hidden text-left sm:block">
-              <span class="block text-xs text-muted-foreground">Connecté</span>
+              <span class="block text-xs text-muted-foreground">{{ __('Signed in') }}</span>
               <span class="block leading-tight">{{ $user->name }}</span>
             </span>
             <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="currentColor">
@@ -158,7 +177,7 @@
           >
             <div class="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2">
               @if ($avatarUrl)
-                <img src="{{ $avatarUrl }}" alt="Avatar utilisateur" class="h-9 w-9 rounded-full object-cover" />
+                <img src="{{ $avatarUrl }}" alt="{{ __('User avatar') }}" class="h-9 w-9 rounded-full object-cover" />
               @else
                 <span class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
                   {{ $initial }}
@@ -170,8 +189,8 @@
               </div>
             </div>
             <div class="mt-2 flex flex-col text-sm">
-              <a wire:navigate href="{{ route('settings') }}" class="rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground" @click="open = false">Paramètres</a>
-              <a wire:navigate href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground" @click="open = false">Mon tableau de bord</a>
+              <a wire:navigate href="{{ route('settings') }}" class="rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground" @click="open = false">{{ __('Settings') }}</a>
+              <a wire:navigate href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground" @click="open = false">{{ __('My dashboard') }}</a>
             </div>
             <div class="mt-2 border-t border-border/70 pt-2">
               <button
@@ -180,7 +199,7 @@
                 class="flex w-full items-center justify-center rounded-lg bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground transition hover:brightness-95"
                 @click="open = false"
               >
-                Déconnexion
+                {{ __('Log out') }}
               </button>
             </div>
           </div>
@@ -192,7 +211,7 @@
             href="{{ $loginLink }}"
             class="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
           >
-            Connexion
+            {{ __('Sign in') }}
           </a>
         @endif
       @endauth
@@ -203,7 +222,7 @@
       @click="mobileOpen = ! mobileOpen"
       :aria-expanded="mobileOpen"
       aria-controls="mobile-nav"
-      aria-label="Basculer le menu"
+      aria-label="{{ __('Toggle menu') }}"
     >
       <svg x-show="!mobileOpen" class="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -230,7 +249,7 @@
       @auth
         <div class="flex items-center gap-3">
           @if ($avatarUrl)
-            <img src="{{ $avatarUrl }}" alt="Avatar utilisateur" class="h-10 w-10 rounded-full object-cover" />
+            <img src="{{ $avatarUrl }}" alt="{{ __('User avatar') }}" class="h-10 w-10 rounded-full object-cover" />
           @else
             <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
               {{ $initial }}
@@ -242,6 +261,21 @@
           </div>
         </div>
       @endauth
+
+      <form method="POST" action="{{ route('locale.update') }}" class="flex items-center">
+        @csrf
+        <label class="sr-only" for="mobile-locale">{{ __('Language') }}</label>
+        <select
+          id="mobile-locale"
+          name="locale"
+          class="w-full rounded-lg border border-border/70 bg-background px-3 py-2 text-sm font-semibold text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
+          onchange="this.form.submit()"
+        >
+          @foreach ($availableLocales as $locale)
+            <option value="{{ $locale }}" @selected($locale === $currentLocale)>{{ strtoupper($locale) }}</option>
+          @endforeach
+        </select>
+      </form>
 
       <nav class="flex flex-col gap-2 text-sm font-medium">
         @foreach ($primaryLinks as $link)
@@ -259,7 +293,7 @@
 
       @if (! empty($secondaryLinks))
         <div>
-          <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Espace membre</span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{{ __('Member area') }}</span>
           <div class="mt-3 flex flex-col gap-2 text-sm">
             @foreach ($secondaryLinks as $link)
               @php($isActive = request()->routeIs($link['active']))
@@ -295,7 +329,7 @@
             class="w-full rounded-full bg-destructive px-3 py-2 text-center text-sm font-semibold text-destructive-foreground transition hover:brightness-95"
             @click="mobileOpen = false"
           >
-            Déconnexion
+            {{ __('Log out') }}
           </button>
         @else
           @if ($loginLink)
@@ -305,7 +339,7 @@
               class="w-full rounded-full border border-border/70 px-3 py-2 text-center text-sm font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
               @click="mobileOpen = false"
             >
-              Connexion
+              {{ __('Sign in') }}
             </a>
           @endif
         @endauth

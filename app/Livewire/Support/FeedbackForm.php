@@ -47,20 +47,20 @@ class FeedbackForm extends Component implements HasForms
             ])
             ->components([
                 TextInput::make('name')
-                    ->label('Ton nom')
+                    ->label(__('Your name'))
                     ->required()
                     ->maxLength(120),
                 TextInput::make('email')
-                    ->label('Email')
+                    ->label(__('Email'))
                     ->email()
                     ->required()
                     ->maxLength(190),
                 Select::make('category')
-                    ->label('Catégorie')
+                    ->label(__('Category'))
                     ->options([
-                        'question' => 'Question',
-                        'bug' => 'Bug',
-                        'idea' => 'Idée',
+                        'question' => __('Question'),
+                        'bug' => __('Bug'),
+                        'idea' => __('Idea'),
                     ])
                     ->required()
                     ->default('question')
@@ -69,7 +69,7 @@ class FeedbackForm extends Component implements HasForms
                         'sm' => 2,
                     ]),
                 Textarea::make('message')
-                    ->label('Dis-nous tout')
+                    ->label(__('Tell us everything'))
                     ->rows(5)
                     ->required()
                     ->maxLength(2000)
@@ -101,8 +101,8 @@ class FeedbackForm extends Component implements HasForms
         ]);
 
         Notification::make()
-            ->title('Merci pour ton retour !')
-            ->body('Nous revenons vers toi rapidement. Tu peux suivre la discussion par email.')
+            ->title(__('Thanks for your feedback!'))
+            ->body(__('We will get back to you shortly. You can follow the conversation via email.'))
             ->success()
             ->send();
     }

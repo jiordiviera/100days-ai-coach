@@ -1,10 +1,10 @@
 <div class="mx-auto max-w-3xl space-y-6 py-8">
   <x-filament::section>
     <x-slot name="heading">
-      Tâches du projet
+      {{ __('Project tasks') }}
     </x-slot>
     <x-slot name="description">
-      Gérez vos tâches quotidiennes pour « {{ $project->name }} ».
+      {{ __('Manage your daily tasks for “:project”.', ['project' => $project->name]) }}
     </x-slot>
 
     @if (session()->has('message'))
@@ -16,11 +16,11 @@
     <x-filament::card>
       <form wire:submit.prevent="createTask" class="space-y-4">
         <div>
-          <label class="text-sm font-medium">Nom de la tâche</label>
+          <label class="text-sm font-medium">{{ __('Task name') }}</label>
           <input
             type="text"
             wire:model="taskName"
-            placeholder="Nom de la tâche..."
+            placeholder="{{ __('Task name...') }}"
             class="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
           @error('taskName')
@@ -30,13 +30,13 @@
 
         @if (! empty($assignableUsers))
           <div>
-            <label class="text-sm font-medium" for="task_assignee">Assigner à</label>
+            <label class="text-sm font-medium" for="task_assignee">{{ __('Assign to') }}</label>
             <select
               id="task_assignee"
               wire:model="taskAssigneeId"
               class="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
             >
-              <option value="">-- Assigner plus tard --</option>
+              <option value="">-- {{ __('Assign later') }} --</option>
               @foreach ($assignableUsers as $member)
                 <option value="{{ $member->id }}">{{ $member->name }}</option>
               @endforeach
@@ -48,7 +48,7 @@
         @endif
 
         <x-filament::button type="submit">
-          Créer la tâche
+          {{ __('Create task') }}
         </x-filament::button>
       </form>
     </x-filament::card>
@@ -63,15 +63,15 @@
                   {{ $task->title }}
                 </p>
                 <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span>Créée par {{ $task->user->name ?? 'N/A' }}</span>
+                  <span>{{ __('Created by :name', ['name' => $task->user->name ?? 'N/A']) }}</span>
                   @if ($task->assignee)
                     <span>•</span>
-                    <span>Assignée à {{ $task->assignee->name }}</span>
+                    <span>{{ __('Assigned to :name', ['name' => $task->assignee->name]) }}</span>
                   @endif
                 </div>
                 @if ($task->is_completed)
                   <x-filament::badge color="success">
-                    Terminée
+                    {{ __('Completed') }}
                   </x-filament::badge>
                 @endif
               </div>
@@ -84,7 +84,7 @@
                     color="success"
                     type="button"
                   >
-                    Marquer comme terminée
+                    {{ __('Mark as completed') }}
                   </x-filament::button>
                 @endif
 
@@ -93,31 +93,31 @@
                   size="sm"
                   type="button"
                 >
-                  Éditer
+                  {{ __('Edit') }}
                 </x-filament::button>
 
                 <x-filament::button
-                  wire:confirm="Supprimer cette tâche ?"
+                  wire:confirm="{{ __('Delete this task?') }}"
                   wire:click="deleteTask({{ $task->id }})"
                   size="sm"
                   color="danger"
                   type="button"
                 >
-                  Supprimer
+                  {{ __('Delete') }}
                 </x-filament::button>
               </div>
             </div>
 
             @if (! empty($assignableUsers))
               <div class="flex flex-wrap items-center gap-2">
-                <label class="text-xs uppercase text-muted-foreground" for="assign-{{ $task->id }}">Assigner</label>
+                <label class="text-xs uppercase text-muted-foreground" for="assign-{{ $task->id }}">{{ __('Assign') }}</label>
                 <select
                   id="assign-{{ $task->id }}"
                   wire:model="assignmentBuffer.{{ $task->id }}"
                   wire:change="updateTaskAssignment('{{ $task->id }}')"
                   class="rounded-lg border border-border bg-background px-2 py-1 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                 >
-                  <option value="">Non assignée</option>
+                  <option value="">{{ __('Unassigned') }}</option>
                   @foreach ($assignableUsers as $member)
                     <option value="{{ $member->id }}">{{ $member->name }}</option>
                   @endforeach
@@ -140,14 +140,14 @@
                     wire:model="editTaskAssigneeId"
                     class="w-full min-w-[12rem] rounded-lg border border-border bg-background px-2 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                   >
-                    <option value="">Non assignée</option>
+                    <option value="">{{ __('Unassigned') }}</option>
                     @foreach ($assignableUsers as $member)
                       <option value="{{ $member->id }}">{{ $member->name }}</option>
                     @endforeach
                   </select>
                 @endif
                 <x-filament::button size="sm" type="submit">
-                  Valider
+                  {{ __('Save') }}
                 </x-filament::button>
                 <x-filament::button
                   size="sm"
@@ -156,7 +156,7 @@
                   outlined
                   wire:click="$set('editTaskId', null)"
                 >
-                  Annuler
+                  {{ __('Cancel') }}
                 </x-filament::button>
                 @error('editTaskName')
                   <p class="mt-1 text-xs text-destructive">{{ $message }}</p>
@@ -178,7 +178,7 @@
                     <p>{{ $comment->body }}</p>
                   </div>
                 @empty
-                  <p class="text-xs text-muted-foreground">Pas encore de commentaire.</p>
+                  <p class="text-xs text-muted-foreground">{{ __('No comments yet.') }}</p>
                 @endforelse
               </div>
 
@@ -186,11 +186,11 @@
                 <input
                   type="text"
                   wire:model.defer="commentDrafts.{{ $task->id }}"
-                  placeholder="Ajouter un commentaire"
+                  placeholder="{{ __('Add a comment') }}"
                   class="w-full flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
                 <x-filament::button size="xs" type="submit">
-                  Envoyer
+                  {{ __('Send') }}
                 </x-filament::button>
                 @error('commentDrafts.'.$task->id)
                   <p class="text-xs text-destructive">{{ $message }}</p>
@@ -202,17 +202,17 @@
       @empty
         <x-filament::card>
           <x-slot name="heading">
-            Aucune tâche pour ce projet
+            {{ __('No tasks for this project yet.') }}
           </x-slot>
           <p class="text-sm text-muted-foreground">
-            Ajoutez votre première tâche pour commencer à progresser !
+            {{ __('Add your first task to start making progress!') }}
           </p>
         </x-filament::card>
       @endforelse
     </div>
 
     <x-filament::button tag="a" href="{{ route('projects.index') }}" color="gray">
-      Retour aux projets
+      {{ __('Back to projects') }}
     </x-filament::button>
   </x-filament::section>
 </div>

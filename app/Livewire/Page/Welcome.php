@@ -10,7 +10,7 @@ class Welcome extends Component
     {
         seo()
             ->title('100DaysOfCode AI Coach')
-            ->description('Rejoins le challenge #100DaysOfCode, consigne tes progrès quotidiens et débloque des badges alimentés par l’IA.')
+            ->description(__('Join the #100DaysOfCode challenge, log your daily progress, and unlock AI-powered badges.'))
             ->tag('og:type', 'website');
 
         return view('livewire.page.welcome');
