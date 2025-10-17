@@ -130,6 +130,9 @@ jobs:
           php artisan config:cache
           php artisan route:cache || true
           php artisan view:cache  || true
+          bun install
+          bun run build
+          rm -rf node_modules
 
           echo "OK"
           EOF
