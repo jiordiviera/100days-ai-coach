@@ -1,5 +1,7 @@
 # 100DaysOfCode AI Coach
 
+**Liens rapides :** [Vision](#vision) · [Tech Stack](#tech-stack-mvp) · [Roadmap](#roadmap-work-in-progress) · [Admin Panel](#admin-panel) · [Liste des fonctionnalités](docs/features-list.md)
+
 **Work in progress** — This project is being developed publicly as part of my [#100DaysOfCode](https://www.100daysofcode.com/) journey.
 
 The goal is simple: turn the challenge into an **AI-augmented experience** that makes it easier, more motivating, and more social to complete the 100 days.
@@ -63,3 +65,24 @@ This project is **open source** and still in its early stage.
 
 [MIT](LICENSE) — free to use, modify, and redistribute.  
 Created by [Jiordi Viera](https://github.com/jiordiviera) as part of the #100DaysOfCode challenge.
+
+## Admin Panel
+
+L’application embarque un panneau d’administration Filament accessible depuis `/admin`.
+
+- **Accès** : seuls les utilisateurs possédant `is_admin = true` peuvent s’y connecter.  
+  Pour promouvoir un compte local existant :
+
+  ```bash
+  php artisan tinker
+  >>> App\Models\User::where('email', 'test@example.com')->update(['is_admin' => true]);
+  ```
+
+- **Fonctionnalités principales** :
+  - gestion des utilisateurs, des challenges, des logs et des notifications via les resources Filament existantes ;
+  - consultation des métriques IA (latence/coût, taux d’échec) via le dashboard `viewAiMetrics`;
+  - accès aux jobs (Horizon), files et paramètres techniques.
+
+- **Authentification** : utilise la même session que l’app principale ; aucune inscription séparée n’est nécessaire.
+
+Pensez à exécuter `php artisan config:cache` ou à redémarrer Horizon après toute modification de rôles pour refléter les droits côté files et métriques.
