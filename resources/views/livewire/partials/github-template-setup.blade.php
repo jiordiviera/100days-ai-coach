@@ -1,4 +1,4 @@
-<div class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
+<div class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm" wire:init="loadOwners">
     <div class="flex items-start justify-between gap-4">
         <div>
             <h2 class="text-lg font-semibold text-foreground">{{ __('Repository #100DaysOfCode') }}</h2>
@@ -45,23 +45,30 @@
             </div>
         </div>
     @elseif ($isReady && ! $errorMessage)
-        <form wire:submit.prevent="createRepository" class="mt-5 space-y-4">
-            {{ $this->form }}
-            <div class="flex items-center gap-3">
-                <x-filament::button
-                    size="sm"
-                    type="submit"
-                    :disabled="$isProcessing"
-
-                >
-                    <span wire:loading wire:target="createRepository"
-                          class="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/70 border-t-transparent"></span>
-                    <span>{{ $isProcessing ? __('Creating...') : __('Create repository') }}</span>
-                </x-filament::button>
-                <p class="text-xs text-muted-foreground">
-                    {{ __('The template :name will be cloned to the selected account.', ['name' => config('services.github.template.repository')]) }}
-                </p>
+        @if (! $ownersLoaded)
+            <div class="mt-5 flex items-center gap-3 rounded-2xl border border-border/70 bg-muted/10 px-4 py-3 text-xs text-muted-foreground">
+                <span class="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/60 border-t-transparent"></span>
+                <span>{{ __('Fetching GitHub data...') }}</span>
             </div>
-        </form>
+        @else
+            <form wire:submit.prevent="createRepository" class="mt-5 space-y-4">
+                {{ $this->form }}
+                <div class="flex items-center gap-3">
+                    <x-filament::button
+                        size="sm"
+                        type="submit"
+                        :disabled="$isProcessing"
+
+                    >
+                        <span wire:loading wire:target="createRepository"
+                              class="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/70 border-t-transparent"></span>
+                        <span>{{ $isProcessing ? __('Creating...') : __('Create repository') }}</span>
+                    </x-filament::button>
+                    <p class="text-xs text-muted-foreground">
+                        {{ __('The template :name will be cloned to the selected account.', ['name' => config('services.github.template.repository')]) }}
+                    </p>
+                </div>
+            </form>
+        @endif
     @endif
 </div>

@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class GithubTemplateSetup extends Component implements HasForms
@@ -25,6 +26,10 @@ class GithubTemplateSetup extends Component implements HasForms
 
     public array $owners = [];
 
+    public bool $ownersLoaded = false;
+
+    public bool $ownersLoading = false;
+
     public ?UserRepository $repository = null;
 
     public ?string $errorMessage = null;
@@ -33,7 +38,7 @@ class GithubTemplateSetup extends Component implements HasForms
 
     public bool $isProcessing = false;
 
-    public function mount(GitHubTemplateService $templateService): void
+    public function mount(): void
     {
         $user = auth()->user();
         $this->repository = $user->repositories()->where('provider', 'github')->first();
@@ -44,15 +49,8 @@ class GithubTemplateSetup extends Component implements HasForms
             return;
         }
 
-        try {
-            $owners = $templateService->listInstallableOwners($user);
-            $this->owners = $owners;
-        } catch (GitHubApiException $exception) {
-            $this->errorMessage = $exception->getMessage();
-        }
-
         $defaultOwner = $this->repository?->repo_owner
-            ?: (Arr::first($this->owners)['login'] ?? $user->profile?->github_username);
+            ?: ($user->profile?->github_username);
 
         $defaultVisibility = $this->repository?->visibility
             ?: (config('services.github.template.visibility', 'private'));
@@ -69,6 +67,45 @@ class GithubTemplateSetup extends Component implements HasForms
         $this->form->fill($this->githubForm);
 
         $this->isReady = true;
+    }
+
+    public function loadOwners(GitHubTemplateService $templateService): void
+    {
+        if ($this->ownersLoaded || ! $this->isReady || $this->errorMessage) {
+            return;
+        }
+
+        $user = auth()->user()->fresh(['profile', 'repositories']);
+
+        if (! $user?->profile?->github_access_token) {
+            return;
+        }
+
+        $this->ownersLoading = true;
+
+        try {
+            $cacheKey = sprintf('github.installable-owners.%d', $user->id);
+            $owners = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($templateService, $user) {
+                return $templateService->listInstallableOwners($user);
+            });
+
+            $this->owners = $owners;
+            $this->ownersLoaded = true;
+
+            $defaultOwner = $this->githubForm['owner']
+                ?? $this->repository?->repo_owner
+                ?? (Arr::first($owners)['login'] ?? $user->profile?->github_username);
+
+            if ($defaultOwner) {
+                $this->githubForm['owner'] = $defaultOwner;
+            }
+
+            $this->form->fill($this->githubForm);
+        } catch (GitHubApiException $exception) {
+            $this->errorMessage = $exception->getMessage();
+        } finally {
+            $this->ownersLoading = false;
+        }
     }
 
     public function form(Schema $schema): Schema
@@ -123,6 +160,7 @@ class GithubTemplateSetup extends Component implements HasForms
                 'repo_name' => $repo->repo_name,
                 'visibility' => $repo->visibility,
             ];
+            $this->ownersLoaded = true;
             Notification::make()
                 ->title('Repository créé')
                 ->body('Ton template GitHub est prêt. Tu peux commencer à documenter ta progression !')

@@ -248,6 +248,7 @@
                                     href="{{ route('projects.tasks.index', ['project' => $project->id]) }}"
                                     size="sm"
                                     color="gray"
+                                    wire:navigate
                                 >
                                     {{ __('View tasks') }}
                                 </x-filament::button>
