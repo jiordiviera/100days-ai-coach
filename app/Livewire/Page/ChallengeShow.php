@@ -60,11 +60,11 @@ class ChallengeShow extends Component implements HasForms
         $email = strtolower($data['email'] ?? '');
 
         if (! $email) {
-            $this->addError('inviteForm.email', 'Adresse e-mail requise.');
+            $this->addError('inviteForm.email', __('Email address required.'));
 
             Notification::make()
-                ->title('Email manquant')
-                ->body('Indiquez l\'adresse e-mail de la personne à inviter.')
+                ->title(__('Email missing'))
+                ->body(__('Provide the email address of the person to invite.'))
                 ->warning()
                 ->persistent()
                 ->send();
@@ -75,11 +75,11 @@ class ChallengeShow extends Component implements HasForms
         // Already participant?
         $already = $this->run->participants()->where('email', $email)->exists();
         if ($already) {
-            $this->addError('inviteForm.email', 'Cet utilisateur participe déjà.');
+            $this->addError('inviteForm.email', __('This user is already part of the challenge.'));
 
             Notification::make()
-                ->title('Déjà participant')
-                ->body('Cette personne fait déjà partie du challenge.')
+                ->title(__('Already a participant'))
+                ->body(__('This person is already part of the challenge.'))
                 ->warning()
                 ->persistent()
                 ->send();
@@ -90,11 +90,11 @@ class ChallengeShow extends Component implements HasForms
         // Already engaged in another active challenge?
         $existingUser = User::where('email', $email)->first();
         if ($existingUser && $this->userHasActiveChallenge($existingUser->id)) {
-            $this->addError('inviteForm.email', 'Cette personne participe déjà à un challenge actif.');
+            $this->addError('inviteForm.email', __('This person already participates in an active challenge.'));
 
             Notification::make()
-                ->title('Invitation impossible')
-                ->body('Cette personne mène déjà un challenge actif et ne peut pas en rejoindre un nouveau pour le moment.')
+                ->title(__('Invitation not available'))
+                ->body(__('This person already runs an active challenge and cannot join a new one right now.'))
                 ->warning()
                 ->persistent()
                 ->send();
@@ -108,11 +108,11 @@ class ChallengeShow extends Component implements HasForms
             ->whereNull('accepted_at')
             ->exists();
         if ($pending) {
-            $this->addError('inviteForm.email', 'Invitation déjà envoyée.');
+            $this->addError('inviteForm.email', __('Invitation already sent.'));
 
             Notification::make()
-                ->title('Invitation déjà envoyée')
-                ->body('Une invitation en attente existe déjà pour cette adresse e-mail.')
+                ->title(__('Invitation already sent'))
+                ->body(__('A pending invitation already exists for this email address.'))
                 ->warning()
                 ->persistent()
                 ->send();
@@ -138,15 +138,15 @@ class ChallengeShow extends Component implements HasForms
             report($exception);
 
             Notification::make()
-                ->title('E-mail non envoyé')
-                ->body('Le lien a été généré, mais l\'e-mail n\'a pas pu être envoyé automatiquement.')
+                ->title(__('Email not sent'))
+                ->body(__('The link was generated, but the email could not be sent automatically.'))
                 ->warning()
                 ->send();
         }
-        session()->flash('message', 'Invitation créée. Partagez le lien de participation.');
+        session()->flash('message', __('Invitation created. Share the invite link.'));
         Notification::make()
-            ->title('Invitation créée')
-            ->body('Un lien d\'invitation a été généré. Partagez-le avec la personne invitée.')
+            ->title(__('Invitation created'))
+            ->body(__('An invitation link was generated. Share it with the invitee.'))
             ->success()
             ->send();
     }
@@ -156,11 +156,11 @@ class ChallengeShow extends Component implements HasForms
         return $schema
             ->components([
                 TextInput::make('email')
-                    ->label('Email')
+                    ->label(__('Email'))
                     ->email()
                     ->required()
                     ->maxLength(255)
-                    ->helperText('Saisissez l\'adresse de la personne à inviter.'),
+                    ->helperText(__('Enter the email of the person to invite.')),
             ])
             ->statePath('inviteForm');
     }
@@ -254,8 +254,8 @@ class ChallengeShow extends Component implements HasForms
         }
 
         Notification::make()
-            ->title($this->run->is_public ? 'Challenge rendu public' : 'Challenge privé')
-            ->body($this->run->is_public ? 'La page publique est désormais accessible.' : 'La page publique a été désactivée.')
+            ->title($this->run->is_public ? __('Challenge set to public') : __('Challenge set to private'))
+            ->body($this->run->is_public ? __('The public page is now accessible.') : __('The public page has been disabled.'))
             ->success()
             ->send();
     }
@@ -320,16 +320,16 @@ class ChallengeShow extends Component implements HasForms
         $link = $this->run->participantLinks()->whereKey($participantId)->firstOrFail();
         // Ne pas retirer l'owner par ce chemin
         if ($link->user_id === $this->run->owner_id) {
-            $this->addError('inviteForm.email', "Vous ne pouvez pas retirer l'owner.");
+            $this->addError('inviteForm.email', __("You cannot remove the owner."));
 
             return;
         }
         $link->delete();
         $this->run->refresh()->load('participantLinks.user');
-        session()->flash('message', 'Participant retiré.');
+        session()->flash('message', __('Participant removed.'));
         Notification::make()
-            ->title('Participant retiré')
-            ->body('L\'utilisateur a été retiré du challenge.')
+            ->title(__('Participant removed'))
+            ->body(__('The user has been removed from the challenge.'))
             ->warning()
             ->send();
     }
@@ -339,24 +339,26 @@ class ChallengeShow extends Component implements HasForms
         // L'owner ne peut pas quitter via cette action
         abort_if(auth()->id() === $this->run->owner_id, 403);
         $this->run->participantLinks()->where('user_id', auth()->id())->delete();
-        session()->flash('message', 'Vous avez quitté le challenge.');
+        session()->flash('message', __('You left the challenge.'));
         redirect()->route('challenges.index');
     }
 
     public function copyLink(string $link): void
     {
-        $this->js("
-        console.log(navigator);
+        $linkJs = json_encode($link);
+        $messageJs = json_encode(__('Automatic copy is not supported on this browser.'));
+
+        $this->js(<<<JS
             if (navigator.clipboard) {
-                navigator.clipboard.writeText('{$link}');
+                navigator.clipboard.writeText({$linkJs});
             } else {
-                alert('La copie automatique n\'est pas supportée sur ce navigateur.');
+                alert({$messageJs});
             }
-        ");
+        JS);
 
         Notification::make()
-            ->title('Lien copié')
-            ->body('Le lien d\'invitation a été copié dans votre presse-papier. Partagez-le !')
+            ->title(__('Link copied'))
+            ->body(__('The invitation link was copied to your clipboard. Share it!'))
             ->success()
             ->send();
     }
@@ -371,8 +373,8 @@ class ChallengeShow extends Component implements HasForms
         if ($inv) {
             $inv->delete();
             Notification::make()
-                ->title('Invitation révoquée')
-                ->body('L\'invitation a été supprimée et le lien ne fonctionnera plus.')
+                ->title(__('Invitation revoked'))
+                ->body(__('The invitation was deleted and the link will no longer work.'))
                 ->warning()
                 ->send();
         }

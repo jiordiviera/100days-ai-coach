@@ -4,29 +4,40 @@
     $joinedCount = $joined->count();
     $activeRun = $activeRun ?? null;
     $activeRunOwned = $activeRun && $activeRun->owner_id === $user->id;
+
     $heroBadge = $activeRun
-        ? ($activeRunOwned ? 'Run propriétaire' : 'Run en participation')
-        : 'Prêt pour un nouveau run ?';
+        ? ($activeRunOwned ? __('Owner run') : __('Participant run'))
+        : __('Ready for a new run?');
+
     $heroTitle = $activeRun
-        ? ($activeRun->title ?: 'Challenge #100DaysOfCode')
-        : 'Lance ton challenge 100DaysOfCode';
+        ? ($activeRun->title ?: __('100DaysOfCode challenge'))
+        : __('Start your #100DaysOfCode challenge');
+
     $activeDayNumber = $activeRun
-        ? (int) (\Illuminate\Support\Carbon::parse($activeRun->start_date)->startOfDay()->diffInDays(\Illuminate\Support\Carbon::now()->startOfDay()) + 1)
+        ? (int) (\Illuminate\Support\Carbon::parse($activeRun->start_date)->startOfDay()->diffInDays(now()->startOfDay()) + 1)
         : null;
+
     $heroDescription = $activeRun
-        ? "Jour {$activeDayNumber} sur {$activeRun->target_days}. Documente chaque shipment pour tenir la streak."
-        : "Planifie ton prochain run, invite ton crew et utilise le journal intelligent pour suivre tes shipments au quotidien.";
+        ? __('Day :day of :total. Document every shipment to maintain your streak.', [
+            'day' => $activeDayNumber,
+            'total' => $activeRun->target_days,
+        ])
+        : __('Plan your next run, invite your crew, and use the intelligent journal to track daily shipments.');
+
     $ctaPrimary = $activeRun
-        ? ['label' => 'Ouvrir le challenge', 'route' => route('challenges.show', $activeRun)]
-        : ['label' => 'Créer un challenge', 'route' => '#challenge-create'];
+        ? ['label' => __('Open the challenge'), 'route' => route('challenges.show', $activeRun)]
+        : ['label' => __('Create a challenge'), 'route' => '#challenge-create'];
+
     $ctaSecondary = $activeRun
-        ? ['label' => 'Journal du jour', 'route' => route('daily-challenge')]
-        : ['label' => 'Voir les challenges rejoints', 'route' => '#joined-list'];
+        ? ['label' => __('Daily log'), 'route' => route('daily-challenge')]
+        : ['label' => __('View joined challenges'), 'route' => '#joined-list'];
+
     $ctaSecondarySupportsNavigate = ! str_starts_with($ctaSecondary['route'], '#');
+
     $activeRestrictionMessage = $hasActiveChallenge
         ? ($activeRunOwned
-            ? "Tu as déjà un challenge actif. Termine-le avant d'en lancer un nouveau."
-            : "Tu participes déjà à un challenge actif. Termine-le avant d'en lancer un nouveau.")
+            ? __('You already have an active challenge. Finish it before launching another one.')
+            : __('You already participate in an active challenge. Finish it before starting a new one.'))
         : null;
 @endphp
 
@@ -83,19 +94,19 @@
 
         <div class="grid gap-4 sm:grid-cols-3">
           <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-            <p class="text-xs uppercase tracking-widest text-muted-foreground">Challenges créés</p>
+            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Created challenges') }}</p>
             <p class="mt-2 text-2xl font-semibold text-foreground">{{ $ownedCount }}</p>
-            <p class="text-xs text-muted-foreground">{{ \Illuminate\Support\Str::plural('challenge', $ownedCount) }} propriétaire</p>
+            <p class="text-xs text-muted-foreground">{{ \Illuminate\Support\Str::plural(__('challenge'), $ownedCount) }} {{ __('owned') }}</p>
           </div>
           <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-            <p class="text-xs uppercase tracking-widest text-muted-foreground">Challenges rejoints</p>
+            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Joined challenges') }}</p>
             <p class="mt-2 text-2xl font-semibold text-foreground">{{ $joinedCount }}</p>
-            <p class="text-xs text-muted-foreground">Runs où tu es participant</p>
+            <p class="text-xs text-muted-foreground">{{ __('Runs where you are a participant') }}</p>
           </div>
           <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
-            <p class="text-xs uppercase tracking-widest text-muted-foreground">Streak mode</p>
-            <p class="mt-2 text-2xl font-semibold text-foreground">{{ $activeRun ? 'Actif' : 'À lancer' }}</p>
-            <p class="text-xs text-muted-foreground">Planifie ton prochain run dès maintenant</p>
+            <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Streak mode') }}</p>
+            <p class="mt-2 text-2xl font-semibold text-foreground">{{ $activeRun ? __('Active') : __('Ready to launch') }}</p>
+            <p class="text-xs text-muted-foreground">{{ __('Plan your next challenge now.') }}</p>
           </div>
         </div>
       </div>
@@ -104,9 +115,9 @@
         <div class="absolute -right-6 top-6 h-16 w-16 rounded-full bg-primary/20 blur-3xl"></div>
         <div class="relative h-full rounded-3xl border border-border/60 bg-card/85 p-6 shadow-xl" id="challenge-create">
           <div class="space-y-3">
-            <h2 class="text-lg font-semibold text-foreground">Créer un challenge</h2>
+            <h2 class="text-lg font-semibold text-foreground">{{ __('Create a challenge') }}</h2>
             <p class="text-xs text-muted-foreground">
-              Définis une date de départ, la durée et choisis si ton run est public. Tu pourras inviter des partenaires ensuite.
+              {{ __('Pick a start date, duration, and decide if your run is public. You can invite teammates afterwards.') }}
             </p>
           </div>
 
@@ -121,7 +132,7 @@
 
             <div class="flex justify-end">
               <x-filament::button type="submit" :disabled="$hasActiveChallenge">
-                Lancer le challenge
+                {{ __('Launch the challenge') }}
               </x-filament::button>
             </div>
           </form>
@@ -134,8 +145,8 @@
     <article class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-semibold text-foreground">Mes challenges</h2>
-          <p class="text-xs text-muted-foreground">Tous les runs dont tu es propriétaire.</p>
+          <h2 class="text-lg font-semibold text-foreground">{{ __('My challenges') }}</h2>
+          <p class="text-xs text-muted-foreground">{{ __('All runs you own.') }}</p>
         </div>
         <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $ownedCount }}</span>
       </div>
@@ -145,29 +156,33 @@
           @php($isActive = $activeRun && $activeRun->id === $run->id)
           <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border {{ $isActive ? 'border-primary/60' : 'border-border/70' }} bg-background/80 px-4 py-3 text-sm">
             <div>
-              <p class="font-semibold text-foreground">{{ $run->title ?? 'Challenge 100DaysOfCode' }}</p>
+              <p class="font-semibold text-foreground">{{ $run->title ?? __('100DaysOfCode challenge') }}</p>
               <p class="text-xs text-muted-foreground">
-                Démarré le {{ $run->start_date->format('d/m/Y') }} · {{ $run->target_days }} jours · {{ strtoupper($run->status) }}
+                {{ __('Started on :date · :days days · :status', [
+                    'date' => $run->start_date->format('d/m/Y'),
+                    'days' => $run->target_days,
+                    'status' => strtoupper($run->status),
+                ]) }}
               </p>
             </div>
             <div class="flex items-center gap-2">
               @if ($isActive)
-                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Run en cours</span>
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">{{ __('Active run') }}</span>
               @elseif ($run->status === 'active')
-                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">Actif</span>
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">{{ __('Active') }}</span>
               @endif
               <a
                 wire:navigate
                 href="{{ route('challenges.show', $run) }}"
                 class="inline-flex items-center gap-2 rounded-full border {{ $isActive ? 'border-primary/50 text-primary' : 'border-border/70 text-muted-foreground' }} px-3 py-1.5 text-xs font-semibold transition hover:border-primary/50 hover:text-primary"
               >
-                {{ $isActive ? 'Continuer' : 'Ouvrir' }}
+                {{ $isActive ? __('Continue') : __('Open') }}
               </a>
             </div>
           </div>
         @empty
           <div class="rounded-2xl border border-dashed border-border/70 bg-background/80 px-4 py-6 text-center text-sm text-muted-foreground">
-            Aucun challenge créé pour l'instant. Lance ton premier run pour débloquer le journal quotidien.
+            {{ __('No challenge created yet. Start your first run to unlock the daily journal.') }}
           </div>
         @endforelse
       </div>
@@ -176,8 +191,8 @@
     <article class="rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm" id="joined-list">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-semibold text-foreground">Challenges rejoints</h2>
-          <p class="text-xs text-muted-foreground">Runs auxquels tu participes grâce à une invitation.</p>
+          <h2 class="text-lg font-semibold text-foreground">{{ __('Joined challenges') }}</h2>
+          <p class="text-xs text-muted-foreground">{{ __('Runs you joined via invitation.') }}</p>
         </div>
         <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ $joinedCount }}</span>
       </div>
@@ -187,9 +202,13 @@
           @php($isActive = $activeRun && $activeRun->id === $run->id)
           <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border {{ $isActive ? 'border-primary/60' : 'border-border/70' }} bg-background/80 px-4 py-3 text-sm">
             <div>
-              <p class="font-semibold text-foreground">{{ $run->title ?? 'Challenge 100DaysOfCode' }}</p>
+              <p class="font-semibold text-foreground">{{ $run->title ?? __('100DaysOfCode challenge') }}</p>
               <p class="text-xs text-muted-foreground">
-                Host: {{ $run->owner?->name ?? 'Inconnu' }} · Démarré le {{ $run->start_date->format('d/m/Y') }} · {{ $run->target_days }} jours
+                {{ __('Host: :name · Started on :date · :days days', [
+                    'name' => $run->owner?->name ?? __('Unknown'),
+                    'date' => $run->start_date->format('d/m/Y'),
+                    'days' => $run->target_days,
+                ]) }}
               </p>
             </div>
             <a
@@ -197,12 +216,12 @@
               href="{{ route('challenges.show', $run) }}"
               class="inline-flex items-center gap-2 rounded-full border {{ $isActive ? 'border-primary/50 text-primary' : 'border-border/70 text-muted-foreground' }} px-3 py-1.5 text-xs font-semibold transition hover:border-primary/50 hover:text-primary"
             >
-              {{ $isActive ? 'Continuer' : 'Rejoindre le run' }}
+              {{ $isActive ? __('Continue') : __('Join the run') }}
             </a>
           </div>
         @empty
           <div class="rounded-2xl border border-dashed border-border/70 bg-background/80 px-4 py-6 text-center text-sm text-muted-foreground">
-            Aucun challenge rejoint pour le moment. Lorsque tu accepteras une invitation, il apparaîtra ici.
+            {{ __('No joined challenge yet. Once you accept an invitation, it will appear here.') }}
           </div>
         @endforelse
       </div>

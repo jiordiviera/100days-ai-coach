@@ -16,7 +16,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Mes Challenges')]
+#[Title('My Challenges')]
 #[Layout('components.layouts.app')]
 class ChallengeIndex extends Component implements HasForms
 {
@@ -45,28 +45,28 @@ class ChallengeIndex extends Component implements HasForms
             ->columns(2)
             ->components([
                 TextInput::make('title')
-                    ->label('Titre')
+                    ->label(__('Title'))
                     ->placeholder('100 Days of Code')
-                    ->default('Mon défi 100DaysOfCode')
+                    ->default(__('My 100DaysOfCode challenge'))
                     ->maxLength(255),
                 Textarea::make('description')
-                    ->label('Description (optionnel)')
+                    ->label(__('Description (optional)'))
                     ->rows(2)
                     ->maxLength(255)
                     ->columnSpanFull(),
                 DatePicker::make('start_date')
-                    ->label('Date de début')
+                    ->label(__('Start date'))
                     ->native(false)
                     ->required()
                     ->default(now()->toDateString()),
                 TextInput::make('target_days')
-                    ->label('Nombre de jours')
+                    ->label(__('Number of days'))
                     ->numeric()
                     ->minValue(1)
                     ->maxValue(365)
                     ->required(),
                 Toggle::make('is_public')
-                    ->label('Rendre public')
+                    ->label(__('Make it public'))
                     ->inline(false)
                     ->columnSpanFull(),
             ]);
@@ -80,11 +80,11 @@ class ChallengeIndex extends Component implements HasForms
             $this->hasActiveChallenge = true;
 
             $message = $activeRun->owner_id === auth()->id()
-                ? "Terminez votre challenge actuel avant d'en démarrer un nouveau."
-                : "Vous participez déjà à un challenge actif. Terminez-le avant d'en démarrer un nouveau.";
+                ? __('Finish your current challenge before starting a new one.')
+                : __('You already participate in an active challenge. Finish it before starting another.');
 
             Notification::make()
-                ->title('Challenge déjà en cours')
+                ->title(__('Challenge already in progress'))
                 ->body($message)
                 ->warning()
                 ->persistent()
@@ -115,8 +115,8 @@ class ChallengeIndex extends Component implements HasForms
         $this->hasActiveChallenge = true;
 
         Notification::make()
-            ->title('Challenge lancé !')
-            ->body('Bon courage pour ces '.$run->target_days.' prochains jours.')
+            ->title(__('Challenge launched!'))
+            ->body(__('Good luck for the next :days days.', ['days' => $run->target_days]))
             ->success()
             ->persistent()
             ->send();

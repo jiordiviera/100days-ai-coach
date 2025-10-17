@@ -19,10 +19,12 @@
     $targetDays = $active['targetDays'] ?? 100;
     $daysLeft = $activeDayNumber ? max(0, $targetDays - $activeDayNumber) : null;
     $challengeDaySummary = $activeDayNumber
-        ? 'Jour ' . min($targetDays, $activeDayNumber) . ' sur ' . $targetDays
-        : 'Aucun challenge actif';
+        ? __('Day :current of :total', ['current' => min($targetDays, $activeDayNumber), 'total' => $targetDays])
+        : __('No active challenge');
 
-    $taskCompletionDescription = $taskCount > 0 ? $taskCompletionRate . '% des tâches complétées' : 'Aucune tâche créée';
+    $taskCompletionDescription = $taskCount > 0
+        ? __(':rate% of tasks completed', ['rate' => $taskCompletionRate])
+        : __('No tasks created yet');
 @endphp
 
 <div class="mx-auto max-w-6xl space-y-12 px-4 py-10 sm:px-6 lg:px-0">

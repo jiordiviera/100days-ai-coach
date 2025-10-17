@@ -228,29 +228,29 @@ class Dashboard extends Component
         $items = [
             [
                 'key' => 'first_log',
-                'label' => 'Consigner ta première entrée',
-                'description' => 'Rédige ton log du jour et déclenche l’IA.',
+                'label' => __('Log your first entry'),
+                'description' => __('Write today’s log and trigger the AI coach.'),
                 'completed' => $checklist['first_log'],
                 'url' => route('daily-challenge').'#daily-log-form',
             ],
             [
                 'key' => 'project_linked',
-                'label' => 'Associer un projet',
-                'description' => 'Structure ton défi en missions concrètes.',
+                'label' => __('Link a project'),
+                'description' => __('Structure your challenge into concrete missions.'),
                 'completed' => $checklist['project_linked'],
                 'url' => route('projects.index'),
             ],
             [
                 'key' => 'reminder_configured',
-                'label' => 'Configurer ton rappel quotidien',
-                'description' => 'Choisis l’heure idéale pour ne jamais manquer un log.',
+                'label' => __('Configure your daily reminder'),
+                'description' => __('Pick the perfect time so you never miss a log.'),
                 'completed' => $checklist['reminder_configured'],
                 'url' => route('settings').'#notifications',
             ],
             [
                 'key' => 'public_share',
-                'label' => 'Partager ton log',
-                'description' => 'Prépare un post LinkedIn/X pour célébrer ton avancée.',
+                'label' => __('Share your log'),
+                'description' => __('Prepare a LinkedIn/X post to celebrate your progress.'),
                 'completed' => $checklist['public_share'],
                 'url' => route('daily-challenge').'#share-section',
             ],
@@ -273,8 +273,8 @@ class Dashboard extends Component
         if ($streak >= 3) {
             $badges[] = [
                 'id' => 'streak_3',
-                'label' => 'Streak 3+',
-                'description' => 'Trois jours successifs de régularité.',
+                'label' => __('3+ day streak'),
+                'description' => __('Three consecutive days of consistency.'),
                 'color' => 'primary',
             ];
         }
@@ -282,8 +282,8 @@ class Dashboard extends Component
         if ($streak >= 7) {
             $badges[] = [
                 'id' => 'streak_7',
-                'label' => 'Semaine en feu',
-                'description' => 'Sept jours consécutifs renseignés.',
+                'label' => __('Week on fire'),
+                'description' => __('Seven consecutive days logged.'),
                 'color' => 'success',
             ];
         }
@@ -291,8 +291,8 @@ class Dashboard extends Component
         if ($totalLogs >= ceil($target / 2)) {
             $badges[] = [
                 'id' => 'halfway',
-                'label' => 'Mi-parcours',
-                'description' => 'Vous avez couvert au moins la moitié du défi.',
+                'label' => __('Halfway there'),
+                'description' => __('You’ve covered at least half of the challenge.'),
                 'color' => 'info',
             ];
         }
@@ -303,8 +303,8 @@ class Dashboard extends Component
         if ($lastSeven->every(fn ($day) => $logsByDate->has($day))) {
             $badges[] = [
                 'id' => 'perfect_week',
-                'label' => 'Semaine parfaite',
-                'description' => 'Toutes les entrées des 7 derniers jours sont complètes.',
+                'label' => __('Perfect week'),
+                'description' => __('All entries from the last 7 days are complete.'),
                 'color' => 'warning',
             ];
         }
@@ -312,8 +312,8 @@ class Dashboard extends Component
         if ($hasEntryToday && ! $badges) {
             $badges[] = [
                 'id' => 'fresh-start',
-                'label' => 'Entrée du jour',
-                'description' => 'Belle constance aujourd’hui !',
+                'label' => __('Today’s entry'),
+                'description' => __('Great consistency today!'),
                 'color' => 'gray',
             ];
         }
