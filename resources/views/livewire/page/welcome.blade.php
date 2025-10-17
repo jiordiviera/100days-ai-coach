@@ -58,19 +58,19 @@
         [
             'initials' => 'JV',
             'name' => 'Jiordi Viera',
-            'role' => 'Founder & Software Engineer',
+            'role' => __('Founder & Software Engineer'),
             'quote' => __("I have never kept a logbook this long. The reminders and AI help me ship even on busy days."),
         ],
         [
             'initials' => 'CD',
             'name' => 'Claire Deborah',
-            'role' => 'Web Developer',
+            'role' => __('Web Developer'),
             'quote' => __('The log + project combo helps me truly measure progress. No more “tomorrow”. We ship.'),
         ],
         [
             'initials' => 'DF',
             'name' => 'Darwin Fotso',
-            'role' => 'Backend Engineer',
+            'role' => __('Backend Engineer'),
             'quote' => __('We onboarded the whole cohort on the platform. Everyone keeps their rhythm and we share insights at the end of the week.'),
         ],
     ];

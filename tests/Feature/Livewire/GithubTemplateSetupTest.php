@@ -6,6 +6,7 @@ use App\Models\UserRepository;
 use App\Services\GitHub\GitHubTemplateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -30,6 +31,8 @@ it('displays the existing repository link when already provisioned', function ()
         'visibility' => 'public',
         'status' => 'created',
     ]);
+
+    Cache::flush();
 
     Http::fake([
         'https://api.github.com/user/orgs' => Http::response([], 200),
@@ -75,7 +78,10 @@ it('calls the template service to create the repository', function (): void {
 
     $this->actingAs($user);
 
+    Cache::flush();
+
     Livewire::test(GithubTemplateSetup::class)
+        ->call('loadOwners')
         ->set('githubForm.repo_name', '100days-of-code')
         ->call('createRepository')
         ->assertSet('repository.repo_name', '100days-of-code');
