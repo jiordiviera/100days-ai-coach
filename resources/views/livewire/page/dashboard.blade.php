@@ -162,7 +162,7 @@
                         <li class="flex flex-col justify-between gap-3 rounded-2xl border border-primary/60 bg-secondary/80 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center">
                             <div class="flex items-start gap-3">
                 <span
-                    class="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full {{ $item['completed'] ? 'bg-emerald-500 text-emerald-50' : 'bg-white text-accent border border-secondary' }}">
+                    class="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full {{ $item['completed'] ? 'bg-green-700 text-green-50' : 'bg-white text-accent border border-secondary' }}">
                   @if ($item['completed'])
                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd"

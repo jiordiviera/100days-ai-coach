@@ -90,7 +90,7 @@
                             </div>
                             <div>
                                 <p class="text-3xl font-semibold text-foreground">{{ $myStreak }}</p>
-                                <p class="text-xs uppercase tracking-[0.28em] text-muted-foreground">{{ __('days in a row') }}</p>
+                                <p class="text-sm text-muted-foreground">{{ __('days in a row') }}</p>
                             </div>
                         </div>
                         @php($streakFlames = min($myStreak, 7))
@@ -99,7 +99,7 @@
                                 <span class="text-lg leading-none">🔥</span>
                             @endfor
                             @if ($myStreak > 7)
-                                <span class="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
+                                <span class="rounded-full bg-amber-200/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
                                     +{{ $myStreak - 7 }}
                                 </span>
                             @endif

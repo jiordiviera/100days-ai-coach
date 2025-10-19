@@ -48,7 +48,7 @@ class Wizard extends Component implements HasForms
             'username' => $profile->username,
             'focus_area' => $profile->focus_area,
             'timezone' => $preferences['timezone'] ?? config('app.timezone', 'UTC'),
-            'challenge_title' => $user->name ? 'Défi de '.$user->name : 'Mon défi 100DaysOfCode',
+            'challenge_title' => $user->name ? __('Challenge of :name', ['name' => $user->name]) : __('My 100DaysOfCode challenge'),
             'challenge_description' => $profile->focus_area,
             'challenge_start_date' => Carbon::today()->toDateString(),
             'challenge_target_days' => 100,
