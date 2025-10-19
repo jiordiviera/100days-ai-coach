@@ -198,8 +198,8 @@ it('polls the AI panel until insights are ready', function (): void {
         ->assertSet('aiPanel.status', 'ready')
         ->assertSet('aiPanel.summary', '## Ready summary')
         ->assertSet('aiPanel.share_templates.linkedin', 'Jour 1/100 — LinkedIn template')
-        ->assertSee('Copier LinkedIn', false)
-        ->assertSee('Copier X', false);
+        ->assertSee(__('Copy LinkedIn draft'), false)
+        ->assertSee(__('Copy X draft'), false);
 });
 
 it('falls back to offline insights when the AI provider fails', function (): void {

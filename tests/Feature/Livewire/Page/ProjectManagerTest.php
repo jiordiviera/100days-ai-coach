@@ -20,7 +20,7 @@ it('prevents project creation without active challenge', function () {
         ->set('projectName', 'Projet orphelin')
         ->call('createProject')
         ->assertSet('feedbackType', 'error')
-        ->assertSet('feedbackMessage', "Vous devez d'abord rejoindre ou créer un challenge actif avant d'ajouter un projet.");
+        ->assertSet('feedbackMessage', __('You must join or create an active challenge before adding a project.'));
 
     expect(Project::count())->toBe(0);
 });
@@ -42,7 +42,7 @@ it('creates project tied to the active challenge run', function () {
         ->set('projectName', 'Suivi API')
         ->call('createProject')
         ->assertSet('feedbackType', 'success')
-        ->assertSet('feedbackMessage', 'Projet créé avec succès.');
+        ->assertSet('feedbackMessage', __('Project created successfully.'));
 
     $project = Project::first();
 
@@ -65,7 +65,7 @@ it('prevents task creation without active challenge', function () {
         ->set('taskProjectId', $project->id)
         ->call('createTask')
         ->assertSet('feedbackType', 'error')
-        ->assertSet('feedbackMessage', "Vous devez d'abord rejoindre ou créer un challenge actif avant d'ajouter une tâche.");
+        ->assertSet('feedbackMessage', __('You must join or create an active challenge before adding a task.'));
 
     expect(Task::count())->toBe(0);
 });

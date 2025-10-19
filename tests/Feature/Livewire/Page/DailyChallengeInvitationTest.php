@@ -40,7 +40,7 @@ test('daily challenge lists pending invitations and allows acceptance', function
 
     Livewire::actingAs($invitee)
         ->test(DailyChallenge::class)
-        ->assertSee('Invitations en attente')
+        ->assertSee(__('Pending invitations'))
         ->call('acceptInvitation', $invitation->id)
         ->assertSet('challengeRunId', $run->id);
 });
