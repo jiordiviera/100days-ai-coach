@@ -39,10 +39,10 @@ return [
         'items' => [
             'ai' => 'AI providers: prompts sent to Groq (Mixtral) and, as a fallback, to OpenAI (GPT-4o-mini). Log content may be included to generate summaries and tips.',
             'wakatime' => 'WakaTime: fetching activity statistics via your personal API key.',
-            'hosting' => 'Hosting infrastructure: database storage, logs and backups (to be detailed for your deployment).',
+            'hosting' => 'Hosting infrastructure: Hetzner Cloud (Germany) VPS managed with Ansible, running Ubuntu, Nginx, and PostgreSQL. Application data, logs, and encrypted backups are stored on this server.',
             'law' => 'Authorities or legal obligations: only when required by law.',
         ],
-        'warning' => 'When deploying publicly, list each processor explicitly (hosting, CDN, analytics, etc.).',
+        'warning' => 'As of today, no CDN, analytics suite, or transactional email provider is used. Should we add one, this section will be updated with the new processor.',
     ],
 
     'retention' => [
@@ -51,7 +51,7 @@ return [
             'account' => 'Account data: kept while the user has access; deleted on request.',
             'logs' => 'Logs, projects, tasks: kept until manually deleted or the account is closed.',
             'tokens' => 'API keys / OAuth tokens: stored encrypted and revoked when the service is disconnected.',
-            'tech' => 'Technical logs: rotated automatically according to the Laravel/Horizon configuration (adjust for production).',
+            'tech' => 'Technical logs: stored on the Hetzner VPS and purged manually during maintenance windows (no automated rotation configured yet).',
         ],
     ],
 

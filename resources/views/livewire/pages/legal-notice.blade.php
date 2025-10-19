@@ -75,10 +75,6 @@
                     </dd>
                 </div>
                 <div class="flex justify-between gap-4">
-                    <dt class="font-medium text-foreground">{{ __('legal.editor.fields.identification') }}</dt>
-                    <dd class="text-right">{{ $editor['siret'] ?? __('legal.editor.identification_hint') }}</dd>
-                </div>
-                <div class="flex justify-between gap-4">
                     <dt class="font-medium text-foreground">{{ __('legal.editor.fields.publication_director') }}</dt>
                     <dd class="text-right">{{ $editor['publication_director'] ?? ($editor['name'] ?? 'À préciser') }}</dd>
                 </div>

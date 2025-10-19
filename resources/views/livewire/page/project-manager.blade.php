@@ -77,10 +77,10 @@
                             {{ __('Create or join a challenge first to add projects and tasks.') }}
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <x-filament::button tag="a" href="{{ route('challenges.index') }}">
+                            <x-filament::button tag="a" href="{{ route('challenges.index') }}" wire:navigate>
                                 {{ __('Browse challenges') }}
                             </x-filament::button>
-                            <x-filament::button tag="a" href="{{ route('challenges.index') }}#create" color="gray">
+                            <x-filament::button tag="a" href="{{ route('challenges.index') }}#create" color="gray" wire:navigate>
                                 {{ __('Create my challenge') }}
                             </x-filament::button>
                         </div>

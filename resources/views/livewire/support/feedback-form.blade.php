@@ -14,6 +14,7 @@
             <div>
                 <a
                     href="{{ route('support') }}"
+                    wire:navigate
                     class="inline-flex items-center gap-2 rounded-full border border-border/70 px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                 >
                     {{ __('Browse the FAQ') }}

@@ -39,10 +39,10 @@ return [
         'items' => [
             'ai' => 'Fournisseurs IA : prompts envoyés à Groq (Mixtral) et, en cas de repli, à OpenAI (GPT-4o-mini). Les textes de vos journaux peuvent être inclus dans ces requêtes afin de générer le résumé et les suggestions.',
             'wakatime' => 'WakaTime : récupération des statistiques d’activité à l’aide de votre clé API personnelle.',
-            'hosting' => 'Infrastructure d’hébergement : stockage des bases de données, journaux et sauvegardes (à compléter selon votre déploiement).',
+            'hosting' => 'Infrastructure d’hébergement : VPS Hetzner (Allemagne) administré via Ansible, sous Ubuntu avec Nginx et PostgreSQL. Les données applicatives, journaux et sauvegardes chiffrées y sont stockés.',
             'law' => 'Autorités ou obligations légales : uniquement en cas d’exigence réglementaire.',
         ],
-        'warning' => 'Lors d’un déploiement public, complétez la liste précise des sous-traitants (hébergeur, CDN, outils d’analyse, etc.).',
+        'warning' => 'À ce jour, aucun CDN, outil d’analytics ou service d’e-mails transactionnels n’est utilisé. Toute évolution future sera ajoutée à cette section.',
     ],
 
     'retention' => [
@@ -51,7 +51,7 @@ return [
             'account' => 'Données de compte : conservées tant que l’utilisateur dispose d’un accès. Suppression possible sur demande.',
             'logs' => 'Journaux, projets et tâches : conservés jusqu’à suppression manuelle par l’utilisateur ou fermeture du compte.',
             'tokens' => 'Clés API / jetons OAuth : stockés chiffrés et supprimés lors de la déconnexion du service concerné.',
-            'tech' => 'Logs techniques : rotation automatique selon la configuration Laravel/Horizon (à adapter lors du déploiement).',
+            'tech' => 'Logs techniques : stockés sur le VPS Hetzner et purgés manuellement lors des opérations de maintenance (pas encore de rotation automatique).',
         ],
     ],
 

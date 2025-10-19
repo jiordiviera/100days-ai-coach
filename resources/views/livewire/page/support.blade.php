@@ -1,8 +1,3 @@
-@php
-    $sections = collect($sections);
-    $resources = collect($resources);
-@endphp
-
 <div class="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6 lg:px-0">
     <header class="rounded-3xl border border-border/60 bg-gradient-to-br from-primary/10 via-background to-background p-10 shadow-lg">
         <div class="mx-auto max-w-3xl space-y-4 text-center">
@@ -37,10 +32,10 @@
                 <div class="space-y-4 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-sm">
                     <h3 class="text-lg font-semibold text-foreground">{{ $section['title'] ?? __('Section') }}</h3>
                     <div class="space-y-3">
-                        @foreach (collect($section['items'] ?? []) as $item)
+                        @foreach (($section['items'] ?? []) as $item)
                             <details class="group rounded-2xl border border-border/50 bg-background/90 p-4 transition hover:border-primary/40">
                                 <summary class="flex cursor-pointer items-center justify-between gap-4 text-sm font-semibold text-foreground">
-                                    <span>{{ $item['question'] ?? 'Question' }}</span>
+                                    <span>{{ $item['question'] ?? __('Question') }}</span>
                                     <svg class="h-4 w-4 text-muted-foreground transition group-open:rotate-45" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                                         <path d="M10 4v12" stroke-width="1.5" stroke-linecap="round" />
                                         <path d="M4 10h12" stroke-width="1.5" stroke-linecap="round" />
@@ -74,8 +69,8 @@
                         class="group flex flex-col justify-between rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm transition hover:border-primary/50 hover:shadow-lg"
                     >
                         <div class="space-y-3">
-                            <h3 class="text-lg font-semibold text-foreground group-hover:text-primary">{{ $resource['title'] }}</h3>
-                            <p class="text-sm text-muted-foreground">{{ $resource['description'] }}</p>
+                            <h3 class="text-lg font-semibold text-foreground group-hover:text-primary">{{ $resource['title'] ?? __('Resource') }}</h3>
+                            <p class="text-sm text-muted-foreground">{{ $resource['description'] ?? '' }}</p>
                         </div>
                         <span class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                             {{ __('Open') }}

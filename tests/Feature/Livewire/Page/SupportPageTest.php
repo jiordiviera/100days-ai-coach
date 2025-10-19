@@ -7,10 +7,16 @@ use Livewire\Livewire;
 uses(RefreshDatabase::class);
 
 it('renders the support knowledge base with faq and resources', function (): void {
+    $firstQuestion = __((string) data_get(config('support.faq_sections'), '0.items.0.question'));
+    $firstResource = collect(config('support.resources'))->first() ?? [];
+
     Livewire::test(Support::class)
         ->assertStatus(200)
-        ->assertSee('Centre d’aide & feedback', false)
-        ->assertSee('Questions fréquentes', false)
-        ->assertSee('Roadmap publique', false)
-        ->assertSee('Envoyer un feedback', false);
+        ->assertSee(__('Support & feedback center'), false)
+        ->assertSee(__('Frequently asked questions'), false)
+        ->assertSee($firstQuestion, false)
+        ->assertSee(__('Quick resources'), false)
+        ->assertSee(__('Send feedback'), false)
+        ->assertSee(__($firstResource['title'] ?? ''), false)
+        ->assertSee(__($firstResource['description'] ?? ''), false);
 });
