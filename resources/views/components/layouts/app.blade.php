@@ -25,7 +25,12 @@
     />
 
     <!-- Styles / Scripts -->
-    @vite(["resources/css/app.css"])
+    @php
+        $shouldLoadViteAssets = ! (app()->environment('testing') && ! file_exists(public_path('build/manifest.json')));
+    @endphp
+    @if ($shouldLoadViteAssets)
+      @vite(["resources/css/app.css"])
+    @endif
     @livewireStyles
       @filamentStyles
   </head>

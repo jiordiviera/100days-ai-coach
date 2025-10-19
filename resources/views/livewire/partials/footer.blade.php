@@ -55,15 +55,15 @@
         [
             'title' => __('Support'),
             'links' => [
-                ['label' => __('Legal notice'), 'route' => '#', 'visible' => true],
-                ['label' => __('Privacy policy'), 'route' => '#', 'visible' => true],
-                ['label' => __('Contact'), 'route' => 'mailto:hello@jiordiviera.me', 'visible' => true, 'external' => true],
+                ['label' => __('Legal Notice'), 'route' => route('legal.notice'), 'visible' => true],
+                ['label' => __('Privacy Policy'), 'route' => route('privacy.policy'), 'visible' => true],
+                ['label' => __('Contact'), 'route' => 'mailto:'.(config('legal.editor.email') ?? 'hello@jiordiviera.me'), 'visible' => true, 'external' => true],
             ],
         ],
         [
             'title' => __('Resources'),
             'links' => [
-                ['label' => 'GitHub', 'route' => 'https://github.com/jiordiviera/100DaysOfCode', 'visible' => true, 'external' => true],
+                ['label' => 'GitHub', 'route' => 'https://github.com/jiordiviera/100days-ai-coach', 'visible' => true, 'external' => true],
                 ['label' => __('Community hashtag'), 'route' => 'https://x.com/hashtag/100DaysOfCode', 'visible' => true, 'external' => true],
                 ['label' => __('Guided docs'), 'route' => route('home') . '#how-it-works', 'visible' => true],
             ],
@@ -73,7 +73,7 @@
     $socials = [
         [
             'label' => 'GitHub',
-            'url' => 'https://github.com/jiordiviera/100DaysOfCode',
+            'url' => 'https://github.com/jiordiviera/100days-ai-coach',
             'icon' => 'github',
         ],
         [
@@ -190,7 +190,7 @@
 
     <div class="border-t border-border/70 py-6">
       <div class="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row sm:text-sm">
-        <p>&copy; {{ now()->year }} {{ config('app.name') }}. {{ __('All rights reserved.') }}</p>
+        <p>&copy; {{ now()->year }} {{ config('app.name') }}. {{ __('All rights reserved.') }} <span class="opacity-75">· {{ __('Hosted on') }} <a href="https://www.hetzner.com" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Hetzner</a></span></p>
         @if ($isAuthenticated && $user)
           <p class="flex items-center gap-1">
             <span class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-[0.7rem] font-semibold text-primary">{{ mb_substr($user->name, 0, 1) }}</span>

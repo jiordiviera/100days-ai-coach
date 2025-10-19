@@ -6,6 +6,8 @@ use App\Http\Controllers\PublicDailyLogController;
 use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\PublicSitemapController;
 use App\Http\Controllers\AiMetricsController;
+use App\Livewire\Pages\LegalNotice;
+use App\Livewire\Pages\PrivacyPolicy;
 use App\Livewire\Onboarding\Wizard as OnboardingWizard;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
@@ -29,6 +31,8 @@ Route::get('profiles/{username}', PublicProfileController::class)->name('public.
 Route::get('challenges/public/{slug}', PublicChallengeController::class)->name('public.challenge');
 Route::get('sitemap.xml', PublicSitemapController::class)->name('public.sitemap');
 Route::get('support', Support::class)->name('support');
+Route::get('legal', LegalNotice::class)->name('legal.notice');
+Route::get('privacy', PrivacyPolicy::class)->name('privacy.policy');
 Route::post('locale', LocaleController::class)->name('locale.update');
 
 Route::middleware('auth')->group(function () {

@@ -13,7 +13,7 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $available = config('app.available_locales', ['en', 'fr']);
+        $available = config('app.available_locales', ['fr', 'en']);
         $default = config('app.locale', 'en');
 
         $locale = session('locale', $default);
@@ -24,15 +24,14 @@ class SetLocale
 
             if ($preferred && in_array($preferred, $available, true)) {
                 $locale = $preferred;
-                session(['locale' => $locale]);
             }
         }
 
-        if (! session()->has('locale') && ! Auth::check()) {
+        if (! session()->has('locale') && ! Auth::check() && $request->headers->has('Accept-Language')) {
             $browserLocale = $request->getPreferredLanguage($available);
+
             if ($browserLocale) {
                 $locale = $browserLocale;
-                session(['locale' => $browserLocale]);
             }
         }
 
@@ -41,6 +40,7 @@ class SetLocale
         }
 
         App::setLocale($locale);
+        session(['locale' => $locale]); 
 
         return $next($request);
     }

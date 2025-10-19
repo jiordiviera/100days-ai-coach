@@ -24,7 +24,8 @@
                             {{ __('Daily journal') }}
                         </span>
                         <h1 class="text-3xl font-semibold text-foreground sm:text-4xl">
-                            {{ __('No active challenge right now') }}</h1>
+                            {{ __('No active challenge right now') }}
+                        </h1>
                         <p class="max-w-xl text-sm text-muted-foreground sm:text-base">
                             {{ __('Join a #100DaysOfCode run or launch your own to start logging shipments and unlock badges.') }}
                         </p>
@@ -37,16 +38,25 @@
                         </a>
                         <a wire:navigate href="{{ route('challenges.index') }}#create"
                             class="inline-flex items-center justify-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary">
-                            {{ __('Create my challenge') }}
+                            Créer mon challenge
+                            @if (app()->getLocale() !== 'fr')
+                                <span class="sr-only">{{ __('Create my challenge') }}</span>
+                            @endif
                         </a>
                     </div>
                 </div>
 
                 <div class="space-y-5 rounded-3xl border border-border/60 bg-card/90 p-6 shadow-xl">
                     <div>
-                        <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Join with a code') }}</p>
+                        <p class="text-xs uppercase tracking-widest text-muted-foreground">
+                            Rejoindre via un code
+                            @if (app()->getLocale() !== 'fr')
+                                <span class="sr-only">{{ __('Join with a code') }}</span>
+                            @endif
+                        </p>
                         <p class="text-sm text-muted-foreground">
-                            {{ __('Paste a public code or private invite to get started instantly.') }}</p>
+                            {{ __('Paste a public code or private invite to get started instantly.') }}
+                        </p>
                     </div>
                     <form wire:submit.prevent="joinWithCode" class="space-y-3">
                         <div class="flex flex-col gap-3 sm:flex-row">
@@ -125,7 +135,7 @@
                             'rounded-full border px-4 py-2 text-xs font-semibold transition',
                             'border-border/70 text-muted-foreground hover:border-primary hover:text-primary' => $canGoPrevious,
                             'border-border/40 text-muted-foreground/70 cursor-not-allowed' => !$canGoPrevious,
-                        ]) @disabled(!$canGoPrevious)>
+                        ])    @disabled(!$canGoPrevious)>
                             {{ __('Previous day') }}
                         </button>
                         <button type="button" wire:click="goToDay('next')" @class([
@@ -183,7 +193,8 @@
                     <div class="rounded-2xl border border-border/70 bg-card/90 p-4">
                         <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Total hours') }}</p>
                         <p class="mt-2 text-2xl font-semibold text-foreground">
-                            {{ $formatHours($summary['totalHours'] ?? 0) }} {{ __('h') }}</p>
+                            {{ $formatHours($summary['totalHours'] ?? 0) }} {{ __('h') }}
+                        </p>
                         <p class="text-xs text-muted-foreground">
                             {{ __(':hours h this week', ['hours' => $formatHours($summary['hoursThisWeek'] ?? 0)]) }}
                         </p>
@@ -192,7 +203,8 @@
                         <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Progress') }}</p>
                         <p class="mt-2 text-2xl font-semibold text-foreground">{{ $progressPercent }}%</p>
                         <p class="text-xs text-muted-foreground">
-                            {{ __('Target: :days days', ['days' => $run->target_days]) }}</p>
+                            {{ __('Target: :days days', ['days' => $run->target_days]) }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -272,7 +284,8 @@
                             <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Hours coded') }}
                             </p>
                             <p class="mt-1 text-base font-semibold text-foreground">
-                                {{ $formatHours($todayEntry->hours_coded) }}</p>
+                                {{ $formatHours($todayEntry->hours_coded) }}
+                            </p>
                         </div>
                         <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
                             <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Learnings') }}</p>
@@ -280,14 +293,16 @@
                         </div>
                         <div class="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
                             <p class="text-xs uppercase tracking-widest text-muted-foreground">
-                                {{ __('Challenges faced') }}</p>
+                                {{ __('Challenges faced') }}
+                            </p>
                             <p class="mt-1 text-sm text-foreground">{{ $todayEntry->challenges_faced ?: '—' }}</p>
                         </div>
                     </div>
 
                     <div>
                         <p class="text-xs uppercase tracking-widest text-muted-foreground">
-                            {{ __('Projects worked on') }}</p>
+                            {{ __('Projects worked on') }}
+                        </p>
                         <div class="mt-2 flex flex-wrap gap-2">
                             @php($projects = collect($todayEntry->projects_worked_on ?? []))
                             @forelse ($projects as $pid)
@@ -436,7 +451,8 @@
                             <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Coach tip') }}</p>
                             @if ($aiPanel['status'] === 'ready' && $aiPanel['coach_tip'])
                                 <p class="mt-1 rounded-2xl border border-border/70 bg-background/80 px-4 py-2 text-sm">
-                                    {{ $aiPanel['coach_tip'] }}</p>
+                                    {{ $aiPanel['coach_tip'] }}
+                                </p>
                             @else
                                 <div class="h-16 rounded-2xl bg-muted/60 animate-pulse"></div>
                             @endif
@@ -522,7 +538,8 @@
                     <div>
                         <h2 class="text-lg font-semibold text-foreground">{{ __('Public sharing') }}</h2>
                         <p class="text-xs text-muted-foreground">
-                            {{ __('Generate a read-only public link for your journal.') }}</p>
+                            {{ __('Generate a read-only public link for your journal.') }}
+                        </p>
                     </div>
                     @if ($publicShare && empty($publicShare['expired']))
                         <span
@@ -667,7 +684,8 @@
                         </div>
                     @empty
                         <p class="text-xs text-muted-foreground">
-                            {{ __('Link your journal to a project to see the breakdown here.') }}</p>
+                            {{ __('Link your journal to a project to see the breakdown here.') }}
+                        </p>
                     @endforelse
                 </div>
             </section>
