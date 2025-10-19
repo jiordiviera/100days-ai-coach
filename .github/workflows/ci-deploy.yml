@@ -129,6 +129,9 @@ jobs:
           php artisan config:cache
           php artisan route:cache || true
           php artisan view:cache  || true
+          export BUN_INSTALL="${HOME}/.bun"
+          export PATH="${BUN_INSTALL}/bin:${PATH}"
+          command -v bun
           bun install
           bun run build
           rm -rf node_modules
