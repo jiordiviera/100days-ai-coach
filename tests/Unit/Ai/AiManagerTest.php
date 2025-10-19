@@ -2,8 +2,8 @@
 
 use App\Models\DailyLog;
 use App\Services\Ai\AiManager;
-use App\Services\Ai\Contracts\AiDriver;
-use App\Services\Ai\Dto\DailyLogAiResult;
+use App\Services\Ai\Drivers\FailingDriver;
+use App\Services\Ai\Drivers\SuccessfulDriver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -31,27 +31,3 @@ test('manager falls back to secondary driver on failure', function (): void {
 
     expect($result->shareDraft)->toBe('fallback-success');
 });
-
-class FailingDriver implements AiDriver
-{
-    public function generateDailyLogInsights(DailyLog $log): DailyLogAiResult
-    {
-        throw new RuntimeException('fail');
-    }
-}
-
-class SuccessfulDriver implements AiDriver
-{
-    public function generateDailyLogInsights(DailyLog $log): DailyLogAiResult
-    {
-        return new DailyLogAiResult(
-            summary: 'ok',
-            tags: ['fallback'],
-            coachTip: 'trust fallback',
-            shareDraft: 'fallback-success',
-            model: 'stub',
-            latencyMs: 10,
-            costUsd: 0.0,
-        );
-    }
-}

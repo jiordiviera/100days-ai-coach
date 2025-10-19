@@ -16,7 +16,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-  @vite(['resources/css/app.css'])
+  @php
+      $shouldLoadViteAssets = ! (app()->environment('testing') && ! file_exists(public_path('build/manifest.json')));
+  @endphp
+  @if ($shouldLoadViteAssets)
+    @vite(['resources/css/app.css'])
+  @endif
 </head>
 
 <body class="min-h-screen bg-slate-950 text-slate-100 !font-['Outfit',_sans-serif]">

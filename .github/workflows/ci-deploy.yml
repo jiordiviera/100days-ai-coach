@@ -132,6 +132,7 @@ jobs:
           bun install
           bun run build
           rm -rf node_modules
+          php artisan generate:sitemap
 
           echo "OK"
           EOF

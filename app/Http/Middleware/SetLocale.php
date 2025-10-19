@@ -27,14 +27,6 @@ class SetLocale
             }
         }
 
-        if (! session()->has('locale') && ! Auth::check() && $request->headers->has('Accept-Language')) {
-            $browserLocale = $request->getPreferredLanguage($available);
-
-            if ($browserLocale) {
-                $locale = $browserLocale;
-            }
-        }
-
         if (! in_array($locale, $available, true)) {
             $locale = $default;
         }
