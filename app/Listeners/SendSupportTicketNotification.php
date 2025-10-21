@@ -16,14 +16,22 @@ class SendSupportTicketNotification
             $recipients = [config('mail.from.address')];
         }
 
-        $recipients = array_filter(array_unique($recipients));
+        $telegramRecipients = config('support.team_telegram_chat_ids', []);
 
-        if (empty($recipients)) {
+        $recipients = array_filter(array_unique($recipients));
+        $telegramRecipients = array_values(array_filter(array_unique($telegramRecipients)));
+
+        if (empty($recipients) && empty($telegramRecipients)) {
             return;
         }
 
         foreach ($recipients as $email) {
             Notification::route('mail', $email)
+                ->notify(new SupportTicketReceived($event->ticket));
+        }
+
+        foreach ($telegramRecipients as $chatId) {
+            Notification::route('telegram', $chatId)
                 ->notify(new SupportTicketReceived($event->ticket));
         }
     }
