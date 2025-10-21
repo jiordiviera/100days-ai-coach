@@ -6,10 +6,13 @@ use App\Models\ChallengeRun;
 use App\Models\DailyLog;
 use App\Models\NotificationOutbox;
 use App\Models\User;
+use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\DailyReminderNotification;
+use App\Services\Notifications\NotificationChannelResolver;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Notification;
 use Throwable;
 
 class SendDailyReminders extends Command
@@ -21,10 +24,11 @@ class SendDailyReminders extends Command
     public function handle(): int
     {
         $nowUtc = now();
+        $resolver = app(NotificationChannelResolver::class);
 
         User::query()
-            ->with('profile')
-            ->each(function (User $user) use ($nowUtc): void {
+            ->with(['profile', 'notificationChannels'])
+            ->each(function (User $user) use ($nowUtc, $resolver): void {
                 $profile = $user->profile;
 
                 if (! $profile) {
@@ -37,7 +41,9 @@ class SendDailyReminders extends Command
                     return;
                 }
 
-                if (! data_get($preferences, 'channels.email', false)) {
+                $channels = $resolver->resolve($user, 'daily_reminder');
+
+                if (empty($channels)) {
                     return;
                 }
 
@@ -58,25 +64,25 @@ class SendDailyReminders extends Command
 
                 $localDate = $reminderDateTime->toDateString();
 
-                if ($this->hasReminderAlready($user->id, $localDate)) {
-                    return;
-                }
-
                 $run = $this->resolveActiveRun($user);
 
                 if (! $run) {
-                    $this->recordOutbox($user->id, 'skipped', $timezone, $reminderDateTime, [
-                        'reason' => 'no_active_run',
-                    ]);
+                    foreach ($channels as $channel) {
+                        $this->recordOutbox($user->id, $channel, 'skipped', $timezone, $reminderDateTime, [
+                            'reason' => 'no_active_run',
+                        ]);
+                    }
 
                     return;
                 }
 
                 if ($this->hasLogForDate($user->id, $run->id, $localDate)) {
-                    $this->recordOutbox($user->id, 'skipped', $timezone, $reminderDateTime, [
-                        'run_id' => $run->id,
-                        'reason' => 'log_already_recorded',
-                    ]);
+                    foreach ($channels as $channel) {
+                        $this->recordOutbox($user->id, $channel, 'skipped', $timezone, $reminderDateTime, [
+                            'run_id' => $run->id,
+                            'reason' => 'log_already_recorded',
+                        ]);
+                    }
 
                     return;
                 }
@@ -89,47 +95,56 @@ class SendDailyReminders extends Command
                     'reminder_time' => $reminderTime,
                 ];
 
-                $outbox = $this->recordOutbox($user->id, 'queued', $timezone, $reminderDateTime, $payload);
+                foreach ($channels as $channel) {
+                    $driver = $channel === 'telegram' ? TelegramChannel::class : $channel;
 
-                try {
-                    $user->notify(new DailyReminderNotification($run, $localDate, [
-                        'timezone' => $timezone,
-                        'reminder_time' => $reminderTime,
-                    ]));
+                    if ($this->hasReminderAlready($user->id, $localDate, $channel)) {
+                        continue;
+                    }
 
-                    $outbox->forceFill([
-                        'status' => 'sent',
-                        'sent_at' => now(),
-                        'error' => null,
-                    ])->save();
-                } catch (Throwable $exception) {
-                    report($exception);
+                    $outbox = $this->recordOutbox($user->id, $channel, 'queued', $timezone, $reminderDateTime, $payload);
 
-                    $outbox->forceFill([
-                        'status' => 'failed',
-                        'error' => $exception->getMessage(),
-                    ])->save();
+                    try {
+                        Notification::sendNow($user, new DailyReminderNotification($run, $localDate, [
+                            'timezone' => $timezone,
+                            'reminder_time' => $reminderTime,
+                        ]), [$driver]);
+
+                        $outbox->forceFill([
+                            'status' => 'sent',
+                            'sent_at' => now(),
+                            'error' => null,
+                        ])->save();
+                    } catch (Throwable $exception) {
+                        report($exception);
+
+                        $outbox->forceFill([
+                            'status' => 'failed',
+                            'error' => $exception->getMessage(),
+                        ])->save();
+                    }
                 }
             });
 
         return self::SUCCESS;
     }
 
-    protected function hasReminderAlready(string $userId, string $localDate): bool
+    protected function hasReminderAlready(string $userId, string $localDate, string $channel): bool
     {
         return NotificationOutbox::query()
             ->where('user_id', $userId)
             ->where('type', 'daily_reminder')
+            ->where('channel', $channel)
             ->whereDate('scheduled_at', $localDate)
             ->exists();
     }
 
-    protected function recordOutbox(string $userId, string $status, string $timezone, Carbon $reminderDateTime, array $payload = []): NotificationOutbox
+    protected function recordOutbox(string $userId, string $channel, string $status, string $timezone, Carbon $reminderDateTime, array $payload = []): NotificationOutbox
     {
         return NotificationOutbox::query()->create([
             'user_id' => $userId,
             'type' => 'daily_reminder',
-            'channel' => 'mail',
+            'channel' => $channel,
             'payload' => $payload,
             'scheduled_at' => $reminderDateTime->copy()->setTimezone('UTC'),
             'status' => $status,
