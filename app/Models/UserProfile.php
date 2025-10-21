@@ -19,6 +19,7 @@ class UserProfile extends Model
         'reminder_time' => '20:30',
         'channels' => [
             'email' => true,
+            'telegram' => false,
             'slack' => false,
             'push' => false,
         ],

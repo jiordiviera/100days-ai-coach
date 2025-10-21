@@ -18,6 +18,8 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
@@ -34,6 +36,8 @@ use Livewire\Component;
 class Settings extends Component implements HasActions, HasForms
 {
     use InteractsWithActions, InteractsWithForms;
+
+    private const TELEGRAM_LANGUAGES = ['auto', 'en', 'fr'];
 
     public ?array $data = [];
 
@@ -61,6 +65,13 @@ class Settings extends Component implements HasActions, HasForms
         $settings = $profile->wakatime_settings ?? [];
         $defaultHashtags = data_get($user->profilePreferencesDefaults(), 'social.share_hashtags', ['#100DaysOfCode', '#buildinpublic']);
 
+        $telegramChannel = $user->notificationChannels()->firstWhere('channel', 'telegram');
+        $telegramLanguage = $telegramChannel?->language ?: 'auto';
+
+        if (! in_array($telegramLanguage, self::TELEGRAM_LANGUAGES, true)) {
+            $telegramLanguage = 'auto';
+        }
+
         $this->hasWakatimeKey = (bool) $profile->wakatime_api_key;
 
         $this->form->fill([
@@ -79,6 +90,11 @@ class Settings extends Component implements HasActions, HasForms
                 'reminder_time' => $this->normalizeReminderTime($preferences['reminder_time'] ?? null),
                 'channels' => collect($preferences['channels'] ?? [])->filter()->keys()->all(),
                 'notification_types' => collect($preferences['notification_types'] ?? [])->filter()->keys()->all(),
+                'telegram' => [
+                    'chat_id' => $telegramChannel?->value ?? '',
+                    'username' => data_get($telegramChannel?->metadata, 'username', ''),
+                    'language' => $telegramLanguage,
+                ],
             ],
             'ai' => [
                 'provider' => $preferences['ai_provider'] ?? 'groq',
@@ -104,19 +120,19 @@ class Settings extends Component implements HasActions, HasForms
             ->schema([
                 // Section Profil Public
                 Placeholder::make('profile_section')
-                    ->content('Profil public')
+                    ->content(__('settings.profile.section'))
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 TextInput::make('profile.name')
-                    ->label('Nom complet')
+                    ->label(__('settings.profile.name_label'))
                     ->maxLength(255)
                     ->required()
                     ->columnSpan(1),
 
                 TextInput::make('profile.username')
-                    ->label('Pseudo')
+                    ->label(__('settings.profile.username_label'))
                     ->maxLength(32)
-                    ->helperText('Affiché dans les classements et sur les pages publiques.')
+                    ->helperText(__('settings.profile.username_helper'))
                     ->rules([
                         'nullable',
                         'alpha_dash',
@@ -125,61 +141,62 @@ class Settings extends Component implements HasActions, HasForms
                     ->columnSpan(1),
 
                 TextInput::make('profile.focus_area')
-                    ->label('Objectif principal')
-                    ->placeholder('Apprendre Laravel, shipping quotidien...')
+                    ->label(__('settings.profile.focus_label'))
+                    ->placeholder(__('settings.profile.focus_placeholder'))
                     ->maxLength(120)
                     ->columnSpan(1),
 
                 Textarea::make('profile.bio')
-                    ->label('Bio')
+                    ->label(__('settings.profile.bio_label'))
                     ->rows(3)
-                    ->helperText('160 caractères maximum.')
+                    ->helperText(__('settings.profile.bio_helper'))
                     ->maxLength(160)
                     ->columnSpan(1),
 
                 TextInput::make('profile.avatar_url')
-                    ->label('Avatar (URL)')
+                    ->label(__('settings.profile.avatar_label'))
                     ->url()
                     ->maxLength(255)
                     ->columnSpan(1),
                 Toggle::make('profile.is_public')
-                    ->label('Profil public')
-                    ->helperText('Autoriser une page publique pour partager tes stats. Requiert un pseudo unique.')
+                    ->label(__('settings.profile.public_toggle_label'))
+                    ->helperText(__('settings.profile.public_toggle_helper'))
                     ->inline(false)
                     ->columnSpan(1),
 
                 // Section Réseaux Sociaux
-                TextEntry::make('social_section')
-                    ->state('Réseaux sociaux')
+
+                Placeholder::make('social_section')
+                    ->content(__('settings.social.section'))
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 KeyValue::make('profile.social_links')
-                    ->label('Réseaux sociaux')
-                    ->keyLabel('Plateforme')
-                    ->valueLabel('Nom d\'utilisateur ou URL')
-                    ->keyPlaceholder('github')
-                    ->valuePlaceholder('@username ou https://...')
-                    ->addButtonLabel('Ajouter un réseau social')
+                    ->label(__('settings.social.label'))
+                    ->keyLabel(__('settings.social.key_label'))
+                    ->valueLabel(__('settings.social.value_label'))
+                    ->keyPlaceholder(__('settings.social.key_placeholder'))
+                    ->valuePlaceholder(__('settings.social.value_placeholder'))
+                    ->actionLabel(__('settings.social.add_button'))
                     ->reorderable()
                     ->columnSpan(1),
 
                 // Section Notifications
-                Placeholder::make('notifications_section')
-                    ->content('Notifications quotidiennes')
+                TextEntry::make('notifications_section')
+                    ->state(__('settings.notifications.section'))
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 Select::make('notifications.language')
-                    ->label('Langue')
+                    ->label(__('settings.notifications.language_label'))
                     ->native(false)
                     ->options([
-                        'en' => 'English',
-                        'fr' => 'Français',
+                        'en' => __('settings.notifications.language_options.en'),
+                        'fr' => __('settings.notifications.language_options.fr'),
                     ])
                     ->required()
                     ->columnSpan(1),
 
                 Select::make('notifications.timezone')
-                    ->label('Fuseau horaire')
+                    ->label(__('settings.notifications.timezone_label'))
                     ->options($this->timezones)
                     ->native(false)
                     ->preload(true)
@@ -188,33 +205,67 @@ class Settings extends Component implements HasActions, HasForms
                     ->columnSpan(1),
 
                 TimePicker::make('notifications.reminder_time')
-                    ->label('Heure du rappel (24h)')
+                    ->label(__('settings.notifications.reminder_time_label'))
                     ->native(false)
                     ->required()
                     ->columnSpan(1),
 
                 CheckboxList::make('notifications.channels')
-                    ->label('Canaux de notification')
+                    ->label(__('settings.notifications.channels_label'))
                     ->options([
-                        'email' => 'Email',
-                        'slack' => 'Slack',
-                        'push' => 'Push (bientôt)',
+                        'email' => __('settings.notifications.channel_options.email'),
+                        'telegram' => __('settings.notifications.channel_options.telegram'),
+                        'slack' => __('settings.notifications.channel_options.slack'),
+                        'push' => __('settings.notifications.channel_options.push'),
                     ])
                     ->columns(3)
                     ->columnSpan(1),
 
+                Fieldset::make('notifications.telegram_config')
+                    ->label(__('settings.notifications.telegram.section'))
+                    ->schema([
+                        TextEntry::make('notifications.telegram_description')
+                            ->state(__('settings.notifications.telegram.description'))
+                            ->columnSpan(2)
+                            ->extraAttributes(['class' => 'text-sm text-muted-foreground']),
+                        TextInput::make('notifications.telegram.chat_id')
+                            ->label(__('settings.notifications.telegram.chat_id_label'))
+                            ->helperText(__('settings.notifications.telegram.chat_id_helper'))
+                            ->maxLength(64)
+                            ->rules(['nullable', 'regex:/^\\d+$/'])
+                            ->columnSpan(1),
+                        TextInput::make('notifications.telegram.username')
+                            ->label(__('settings.notifications.telegram.username_label'))
+                            ->helperText(__('settings.notifications.telegram.username_helper'))
+                            ->maxLength(32)
+                            ->columnSpan(1),
+                        Select::make('notifications.telegram.language')
+                            ->label(__('settings.notifications.telegram.language_label'))
+                            ->options([
+                                'auto' => __('settings.notifications.telegram.language_options.auto'),
+                                'en' => __('settings.notifications.telegram.language_options.en'),
+                                'fr' => __('settings.notifications.telegram.language_options.fr'),
+                            ])
+                            ->default('auto')
+                            ->native(false)
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
+                    ->columnSpan(2)
+                    ->visible(fn (Get $get): bool => in_array('telegram', $get('notifications.channels') ?? [], true)),
+
                 CheckboxList::make('notifications.notification_types')
-                    ->label('Types de notifications')
+                    ->label(__('settings.notifications.types_label'))
                     ->options([
-                        'daily_reminder' => 'Rappel quotidien',
-                        'weekly_digest' => 'Digest hebdomadaire (bientôt)',
+                        'daily_reminder' => __('settings.notifications.type_options.daily_reminder'),
+                        'weekly_digest' => __('settings.notifications.type_options.weekly_digest'),
                     ])
                     ->columns(2)
                     ->columnSpan(1),
 
                 // Section IA
-                Placeholder::make('ai_section')
-                    ->content('Assistant IA')
+                TextEntry::make('ai_section')
+                    ->state('Assistant IA')
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 Select::make('ai.provider')
@@ -362,6 +413,63 @@ class Settings extends Component implements HasActions, HasForms
 
         $reminderTime = $this->normalizeReminderTime($data['notifications']['reminder_time'] ?? null);
 
+        $telegramInput = $data['notifications']['telegram'] ?? [];
+        $telegramChatId = trim((string) ($telegramInput['chat_id'] ?? ''));
+        $telegramUsername = trim((string) ($telegramInput['username'] ?? ''));
+        $telegramLanguageInput = $telegramInput['language'] ?? 'auto';
+
+        if (! in_array($telegramLanguageInput, self::TELEGRAM_LANGUAGES, true)) {
+            $telegramLanguageInput = 'auto';
+        }
+
+        $telegramLanguage = $telegramLanguageInput === 'auto'
+            ? ($data['notifications']['language'] ?? 'en')
+            : $telegramLanguageInput;
+
+        if (! in_array($telegramLanguage, ['en', 'fr'], true)) {
+            $telegramLanguage = 'en';
+        }
+
+        $telegramChannelRecord = $user->notificationChannels()->firstWhere('channel', 'telegram');
+
+        if (($channels['telegram'] ?? false)) {
+            if ($telegramChatId === '') {
+                $this->addError('data.notifications.telegram.chat_id', __('settings.notifications.telegram.errors.missing_chat_id'));
+
+                Notification::make()
+                    ->title(__('settings.notifications.telegram.errors.title'))
+                    ->body(__('settings.notifications.telegram.errors.missing_chat_id'))
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
+            $sanitizedUsername = Str::of($telegramUsername)->trim()->ltrim('@')->value();
+            $metadata = array_filter([
+                'username' => $sanitizedUsername !== '' ? $sanitizedUsername : null,
+            ]);
+
+            $channelPayload = [
+                'value' => $telegramChatId,
+                'language' => $telegramLanguage,
+                'is_active' => true,
+                'metadata' => $metadata ?: null,
+            ];
+
+            if (! $telegramChannelRecord) {
+                $user->notificationChannels()->create(array_merge($channelPayload, [
+                    'channel' => 'telegram',
+                ]));
+            } else {
+                $telegramChannelRecord->forceFill($channelPayload)->save();
+            }
+        } elseif ($telegramChannelRecord && $telegramChannelRecord->is_active) {
+            $telegramChannelRecord->forceFill([
+                'is_active' => false,
+            ])->save();
+        }
+
         $defaultHashtags = data_get($user->profilePreferencesDefaults(), 'social.share_hashtags', ['#100DaysOfCode', '#buildinpublic']);
         $currentHashtags = data_get($preferences, 'social.share_hashtags', $defaultHashtags);
         $rawHashtags = $data['ai']['share_hashtags'] ?? $currentHashtags;
@@ -377,6 +485,7 @@ class Settings extends Component implements HasActions, HasForms
             'reminder_time' => $reminderTime,
             'channels' => array_merge([
                 'email' => false,
+                'telegram' => false,
                 'slack' => false,
                 'push' => false,
             ], $channels),
@@ -399,7 +508,7 @@ class Settings extends Component implements HasActions, HasForms
         ])->save();
 
         Notification::make()
-            ->title('Paramètres mis à jour')
+            ->title(__('settings.messages.updated'))
             ->success()
             ->send();
     }

@@ -1,0 +1,97 @@
+<?php
+
+return [
+    'profile' => [
+        'section' => 'Profil public',
+        'name_label' => 'Nom complet',
+        'username_label' => 'Pseudo',
+        'username_helper' => 'Affiché dans les classements et sur les pages publiques.',
+        'focus_label' => 'Objectif principal',
+        'focus_placeholder' => 'Apprendre Laravel, shipping quotidien...',
+        'bio_label' => 'Bio',
+        'bio_helper' => '160 caractères maximum.',
+        'avatar_label' => 'Avatar (URL)',
+        'public_toggle_label' => 'Profil public',
+        'public_toggle_helper' => 'Autoriser une page publique pour partager tes stats. Requiert un pseudo unique.',
+        'username_required_title' => 'Pseudo requis',
+        'username_required_body' => 'Définis un pseudo unique avant d’activer ton profil public.',
+    ],
+    'social' => [
+        'section' => 'Réseaux sociaux',
+        'label' => 'Réseaux sociaux',
+        'key_label' => 'Plateforme',
+        'value_label' => 'Nom d’utilisateur ou URL',
+        'key_placeholder' => 'github',
+        'value_placeholder' => '@username ou https://...',
+        'add_button' => 'Ajouter un réseau social',
+    ],
+    'notifications' => [
+        'section' => 'Notifications quotidiennes',
+        'language_label' => 'Langue',
+        'language_options' => [
+            'en' => 'Anglais',
+            'fr' => 'Français',
+        ],
+        'timezone_label' => 'Fuseau horaire',
+        'reminder_time_label' => 'Heure du rappel (24h)',
+        'channels_label' => 'Canaux de notification',
+        'channel_options' => [
+            'email' => 'Email',
+            'telegram' => 'Telegram',
+            'slack' => 'Slack (bientôt)',
+            'push' => 'Push (bientôt)',
+        ],
+        'types_label' => 'Types de notification',
+        'type_options' => [
+            'daily_reminder' => 'Rappel quotidien',
+            'weekly_digest' => 'Digest hebdomadaire (bientôt)',
+        ],
+        'telegram' => [
+            'section' => 'Alertes Telegram',
+            'description' => 'Connecte le bot Telegram pour recevoir les rappels et les mises à jour directement dans la conversation.',
+            'chat_id_label' => 'Identifiant du chat',
+            'chat_id_helper' => 'Envoie /start au bot et copie l’ID numérique affiché dans la réponse.',
+            'username_label' => 'Nom d’utilisateur Telegram (optionnel)',
+            'username_helper' => 'Utile pour le suivi — inutile d’ajouter le symbole @.',
+            'language_label' => 'Langue du canal',
+            'language_options' => [
+                'auto' => 'Aligner sur la langue des notifications',
+                'en' => 'Anglais',
+                'fr' => 'Français',
+            ],
+            'errors' => [
+                'title' => 'Canal Telegram incomplet',
+                'missing_chat_id' => 'Renseigne ton identifiant de chat Telegram pour activer ce canal.',
+            ],
+        ],
+    ],
+    'ai' => [
+        'section' => 'Assistant IA',
+        'provider_label' => 'Modèle préféré',
+        'provider_options' => [
+            'groq' => 'Groq (rapide)',
+            'openai' => 'OpenAI',
+            'local' => 'Modèle auto-hébergé',
+        ],
+        'tone_label' => 'Ton des conseils',
+        'tone_options' => [
+            'neutral' => 'Neutre',
+            'fun' => 'Fun',
+        ],
+        'hashtags_label' => 'Hashtags de partage',
+        'hashtags_placeholder' => '#100DaysOfCode',
+        'hashtags_helper' => 'Jusqu’à 6 hashtags utilisés pour les brouillons LinkedIn/X.',
+    ],
+    'integrations' => [
+        'section' => 'Intégrations',
+        'wakatime_key_label' => 'Clé API WakaTime',
+        'wakatime_key_helper' => 'Colle ta clé API depuis https://wakatime.com/settings/api-key. Laisse vide pour conserver la clé actuelle.',
+        'wakatime_hide_label' => 'Masquer les noms des projets synchronisés',
+        'wakatime_hide_helper' => 'Utilise des noms génériques lors de l’affichage des données WakaTime.',
+        'wakatime_remove_label' => 'Supprimer la clé WakaTime enregistrée',
+        'wakatime_remove_helper' => 'Active cette option et enregistre pour supprimer la clé stockée.',
+    ],
+    'messages' => [
+        'updated' => 'Paramètres mis à jour',
+    ],
+];

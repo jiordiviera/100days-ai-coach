@@ -3,15 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\NotificationChannel;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
@@ -56,6 +59,7 @@ class User extends Authenticatable implements FilamentUser
             'reminder_time' => '20:30',
             'channels' => [
                 'email' => true,
+                'telegram' => false,
                 'slack' => false,
                 'push' => false,
             ],
@@ -139,6 +143,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(UserRepository::class);
     }
 
+    public function notificationChannels(): MorphMany
+    {
+        return $this->morphMany(NotificationChannel::class, 'notifiable');
+    }
+
     public function needsOnboarding(): bool
     {
         return (bool) $this->needs_onboarding;
@@ -151,5 +160,20 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return true;
+    }
+
+    public function routeNotificationForTelegram(?Notification $notification = null): ?string
+    {
+        $channels = $this->relationLoaded('notificationChannels')
+            ? $this->notificationChannels
+            : $this->notificationChannels()->get();
+
+        $channel = $channels->first(function ($channel) {
+            return $channel->channel === 'telegram'
+                && $channel->is_active
+                && filled($channel->value);
+        });
+
+        return $channel?->value;
     }
 }

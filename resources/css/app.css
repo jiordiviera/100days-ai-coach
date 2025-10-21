@@ -1,27 +1,27 @@
 @import "tailwindcss";
 /* Required by all components */
-@import '../../vendor/filament/support/resources/css/index.css';
+@import "../../vendor/filament/support/resources/css/index.css";
 
 /* Required by actions and tables */
-@import '../../vendor/filament/actions/resources/css/index.css';
+@import "../../vendor/filament/actions/resources/css/index.css";
 
 /* Required by actions, forms and tables */
-@import '../../vendor/filament/forms/resources/css/index.css';
+@import "../../vendor/filament/forms/resources/css/index.css";
 
 /* Required by actions and infolists */
-@import '../../vendor/filament/infolists/resources/css/index.css';
+@import "../../vendor/filament/infolists/resources/css/index.css";
 
 /* Required by notifications */
-@import '../../vendor/filament/notifications/resources/css/index.css';
+@import "../../vendor/filament/notifications/resources/css/index.css";
 
 /* Required by actions, infolists, forms, schemas and tables */
-@import '../../vendor/filament/schemas/resources/css/index.css';
+@import "../../vendor/filament/schemas/resources/css/index.css";
 
 /* Required by tables */
-@import '../../vendor/filament/tables/resources/css/index.css';
+@import "../../vendor/filament/tables/resources/css/index.css";
 
 /* Required by widgets */
-@import '../../vendor/filament/widgets/resources/css/index.css';
+@import "../../vendor/filament/widgets/resources/css/index.css";
 
 /*@variant dark (&:where(.dark, .dark *));*/
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -191,68 +191,71 @@
     @apply text-foreground/80;
   }
 
-    [wire\:key*="social_links"] .fi-fo-repeater-item {
-        @apply border-gray-200 dark:border-gray-700;
-    }
+  [wire\:key*="social_links"] .fi-fo-repeater-item {
+    @apply border-gray-200 dark:border-gray-700;
+  }
 
-    /* Amélioration de l'espacement des checkboxes */
-    .fi-fo-checkbox-list {
-        @apply gap-3;
-    }
+  /* Amélioration de l'espacement des checkboxes */
+  .fi-fo-checkbox-list {
+    @apply gap-3;
+  }
 
+  .fi-fo-field-wrp:not(:has(.fi-fo-repeater)):not(:has(.fi-fo-placeholder)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 640px) {
     .fi-fo-field-wrp:not(:has(.fi-fo-repeater)):not(:has(.fi-fo-placeholder)) {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-        gap: 1.5rem;
-        align-items: start;
+      grid-template-columns: 1fr;
     }
+  }
 
-    @media (max-width: 640px) {
-        .fi-fo-field-wrp:not(:has(.fi-fo-repeater)):not(:has(.fi-fo-placeholder)) {
-            grid-template-columns: 1fr;
-        }
-    }
+  /* Style pour les placeholders (titres de section) */
+  .fi-fo-placeholder {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgb(17 24 39);
+    border-bottom: 1px solid rgb(229 231 235);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+  }
 
-    /* Style pour les placeholders (titres de section) */
-    .fi-fo-placeholder {
-        font-size: 1rem;
-        font-weight: 600;
-        color: rgb(17 24 39);
-        border-bottom: 1px solid rgb(229 231 235);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        margin-top: 1.5rem;
-    }
+  .dark .fi-fo-placeholder {
+    color: rgb(255 255 255);
+    border-bottom-color: rgb(55 65 81);
+  }
 
-    .dark .fi-fo-placeholder {
-        color: rgb(255 255 255);
-        border-bottom-color: rgb(55 65 81);
-    }
+  .fi-fo-placeholder:first-child {
+    margin-top: 0;
+  }
 
-    .fi-fo-placeholder:first-child {
-        margin-top: 0;
-    }
+  /* Amélioration des checkboxes */
+  .fi-fo-checkbox-list {
+    gap: 0.75rem;
+  }
 
-    /* Amélioration des checkboxes */
-    .fi-fo-checkbox-list {
-        gap: 0.75rem;
-    }
+  /* Style pour le repeater */
+  .fi-fo-repeater {
+    margin-top: 0.5rem;
+  }
 
-    /* Style pour le repeater */
-    .fi-fo-repeater {
-        margin-top: 0.5rem;
-    }
+  .fi-fo-repeater-item {
+    border-color: rgb(229 231 235);
+  }
 
-    .fi-fo-repeater-item {
-        border-color: rgb(229 231 235);
-    }
+  .dark .fi-fo-repeater-item {
+    border-color: rgb(55 65 81);
+  }
 
-    .dark .fi-fo-repeater-item {
-        border-color: rgb(55 65 81);
-    }
-
-    /* Supprime les colonnes par défaut de Filament pour éviter les conflits */
-    .fi-fo-component-ctn > div[class*="grid-cols"] {
-        display: block !important;
-    }
+  /* Supprime les colonnes par défaut de Filament pour éviter les conflits */
+  .fi-fo-component-ctn > div[class*="grid-cols"] {
+    display: block !important;
+  }
+  input[type="checkbox"].fi-checkbox-input {
+    border-radius: 0 !important;
+  }
 }

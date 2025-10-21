@@ -2,10 +2,14 @@
 
 use App\Models\ChallengeRun;
 use App\Models\DailyLog;
+use App\Models\NotificationChannel;
 use App\Models\NotificationOutbox;
 use App\Models\User;
+use App\Notifications\Channels\TelegramChannel;
+use App\Notifications\DailyReminderNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 
 uses(RefreshDatabase::class);
@@ -28,6 +32,7 @@ function createUserWithProfile(array $preferencesOverrides = []): User
 
 it('queues and sends reminders to users without daily log', function (): void {
     Notification::fake();
+    Http::fake();
     Carbon::setTestNow(Carbon::parse('2024-10-05 19:40', 'UTC'));
 
     $user = createUserWithProfile([
@@ -59,6 +64,11 @@ it('queues and sends reminders to users without daily log', function (): void {
     expect($entries)->toHaveCount(1);
     expect($entries->first()->status)->toBe('sent');
 
+    Notification::assertSentTo($user, function ($notification, array $channels): bool {
+        return $notification instanceof DailyReminderNotification
+            && $channels === ['mail'];
+    });
+
     // Running again the same day should not duplicate reminders
     app(App\Console\Commands\SendDailyReminders::class)->handle();
     expect(NotificationOutbox::where('user_id', $user->id)->where('type', 'daily_reminder')->count())->toBe(1);
@@ -66,6 +76,7 @@ it('queues and sends reminders to users without daily log', function (): void {
 
 it('skips reminders when a log already exists for the day', function (): void {
     Notification::fake();
+    Http::fake();
     Carbon::setTestNow(Carbon::parse('2024-10-05 19:40', 'UTC'));
 
     $user = createUserWithProfile([
@@ -92,4 +103,52 @@ it('skips reminders when a log already exists for the day', function (): void {
     $entry = NotificationOutbox::where('user_id', $user->id)->where('type', 'daily_reminder')->first();
     expect($entry)->not()->toBeNull();
     expect($entry->status)->toBe('skipped');
+});
+
+it('sends reminders across active telegram channel when configured', function (): void {
+    Notification::fake();
+    Http::fake();
+    Carbon::setTestNow(Carbon::parse('2024-10-05 19:40', 'UTC'));
+
+    $user = createUserWithProfile([
+        'timezone' => 'Africa/Douala',
+        'reminder_time' => '20:30',
+        'channels' => [
+            'email' => true,
+            'telegram' => true,
+        ],
+    ]);
+
+    NotificationChannel::factory()
+        ->for($user, 'notifiable')
+        ->create([
+            'channel' => 'telegram',
+            'value' => '123456789',
+        ]);
+
+    ChallengeRun::factory()->for($user, 'owner')->create([
+        'title' => 'Telegram reminders',
+        'status' => 'active',
+        'start_date' => Carbon::parse('2024-09-29'),
+    ]);
+
+    app(App\Console\Commands\SendDailyReminders::class)->handle();
+
+    $entries = NotificationOutbox::where('user_id', $user->id)
+        ->where('type', 'daily_reminder')
+        ->get();
+
+    expect($entries)->toHaveCount(2);
+    expect($entries->pluck('channel')->all())
+        ->toMatchArray(['mail', 'telegram']);
+
+    Notification::assertSentTo($user, function ($notification, array $channels): bool {
+        return $notification instanceof DailyReminderNotification
+            && in_array('mail', $channels, true);
+    });
+
+    Notification::assertSentTo($user, function ($notification, array $channels): bool {
+        return $notification instanceof DailyReminderNotification
+            && in_array(TelegramChannel::class, $channels, true);
+    });
 });

@@ -5,6 +5,15 @@ return [
         env('SUPPORT_TEAM_EMAIL', 'hello@jiordiviera.me'),
         env('SUPPORT_TEAM_EMAIL_SECONDARY', 'jiordikengne@gmail.com'),
     ]),
+    'team_telegram_chat_ids' => collect([
+        env('SUPPORT_TEAM_TELEGRAM_CHAT_ID'),
+        ...explode(',', (string) env('SUPPORT_TEAM_TELEGRAM_IDS', '')),
+    ])
+        ->map(fn ($value) => is_string($value) ? trim($value) : $value)
+        ->filter()
+        ->unique()
+        ->values()
+        ->all(),
     'auto_issue_categories' => ['bug'],
     'faq_sections' => [
         [

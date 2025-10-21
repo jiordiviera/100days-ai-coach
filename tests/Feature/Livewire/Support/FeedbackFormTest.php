@@ -3,6 +3,7 @@
 use App\Livewire\Support\FeedbackForm;
 use App\Models\SupportTicket;
 use App\Models\User;
+use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\SupportTicketReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -54,6 +55,7 @@ it('notifies the support team when a ticket is created', function (): void {
     Notification::fake();
 
     config()->set('support.team_recipients', ['team@example.test']);
+    config()->set('support.team_telegram_chat_ids', ['123456789']);
 
     Livewire::test(FeedbackForm::class)
         ->set('formData.name', 'Team Ping')
@@ -65,5 +67,10 @@ it('notifies the support team when a ticket is created', function (): void {
     Notification::assertSentOnDemand(SupportTicketReceived::class, function ($notification, array $channels, $notifiable): bool {
         return in_array('mail', $channels, true)
             && ($notifiable->routes['mail'] ?? null) === 'team@example.test';
+    });
+
+    Notification::assertSentOnDemand(SupportTicketReceived::class, function ($notification, array $channels, $notifiable): bool {
+        return in_array(TelegramChannel::class, $channels, true)
+            && ($notifiable->routes['telegram'] ?? null) === '123456789';
     });
 });

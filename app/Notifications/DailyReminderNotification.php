@@ -3,6 +3,9 @@
 namespace App\Notifications;
 
 use App\Models\ChallengeRun;
+use App\Models\User;
+use App\Notifications\Channels\TelegramChannel;
+use App\Services\Notifications\NotificationChannelResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -20,7 +23,18 @@ class DailyReminderNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        if (! $notifiable instanceof User) {
+            return [];
+        }
+
+        $resolver = app(NotificationChannelResolver::class);
+
+        $channels = $resolver->resolve($notifiable, 'daily_reminder');
+
+        return collect($channels)
+            ->map(fn (string $channel) => $channel === 'telegram' ? TelegramChannel::class : $channel)
+            ->values()
+            ->all();
     }
 
     public function toMail(object $notifiable): MailMessage

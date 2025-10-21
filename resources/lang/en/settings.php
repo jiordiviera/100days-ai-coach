@@ -1,0 +1,97 @@
+<?php
+
+return [
+    'profile' => [
+        'section' => 'Public profile',
+        'name_label' => 'Full name',
+        'username_label' => 'Handle',
+        'username_helper' => 'Shown in leaderboards and on public pages.',
+        'focus_label' => 'Primary focus',
+        'focus_placeholder' => 'Learning Laravel, shipping daily...',
+        'bio_label' => 'Bio',
+        'bio_helper' => '160 characters max.',
+        'avatar_label' => 'Avatar (URL)',
+        'public_toggle_label' => 'Public profile',
+        'public_toggle_helper' => 'Allow a public page to share your stats. Requires a unique handle.',
+        'username_required_title' => 'Handle required',
+        'username_required_body' => 'Set a unique handle before enabling your public profile.',
+    ],
+    'social' => [
+        'section' => 'Social links',
+        'label' => 'Social links',
+        'key_label' => 'Platform',
+        'value_label' => 'Username or URL',
+        'key_placeholder' => 'github',
+        'value_placeholder' => '@username or https://...',
+        'add_button' => 'Add a social profile',
+    ],
+    'notifications' => [
+        'section' => 'Daily notifications',
+        'language_label' => 'Language',
+        'language_options' => [
+            'en' => 'English',
+            'fr' => 'French',
+        ],
+        'timezone_label' => 'Time zone',
+        'reminder_time_label' => 'Reminder time (24h)',
+        'channels_label' => 'Notification channels',
+        'channel_options' => [
+            'email' => 'Email',
+            'telegram' => 'Telegram',
+            'slack' => 'Slack (coming soon)',
+            'push' => 'Push (coming soon)',
+        ],
+        'types_label' => 'Notification types',
+        'type_options' => [
+            'daily_reminder' => 'Daily reminder',
+            'weekly_digest' => 'Weekly digest (coming soon)',
+        ],
+        'telegram' => [
+            'section' => 'Telegram alerts',
+            'description' => 'Connect the Telegram bot to receive reminders and support updates directly in chat.',
+            'chat_id_label' => 'Chat ID',
+            'chat_id_helper' => 'Send /start to the bot and copy the numeric ID shown in its reply.',
+            'username_label' => 'Telegram username (optional)',
+            'username_helper' => 'Used for traceability — no need to include the @ symbol.',
+            'language_label' => 'Channel language',
+            'language_options' => [
+                'auto' => 'Match notification language',
+                'en' => 'English',
+                'fr' => 'French',
+            ],
+            'errors' => [
+                'title' => 'Telegram channel incomplete',
+                'missing_chat_id' => 'Provide your Telegram chat ID to enable this channel.',
+            ],
+        ],
+    ],
+    'ai' => [
+        'section' => 'AI assistant',
+        'provider_label' => 'Preferred model',
+        'provider_options' => [
+            'groq' => 'Groq (fast)',
+            'openai' => 'OpenAI',
+            'local' => 'Self-hosted model',
+        ],
+        'tone_label' => 'Advice tone',
+        'tone_options' => [
+            'neutral' => 'Neutral',
+            'fun' => 'Playful',
+        ],
+        'hashtags_label' => 'Sharing hashtags',
+        'hashtags_placeholder' => '#100DaysOfCode',
+        'hashtags_helper' => 'Up to 6 hashtags used for LinkedIn/X drafts.',
+    ],
+    'integrations' => [
+        'section' => 'Integrations',
+        'wakatime_key_label' => 'WakaTime API key',
+        'wakatime_key_helper' => 'Paste your API key from https://wakatime.com/settings/api-key. Leave blank to keep the current key.',
+        'wakatime_hide_label' => 'Hide synced project names',
+        'wakatime_hide_helper' => 'Use generic names when showing WakaTime data.',
+        'wakatime_remove_label' => 'Delete saved WakaTime key',
+        'wakatime_remove_helper' => 'Toggle this and save to remove the stored key.',
+    ],
+    'messages' => [
+        'updated' => 'Settings updated',
+    ],
+];
