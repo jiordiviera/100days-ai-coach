@@ -53,8 +53,8 @@
                     <dt class="font-medium text-foreground">{{ __('legal.editor.fields.address') }}</dt>
                     <dd class="text-right">
                         @if ($editor['address'] ?? false)
-                            {{ $editor['address'] }}<br>
-                            {{ trim(($editor['postal_code'] ?? '').' '.($editor['city'] ?? '')) }}<br>
+                            {{ $editor['address'] }}<br/>
+                            {{ trim(($editor['postal_code'] ?? '').' '.($editor['city'] ?? '')) }}<br/>
                             {{ $editor['country'] ?? '' }}
                         @else
                             À compléter
@@ -67,7 +67,7 @@
                         @if ($editor['email'] ?? false)
                             <a href="mailto:{{ $editor['email'] }}" class="text-primary hover:underline">{{ $editor['email'] }}</a>
                             @if ($editor['phone'] ?? false)
-                                <br>{{ $editor['phone'] }}
+                                <br/>{{ $editor['phone'] }}
                             @endif
                         @else
                             {!! __('legal.editor.contact_fallback', ['link' => '<a href="https://github.com/jiordiviera/100days-ai-coach/issues" class="text-primary hover:underline" target="_blank" rel="noopener">GitHub</a>']) !!}
@@ -93,8 +93,8 @@
                     <div class="flex justify-between gap-4">
                         <dt class="font-medium text-foreground">{{ __('legal.editor.fields.address') }}</dt>
                         <dd class="text-right">
-                            {{ $hosting['address'] }}<br>
-                            {{ trim(($hosting['postal_code'] ?? '').' '.($hosting['city'] ?? '')) }}<br>
+                            {{ $hosting['address'] }}<br/>
+                            {{ trim(($hosting['postal_code'] ?? '').' '.($hosting['city'] ?? '')) }}<br/>
                             {{ $hosting['country'] }}
                         </dd>
                     </div>

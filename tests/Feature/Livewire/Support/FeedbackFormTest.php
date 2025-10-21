@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\SupportTicketReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
@@ -53,6 +54,7 @@ it('prefills authenticated user data and links the ticket', function (): void {
 
 it('notifies the support team when a ticket is created', function (): void {
     Notification::fake();
+    Http::fake();
 
     config()->set('support.team_recipients', ['team@example.test']);
     config()->set('support.team_telegram_chat_ids', ['123456789']);
@@ -64,12 +66,12 @@ it('notifies the support team when a ticket is created', function (): void {
         ->set('formData.message', 'Test notification flow.')
         ->call('submit');
 
-    Notification::assertSentOnDemand(SupportTicketReceived::class, function ($notification, array $channels, $notifiable): bool {
+    Notification::assertSentOnDemand(SupportTicketReceived::class, function (SupportTicketReceived $notification, array $channels, $notifiable): bool {
         return in_array('mail', $channels, true)
             && ($notifiable->routes['mail'] ?? null) === 'team@example.test';
     });
 
-    Notification::assertSentOnDemand(SupportTicketReceived::class, function ($notification, array $channels, $notifiable): bool {
+    Notification::assertSentOnDemand(SupportTicketReceived::class, function (SupportTicketReceived $notification, array $channels, $notifiable): bool {
         return in_array(TelegramChannel::class, $channels, true)
             && ($notifiable->routes['telegram'] ?? null) === '123456789';
     });

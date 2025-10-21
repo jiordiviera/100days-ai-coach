@@ -46,7 +46,7 @@ class SupportTicketReceived extends Notification implements ShouldQueue
             ->line('Catégorie : '.ucfirst($this->ticket->category))
             ->line('Message :')
             ->line($this->ticket->message)
-            ->action('Ouvrir Filament', url('/admin/support-tickets'))
+            ->action('Ouvrir Filament', route('filament.admin.resources.support-tickets.index'))
             ->salutation('— 100Days AI Coach');
     }
 
@@ -54,14 +54,17 @@ class SupportTicketReceived extends Notification implements ShouldQueue
     {
         $category = ucfirst($this->ticket->category);
 
+        $messageBody = e($this->ticket->message);
+        $messageBody = str_replace(["\r\n", "\n", "\r"], '<br>', $messageBody);
+
         $content = implode('<br>', array_filter([
             '<b>📥 Nouveau ticket support</b>',
             'Catégorie : '.e($category),
             'Auteur : '.e($this->ticket->name).' ('.e($this->ticket->email).')',
             $this->ticket->user_id ? 'Utilisateur ID : '.e((string) $this->ticket->user_id) : null,
             'Message :',
-            nl2br(e($this->ticket->message)),
-            '<a href="'.e(url('/admin/support-tickets')).'">Ouvrir dans Filament</a>',
+            $messageBody,
+            '<a href="'.e(route('filament.admin.resources.support-tickets.index')).'">Ouvrir dans Filament</a>',
         ]));
 
         return TelegramMessage::make()

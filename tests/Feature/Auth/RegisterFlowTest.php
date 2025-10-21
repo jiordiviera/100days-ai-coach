@@ -29,6 +29,7 @@ test('user is redirected to onboarding with default preferences after registrati
         'reminder_time' => '20:30',
         'channels' => [
             'email' => true,
+            'telegram' => false,
             'slack' => false,
             'push' => false,
         ],

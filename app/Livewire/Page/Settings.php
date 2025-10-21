@@ -176,7 +176,7 @@ class Settings extends Component implements HasActions, HasForms
                     ->valueLabel(__('settings.social.value_label'))
                     ->keyPlaceholder(__('settings.social.key_placeholder'))
                     ->valuePlaceholder(__('settings.social.value_placeholder'))
-                    ->actionLabel(__('settings.social.add_button'))
+                    ->addActionLabel(__('settings.social.add_button'))
                     ->reorderable()
                     ->columnSpan(1),
 
@@ -265,58 +265,58 @@ class Settings extends Component implements HasActions, HasForms
 
                 // Section IA
                 TextEntry::make('ai_section')
-                    ->state('Assistant IA')
+                    ->state(__('settings.ai.section'))
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 Select::make('ai.provider')
-                    ->label('Modèle préféré')
+                    ->label(__('settings.ai.provider_label'))
                     ->native(false)
                     ->options([
-                        'groq' => 'Groq (rapide)',
-                        'openai' => 'OpenAI',
-                        'local' => 'Modèle local',
+                        'groq' => __('settings.ai.provider_options.groq'),
+                        'openai' => __('settings.ai.provider_options.openai'),
+                        'local' => __('settings.ai.provider_options.local'),
                     ])
                     ->required()
                     ->columnSpan(1),
 
                 Select::make('ai.tone')
-                    ->label('Ton des conseils')
+                    ->label(__('settings.ai.tone_label'))
                     ->native(false)
                     ->options([
-                        'neutral' => 'Neutre',
-                        'fun' => 'Fun',
+                        'neutral' => __('settings.ai.tone_options.neutral'),
+                        'fun' => __('settings.ai.tone_options.fun'),
                     ])
                     ->required()
                     ->columnSpan(1),
 
                 TagsInput::make('ai.share_hashtags')
-                    ->label('Hashtags de partage')
-                    ->placeholder('#100DaysOfCode')
-                    ->helperText('Jusqu’à 6 hashtags utilisés pour les brouillons LinkedIn/X.')
+                    ->label(__('settings.ai.hashtags_label'))
+                    ->placeholder(__('settings.ai.hashtags_placeholder'))
+                    ->helperText(__('settings.ai.hashtags_helper'))
                     ->separator(',')
                     // ->maxItems(6)
                     ->columnSpan(1),
 
                 // Section Intégrations
                 TextEntry::make('integrations_section')
-                    ->state('Intégrations')
+                    ->state(__('settings.integrations.section'))
                     ->extraAttributes(['class' => $sectionHeadingClass]),
 
                 TextInput::make('integrations.wakatime_api_key')
-                    ->label('Clé API WakaTime')
+                    ->label(__('settings.integrations.wakatime_key_label'))
                     ->password()
-                    ->helperText('Collez votre clé API depuis https://wakatime.com/settings/api-key. Laisser vide pour ne pas remplacer la clé existante.')
+                    ->helperText(__('settings.integrations.wakatime_key_helper'))
                     ->columnSpan(1),
 
                 Toggle::make('integrations.wakatime_hide_project_names')
-                    ->label('Masquer les noms des projets synchronisés')
-                    ->helperText('Utilise des noms génériques lors de l’affichage des données WakaTime.')
+                    ->label(__('settings.integrations.wakatime_hide_label'))
+                    ->helperText(__('settings.integrations.wakatime_hide_helper'))
                     ->inline(false)
                     ->columnSpan(1),
 
                 Toggle::make('integrations.wakatime_remove_key')
-                    ->label('Supprimer la clé WakaTime enregistrée')
-                    ->helperText('Activez cette option et enregistrez pour supprimer la clé stockée.')
+                    ->label(__('settings.integrations.wakatime_remove_label'))
+                    ->helperText(__('settings.integrations.wakatime_remove_helper'))
                     ->inline(false)
                     ->columnSpan(1),
             ]);
@@ -342,11 +342,11 @@ class Settings extends Component implements HasActions, HasForms
         $previousUsername = $profile->username;
 
         if ($profilePublic && blank($username)) {
-            $this->addError('data.profile.username', 'Choisis un pseudo avant de rendre ton profil public.');
+            $this->addError('data.profile.username', __('settings.profile.username_required_body'));
 
             Notification::make()
-                ->title('Pseudo requis')
-                ->body('Définis un pseudo unique pour activer ton profil public.')
+                ->title(__('settings.profile.username_required_title'))
+                ->body(__('settings.profile.username_required_body'))
                 ->warning()
                 ->send();
 

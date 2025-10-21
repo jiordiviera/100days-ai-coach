@@ -64,9 +64,8 @@ it('queues and sends reminders to users without daily log', function (): void {
     expect($entries)->toHaveCount(1);
     expect($entries->first()->status)->toBe('sent');
 
-    Notification::assertSentTo($user, function ($notification, array $channels): bool {
-        return $notification instanceof DailyReminderNotification
-            && $channels === ['mail'];
+    Notification::assertSentTo($user, function (DailyReminderNotification $notification, array $channels): bool {
+        return $channels === ['mail'];
     });
 
     // Running again the same day should not duplicate reminders
@@ -142,13 +141,11 @@ it('sends reminders across active telegram channel when configured', function ()
     expect($entries->pluck('channel')->all())
         ->toMatchArray(['mail', 'telegram']);
 
-    Notification::assertSentTo($user, function ($notification, array $channels): bool {
-        return $notification instanceof DailyReminderNotification
-            && in_array('mail', $channels, true);
+    Notification::assertSentTo($user, function (DailyReminderNotification $notification, array $channels): bool {
+        return in_array('mail', $channels, true);
     });
 
-    Notification::assertSentTo($user, function ($notification, array $channels): bool {
-        return $notification instanceof DailyReminderNotification
-            && in_array(TelegramChannel::class, $channels, true);
+    Notification::assertSentTo($user, function (DailyReminderNotification $notification, array $channels): bool {
+        return in_array(TelegramChannel::class, $channels, true);
     });
 });

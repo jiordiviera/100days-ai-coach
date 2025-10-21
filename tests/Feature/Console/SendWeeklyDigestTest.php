@@ -39,7 +39,7 @@ it('sends weekly digest to opted-in users on sunday', function (): void {
     $user = User::factory()->create(['name' => 'Weekly Coder']);
     $profile = $user->profile()->create([
         'preferences' => array_replace_recursive($user->profilePreferencesDefaults(), [
-            'channels' => ['email' => true, 'slack' => false, 'push' => false],
+            'channels' => ['email' => true, 'telegram' => false, 'slack' => false, 'push' => false],
             'notification_types' => ['weekly_digest' => true, 'daily_reminder' => false],
             'timezone' => 'Europe/Paris',
         ]),
@@ -81,7 +81,7 @@ it('skips users when not sunday or opt-out', function (): void {
     $user = User::factory()->create();
     $user->profile()->create([
         'preferences' => array_replace_recursive($user->profilePreferencesDefaults(), [
-            'channels' => ['email' => true],
+            'channels' => ['email' => true, 'telegram' => false],
             'notification_types' => ['weekly_digest' => true],
             'timezone' => 'UTC',
         ]),
@@ -96,7 +96,7 @@ it('skips users when not sunday or opt-out', function (): void {
     $optOut = User::factory()->create();
     $optOut->profile()->create([
         'preferences' => array_replace_recursive($optOut->profilePreferencesDefaults(), [
-            'channels' => ['email' => true],
+            'channels' => ['email' => true, 'telegram' => false],
             'notification_types' => ['weekly_digest' => false],
             'timezone' => 'UTC',
         ]),
@@ -127,7 +127,7 @@ it('does not duplicate digest within the same week', function (): void {
     $user = User::factory()->create();
     $user->profile()->create([
         'preferences' => array_replace_recursive($user->profilePreferencesDefaults(), [
-            'channels' => ['email' => true],
+            'channels' => ['email' => true, 'telegram' => false],
             'notification_types' => ['weekly_digest' => true],
             'timezone' => 'UTC',
         ]),
