@@ -16,6 +16,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -33,7 +34,7 @@ class Wizard extends Component implements HasForms
 
     public function mount(): void
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user || ! $user->needsOnboarding()) {
             $this->redirectRoute('daily-challenge');
@@ -95,7 +96,7 @@ class Wizard extends Component implements HasForms
 
     protected function saveProfileStep(): void
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $profile = $user->profile;
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
 
@@ -122,7 +123,7 @@ class Wizard extends Component implements HasForms
 
     protected function saveChallengeStep(): void
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $payload = [
             'title' => $this->data['challenge_title'],
@@ -151,7 +152,7 @@ class Wizard extends Component implements HasForms
 
     protected function completeOnboarding(): void
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $profile = $user->profile;
         $preferences = $profile->preferences ?? $user->profilePreferencesDefaults();
 
@@ -240,7 +241,7 @@ class Wizard extends Component implements HasForms
                 ->label('Canaux de notification')
                 ->options([
                     'email' => 'Email',
-                    'slack' => 'Slack',
+                    'slack' => 'Slack (bientôt)',
                     'push' => 'Push (bientôt)',
                 ])
                 ->default(['email'])
