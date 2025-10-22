@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 
 class SupportTicketReceived extends Notification implements ShouldQueue
 {
@@ -37,35 +38,55 @@ class SupportTicketReceived extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $supportUrl = url('/admin/support-tickets');
+
         return (new MailMessage)
             ->subject('[Support] Nouveau feedback — '.$this->ticket->category)
             ->greeting('Hey équipe support,')
             ->line('Un nouveau ticket vient d’être soumis depuis la landing page.')
             ->line('Nom : '.$this->ticket->name)
             ->line('Email : '.$this->ticket->email)
-            ->line('Catégorie : '.ucfirst($this->ticket->category))
+            ->line('Catégorie : '.Str::title($this->ticket->category))
             ->line('Message :')
             ->line($this->ticket->message)
-            ->action('Ouvrir Filament', route('filament.admin.resources.support-tickets.index'))
+            ->action('Ouvrir Filament', $supportUrl)
             ->salutation('— 100Days AI Coach');
     }
 
     public function toTelegram(object $notifiable): TelegramMessage
     {
-        $category = ucfirst($this->ticket->category);
+        $category = Str::title($this->ticket->category);
 
-        $messageBody = e($this->ticket->message);
-        $messageBody = str_replace(["\r\n", "\n", "\r"], '<br>', $messageBody);
+        $messageLines = collect(preg_split("/\r\n|\r|\n/", (string) $this->ticket->message) ?: [])
+            ->map(static fn (string $line) => trim($line))
+            ->filter()
+            ->map(static fn (string $line) => e($line))
+            ->all();
 
-        $content = implode('<br>', array_filter([
+        $lines = [
             '<b>📥 Nouveau ticket support</b>',
-            'Catégorie : '.e($category),
-            'Auteur : '.e($this->ticket->name).' ('.e($this->ticket->email).')',
-            $this->ticket->user_id ? 'Utilisateur ID : '.e((string) $this->ticket->user_id) : null,
-            'Message :',
-            $messageBody,
-            '<a href="'.e(route('filament.admin.resources.support-tickets.index')).'">Ouvrir dans Filament</a>',
-        ]));
+            '',
+            '<b>Catégorie :</b> '.e($category),
+            '<b>Auteur :</b> '.e($this->ticket->name).' ('.e($this->ticket->email).')',
+        ];
+
+        if ($this->ticket->user_id) {
+            $lines[] = '<b>Utilisateur ID :</b> '.e((string) $this->ticket->user_id);
+        }
+
+        $lines[] = '';
+        $lines[] = '<b>Message :</b>';
+
+        if ($messageLines === []) {
+            $lines[] = e('(sans message)');
+        } else {
+            $lines = array_merge($lines, $messageLines);
+        }
+
+        $supportUrl = url('/admin/support-tickets');
+        $lines[] = '<a href="'.e($supportUrl).'">Ouvrir dans Filament</a>';
+
+        $content = implode("\n", $lines);
 
         return TelegramMessage::make()
             ->content($content)

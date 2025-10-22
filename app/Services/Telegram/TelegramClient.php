@@ -2,10 +2,10 @@
 
 namespace App\Services\Telegram;
 
-use App\Notifications\Messages\TelegramMessage;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Notifications\Messages\TelegramMessage;
 use Throwable;
 
 class TelegramClient

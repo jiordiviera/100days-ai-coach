@@ -41,6 +41,10 @@ return [
         'parse_mode' => env('TELEGRAM_DEFAULT_PARSE_MODE', 'HTML'),
     ],
 
+    'telegram-bot-api' => [
+        'token' => env('TELEGRAM_BOT_TOKEN', 'YOUR BOT TOKEN HERE'),
+    ],
+
     'ai' => [
         'groq' => [
             'base_url' => env('AI_GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),

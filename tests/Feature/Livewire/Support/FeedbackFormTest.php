@@ -3,16 +3,18 @@
 use App\Livewire\Support\FeedbackForm;
 use App\Models\SupportTicket;
 use App\Models\User;
-use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\SupportTicketReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use App\Notifications\Channels\TelegramChannel;
 
 uses(RefreshDatabase::class);
 
 it('stores support ticket for guest submission', function (): void {
+    Notification::fake();
+
     Livewire::test(FeedbackForm::class)
         ->set('formData.name', 'Guest Tester')
         ->set('formData.email', 'guest@example.test')
@@ -29,6 +31,8 @@ it('stores support ticket for guest submission', function (): void {
 });
 
 it('prefills authenticated user data and links the ticket', function (): void {
+    Notification::fake();
+
     $user = User::factory()->create([
         'name' => 'Maker One',
         'email' => 'maker@example.test',

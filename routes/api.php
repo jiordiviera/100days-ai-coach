@@ -14,6 +14,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('api')->group(function () {
-    // no-op
-});
+Route::post('telegram/webhook', [App\Http\Controllers\TelegramWebhookController::class, 'handleWebhook'])
+    ->name('api.telegram.webhook');

@@ -2,12 +2,12 @@
 
 namespace App\Notifications\Channels;
 
-use App\Models\User;
 use App\Notifications\Messages\TelegramMessage;
 use App\Services\Telegram\TelegramClient;
 use App\Services\Telegram\TelegramException;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class TelegramChannel
 {
@@ -17,9 +17,6 @@ class TelegramChannel
 
     public function send(mixed $notifiable, Notification $notification): void
     {
-        /**
-         * @var User $notifiable
-         */
         $chatId = $notifiable->routeNotificationFor('telegram', $notification);
 
         if (blank($chatId)) {
@@ -32,10 +29,20 @@ class TelegramChannel
             return;
         }
 
+        $payload = $message instanceof TelegramMessage ? $message : (array) $message;
+
         try {
-            $this->client->sendMessage($chatId, $message instanceof TelegramMessage ? $message : (array) $message);
+            $this->client->sendMessage((string) $chatId, $payload);
         } catch (TelegramException $exception) {
-            Log::channel('stack')->warning('Failed to send Telegram notification', [
+            Log::warning('Failed to send Telegram notification', [
+                'chat_id' => $chatId,
+                'notification' => $notification::class,
+                'error' => $exception->getMessage(),
+            ]);
+
+            throw $exception;
+        } catch (Throwable $exception) {
+            Log::error('Unexpected error while sending Telegram notification', [
                 'chat_id' => $chatId,
                 'notification' => $notification::class,
                 'error' => $exception->getMessage(),
