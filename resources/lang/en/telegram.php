@@ -29,6 +29,7 @@ return [
     ],
     'link' => [
         'generated' => "Tap the button below to link your Telegram chat. If it doesn't open, visit :url and enter your chat ID manually.",
+        'login_required' => 'Please log in to finish linking your Telegram chat.',
     ],
     'support' => [
         'message' => '📮 Need help? Our support page is here: :url',

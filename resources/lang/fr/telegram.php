@@ -29,6 +29,7 @@ return [
     ],
     'link' => [
         'generated' => 'Appuie sur le bouton ci-dessous pour relier ton chat Telegram. Si le lien ne s’ouvre pas, rends-toi sur :url et saisis ton identifiant manuellement.',
+        'login_required' => 'Connecte-toi pour terminer la liaison de ton chat Telegram.',
     ],
     'support' => [
         'message' => '📮 Besoin d’aide ? La page support est ici : :url',
