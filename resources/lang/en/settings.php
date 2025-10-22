@@ -91,6 +91,11 @@ return [
         'wakatime_remove_label' => 'Delete saved WakaTime key',
         'wakatime_remove_helper' => 'Toggle this and save to remove the stored key.',
     ],
+    'telegram' => [
+        'link_success' => 'Telegram linked successfully. You will now receive reminders in this chat.',
+        'link_failed' => 'We could not link your Telegram chat. Please try again from the bot.',
+        'link_expired' => 'This Telegram link has expired. Generate a new link from the bot with /start.',
+    ],
     'messages' => [
         'updated' => 'Settings updated',
     ],

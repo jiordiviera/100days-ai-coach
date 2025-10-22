@@ -8,7 +8,7 @@ return [
         'greeting' => '👋 Salut :name !',
         'intro' => 'Je suis le bot compagnon de 100Days AI Coach.',
         'chat_id' => 'Ton identifiant de chat Telegram est <code>:chat_id</code>.',
-        'instructions' => 'Copie cet identifiant dans l’app (Paramètres → Notifications) pour recevoir les rappels ici.',
+        'instructions' => 'Appuie sur le bouton ci-dessous pour relier automatiquement ton compte. Tu peux aussi coller l’identifiant dans Paramètres → Notifications si tu préfères.',
         'help' => 'Tape /help pour voir tout ce que je peux faire.',
     ],
     'help' => [
@@ -25,6 +25,10 @@ return [
         'unsupported' => '❌ Je comprends uniquement le français (fr) ou l’anglais (en). Essaie /language en ou /language fr.',
         'updated' => '✅ Langue mise à jour : :language.',
         'settings_hint' => 'Tu peux changer à tout moment avec /language en ou /language fr.',
+        'pick' => 'Choisis ta langue préférée :',
+    ],
+    'link' => [
+        'generated' => 'Appuie sur le bouton ci-dessous pour relier ton chat Telegram. Si le lien ne s’ouvre pas, rends-toi sur :url et saisis ton identifiant manuellement.',
     ],
     'support' => [
         'message' => '📮 Besoin d’aide ? La page support est ici : :url',
@@ -39,5 +43,12 @@ return [
     'languages' => [
         'en' => 'Anglais',
         'fr' => 'Français',
+    ],
+    'buttons' => [
+        'link_account' => 'Relier mon compte',
+        'language' => 'Choisir la langue',
+        'open_settings' => 'Ouvrir les paramètres',
+        'support' => 'Support',
+        'link_open' => 'Relier mon compte',
     ],
 ];

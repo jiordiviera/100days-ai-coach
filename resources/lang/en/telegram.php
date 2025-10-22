@@ -8,7 +8,7 @@ return [
         'greeting' => '👋 Hello :name!',
         'intro' => 'I’m the bot companion for 100Days AI Coach.',
         'chat_id' => 'Your Telegram chat ID is <code>:chat_id</code>.',
-        'instructions' => 'Copy this ID into the app (Settings → Notifications) to receive reminders here.',
+        'instructions' => 'Tap the button below to link your account automatically. You can also paste the ID in Settings → Notifications if you prefer.',
         'help' => 'Type /help to see everything I can do.',
     ],
     'help' => [
@@ -25,6 +25,10 @@ return [
         'unsupported' => '❌ I only speak English (en) or French (fr) for now. Try /language en or /language fr.',
         'updated' => '✅ Language updated to :language.',
         'settings_hint' => 'You can change this at any time with /language en or /language fr.',
+        'pick' => 'Select your preferred language:',
+    ],
+    'link' => [
+        'generated' => "Tap the button below to link your Telegram chat. If it doesn't open, visit :url and enter your chat ID manually.",
     ],
     'support' => [
         'message' => '📮 Need help? Our support page is here: :url',
@@ -39,5 +43,12 @@ return [
     'languages' => [
         'en' => 'English',
         'fr' => 'French',
+    ],
+    'buttons' => [
+        'link_account' => 'Link my account',
+        'language' => 'Choose language',
+        'open_settings' => 'Open settings',
+        'support' => 'Support',
+        'link_open' => 'Link my account',
     ],
 ];

@@ -36,6 +36,8 @@ Route::post('locale', LocaleController::class)->name('locale.update');
 Route::middleware('auth')->group(function () {
     Route::get('onboarding', OnboardingWizard::class)->name('onboarding.wizard');
     Route::get('dashboard', Dashboard::class)->name('dashboard');
+    Route::get('settings/telegram/link/{token}', \App\Http\Controllers\Settings\TelegramLinkController::class)
+        ->name('settings.telegram.link');
     Route::post('logout', function () {
         Auth::logout();
 

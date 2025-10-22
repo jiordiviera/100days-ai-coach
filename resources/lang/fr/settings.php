@@ -91,6 +91,11 @@ return [
         'wakatime_remove_label' => 'Supprimer la clé WakaTime enregistrée',
         'wakatime_remove_helper' => 'Active cette option et enregistre pour supprimer la clé stockée.',
     ],
+    'telegram' => [
+        'link_success' => 'Telegram est relié. Tu recevras désormais les rappels dans cette conversation.',
+        'link_failed' => 'Impossible de relier ton chat Telegram. Réessaie depuis le bot.',
+        'link_expired' => 'Ce lien Telegram a expiré. Génère-en un nouveau avec la commande /start.',
+    ],
     'messages' => [
         'updated' => 'Paramètres mis à jour',
     ],
