@@ -7,7 +7,7 @@
 
     {{-- Tabs Navigation --}}
     <div class="border-b border-gray-200 dark:border-gray-700">
-        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <nav class="-mb-px flex space-x-8 overflow-auto" aria-label="Tabs">
             <button 
                 wire:click="$set('activeTab', 'profile')"
                 @class([
