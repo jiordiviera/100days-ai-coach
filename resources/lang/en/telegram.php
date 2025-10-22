@@ -16,6 +16,7 @@ return [
         'lines' => [
             '/start – show the welcome message',
             '/help – list available commands',
+            '/signup – open the sign-up page with Telegram prefilled',
             '/language en|fr – choose the language used for notifications',
             '/support – open the support page',
             '/stop – pause Telegram notifications',
@@ -41,6 +42,10 @@ return [
         'unknown_command' => 'I didn’t recognise that command. Type /help to see what I can do.',
         'default' => "Thanks! If you need help, use /support or submit the in-app support form.",
     ],
+    'signup' => [
+        'instructions' => 'Ready to join? Tap the button below to open the sign-up page with your Telegram chat prefilled. If the link does not open, go to :url and enter your chat ID manually.',
+        'welcome' => '🎉 Your account is linked to Telegram. You will now receive reminders directly in this chat.',
+    ],
     'languages' => [
         'en' => 'English',
         'fr' => 'French',
@@ -51,5 +56,6 @@ return [
         'open_settings' => 'Open settings',
         'support' => 'Support',
         'link_open' => 'Link my account',
+        'signup' => 'Create my account',
     ],
 ];

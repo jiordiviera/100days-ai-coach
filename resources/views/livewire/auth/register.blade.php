@@ -31,6 +31,12 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="mt-6">
             <x-filament::button
                 tag="a"
@@ -62,9 +68,9 @@
         </div>
 
         <p class="mt-6 text-xs text-muted-foreground text-center">
-            {{ __('Once created, you will be redirected to the daily journal to start your streak.') }}
-        </p>
-    </div>
+                {{ __('Once created, you will be redirected to the daily journal to start your streak.') }}
+            </p>
+        </div>
 </div>
 
 @once

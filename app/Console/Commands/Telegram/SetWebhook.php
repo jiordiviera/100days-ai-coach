@@ -56,6 +56,7 @@ class SetWebhook extends Command
             'en' => [
                 ['command' => 'start', 'description' => 'Show the welcome message'],
                 ['command' => 'help', 'description' => 'List available commands'],
+                ['command' => 'signup', 'description' => 'Open the sign-up page with Telegram linked'],
                 ['command' => 'language', 'description' => 'Choose notification language (en|fr)'],
                 ['command' => 'support', 'description' => 'Open the support centre'],
                 ['command' => 'stop', 'description' => 'Pause Telegram notifications'],
@@ -63,6 +64,7 @@ class SetWebhook extends Command
             'fr' => [
                 ['command' => 'start', 'description' => "Afficher le message d'accueil"],
                 ['command' => 'help', 'description' => 'Lister les commandes disponibles'],
+                ['command' => 'signup', 'description' => "Ouvrir l'inscription avec Telegram relié"],
                 ['command' => 'language', 'description' => 'Choisir la langue des notifications (en|fr)'],
                 ['command' => 'support', 'description' => 'Ouvrir le centre support'],
                 ['command' => 'stop', 'description' => 'Suspendre les notifications Telegram'],

@@ -21,6 +21,7 @@ class TelegramWebhookController extends Controller
     private const DEFAULT_LANGUAGE = 'en';
     private const CACHE_LANGUAGE_TTL = 365; // days
     private const LINK_TOKEN_TTL_MINUTES = 30;
+    private const SIGNUP_TOKEN_TTL_MINUTES = 30;
 
     public function __construct(
         private readonly TelegramClient $telegram,
@@ -97,6 +98,12 @@ class TelegramWebhookController extends Controller
             return;
         }
 
+        if ($data === 'signup') {
+            $this->handleSignupRequest($chatId, $language, $message);
+
+            return;
+        }
+
         if ($data === 'language_picker') {
             $this->showLanguagePicker($chatId, $language);
 
@@ -127,6 +134,9 @@ class TelegramWebhookController extends Controller
                 break;
             case '/help':
                 $this->handleHelpCommand($chatId, $language);
+                break;
+            case '/signup':
+                $this->handleSignupRequest($chatId, $language, $message);
                 break;
             case '/language':
             case '/lang':
@@ -179,6 +189,10 @@ class TelegramWebhookController extends Controller
                 [
                     'text' => Lang::get('telegram.buttons.open_settings', [], $language),
                     'url' => $settingsUrl,
+                ],
+                [
+                    'text' => Lang::get('telegram.buttons.signup', [], $language),
+                    'callback_data' => 'signup',
                 ],
                 [
                     'text' => Lang::get('telegram.buttons.support', [], $language),
@@ -319,6 +333,44 @@ class TelegramWebhookController extends Controller
         }
     }
 
+    private function handleSignupRequest(string $chatId, string $language, array $message): void
+    {
+        $token = Str::uuid()->toString();
+        $firstName = Arr::get($message, 'from.first_name');
+        $username = Arr::get($message, 'chat.username');
+        $email = null;
+
+        Cache::put(
+            $this->signupTokenKey($token),
+            [
+                'chat_id' => $chatId,
+                'language' => $language,
+                'first_name' => $firstName,
+                'username' => $username,
+                'email' => $email,
+            ],
+            now()->addMinutes(self::SIGNUP_TOKEN_TTL_MINUTES)
+        );
+
+        $signupUrl = route('register', ['telegram_token' => $token]);
+
+        $text = Lang::get('telegram.signup.instructions', ['url' => e($signupUrl)], $language);
+
+        $keyboard = [
+            [
+                [
+                    'text' => Lang::get('telegram.buttons.signup', [], $language),
+                    'url' => $signupUrl,
+                ],
+            ],
+        ];
+
+        $this->reply($chatId, [
+            'text' => $text,
+            'reply_markup' => ['inline_keyboard' => $keyboard],
+        ]);
+    }
+
     private function resolveLanguage(string $chatId, array $message): string
     {
         $cached = Cache::get($this->languageCacheKey($chatId));
@@ -393,6 +445,11 @@ class TelegramWebhookController extends Controller
     private function linkTokenKey(string $token): string
     {
         return "telegram:link-token:{$token}";
+    }
+
+    private function signupTokenKey(string $token): string
+    {
+        return "telegram:signup-token:{$token}";
     }
 
     private function findChannel(string $chatId): ?NotificationChannel

@@ -16,6 +16,7 @@ return [
         'lines' => [
             '/start – afficher le message d’accueil',
             '/help – lister les commandes disponibles',
+            '/signup – ouvrir la page d’inscription pré-remplie',
             '/language en|fr – choisir la langue utilisée pour les notifications',
             '/support – ouvrir la page support',
             '/stop – suspendre les notifications Telegram',
@@ -41,6 +42,10 @@ return [
         'unknown_command' => 'Cette commande est inconnue. Tape /help pour voir ce que je peux faire.',
         'default' => "Merci ! Si tu as besoin d’aide, utilise /support ou le formulaire support dans l’app.",
     ],
+    'signup' => [
+        'instructions' => 'Prêt à rejoindre la communauté ? Appuie sur le bouton ci-dessous pour ouvrir la page d’inscription avec ton chat Telegram pré-rempli. Si le lien ne s’ouvre pas, rends-toi sur :url et saisis ton identifiant manuellement.',
+        'welcome' => '🎉 Ton compte est relié à Telegram. Tu recevras désormais les rappels directement dans cette conversation.',
+    ],
     'languages' => [
         'en' => 'Anglais',
         'fr' => 'Français',
@@ -51,5 +56,6 @@ return [
         'open_settings' => 'Ouvrir les paramètres',
         'support' => 'Support',
         'link_open' => 'Relier mon compte',
+        'signup' => 'Créer mon compte',
     ],
 ];
