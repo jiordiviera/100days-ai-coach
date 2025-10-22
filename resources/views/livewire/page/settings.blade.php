@@ -1,20 +1,276 @@
-<div class="mx-auto max-w-5xl space-y-8 py-8 px-4">
-    {{-- Main form --}}
-    <x-filament::card class="overflow-hidden">
-        <x-slot name="heading">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ __('Settings') }}</h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Manage your preferences and profile information.') }}</p>
-                </div>
-            </div>
-        </x-slot>
+<div class="mx-auto max-w-6xl space-y-12 px-4 py-10 sm:px-6 lg:px-0">
+    {{-- Header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ __('Settings') }}</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Manage your preferences and profile information.') }}</p>
+    </div>
 
+    {{-- Tabs Navigation --}}
+    <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button 
+                wire:click="$set('activeTab', 'profile')"
+                @class([
+                    'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors',
+                    'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500' => $activeTab === 'profile',
+                    'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300' => $activeTab !== 'profile',
+                ])
+            >
+                <div class="flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    {{ __('settings.profile.section') }}
+                </div>
+            </button>
+
+            <button 
+                wire:click="$set('activeTab', 'social')"
+                @class([
+                    'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors',
+                    'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500' => $activeTab === 'social',
+                    'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300' => $activeTab !== 'social',
+                ])
+            >
+                <div class="flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    {{ __('settings.social.section') }}
+                </div>
+            </button>
+
+            <button 
+                wire:click="$set('activeTab', 'notifications')"
+                @class([
+                    'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors',
+                    'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500' => $activeTab === 'notifications',
+                    'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300' => $activeTab !== 'notifications',
+                ])
+            >
+                <div class="flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    {{ __('settings.notifications.section') }}
+                </div>
+            </button>
+
+            <button 
+                wire:click="$set('activeTab', 'ai')"
+                @class([
+                    'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors',
+                    'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500' => $activeTab === 'ai',
+                    'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300' => $activeTab !== 'ai',
+                ])
+            >
+                <div class="flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    {{ __('settings.ai.section') }}
+                </div>
+            </button>
+
+            <button 
+                wire:click="$set('activeTab', 'integrations')"
+                @class([
+                    'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors',
+                    'border-primary-600 text-primary-600 dark:border-primary-500 dark:text-primary-500' => $activeTab === 'integrations',
+                    'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-300' => $activeTab !== 'integrations',
+                ])
+            >
+                <div class="flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                    </svg>
+                    {{ __('settings.integrations.section') }}
+                </div>
+            </button>
+        </nav>
+    </div>
+
+    {{-- Tab Content --}}
+    <x-filament::card class="overflow-hidden">
         <form wire:submit.prevent="save" class="space-y-6">
-            {{-- Direct form rendering with custom styling --}}
-            <div class="space-y-8">
-                {{ $this->form }}
-            </div>
+            {{-- Profile Tab --}}
+            @if($activeTab === 'profile')
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ __('settings.profile.section') }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Update your public profile information.') }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{ $this->form->getComponent('profile.name') }}
+                        {{ $this->form->getComponent('profile.username') }}
+                        {{ $this->form->getComponent('profile.focus_area') }}
+                        {{ $this->form->getComponent('profile.avatar_url') }}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        {{ $this->form->getComponent('profile.bio') }}
+                        {{ $this->form->getComponent('profile.is_public') }}
+                    </div>
+                </div>
+            @endif
+
+            {{-- Social Tab --}}
+            @if($activeTab === 'social')
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ __('settings.social.section') }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Manage your social media links.') }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        {{ $this->form->getComponent('profile.social_links') }}
+                    </div>
+                </div>
+            @endif
+
+            {{-- Notifications Tab --}}
+            @if($activeTab === 'notifications')
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ __('settings.notifications.section') }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Configure how and when you receive notifications.') }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{ $this->form->getComponent('notifications.language') }}
+                        {{ $this->form->getComponent('notifications.timezone') }}
+                        {{ $this->form->getComponent('notifications.reminder_time') }}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        {{ $this->form->getComponent('notifications.channels') }}
+                        {{ $this->form->getComponent('notifications.telegram_config') }}
+                        {{ $this->form->getComponent('notifications.notification_types') }}
+                    </div>
+                </div>
+            @endif
+
+            {{-- AI Tab --}}
+            @if($activeTab === 'ai')
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ __('settings.ai.section') }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Customize AI-powered features and content generation.') }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{ $this->form->getComponent('ai.provider') }}
+                        {{ $this->form->getComponent('ai.tone') }}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        {{ $this->form->getComponent('ai.share_hashtags') }}
+                    </div>
+                </div>
+            @endif
+
+            {{-- Integrations Tab --}}
+            @if($activeTab === 'integrations')
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ __('settings.integrations.section') }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Connect external services and tools.') }}</p>
+                    </div>
+                    
+                    {{-- WakaTime Section --}}
+                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800">
+                                <img src="{{ asset('images/wakatime-white.svg') }}" alt="WakaTime" class="h-6 w-6">
+                            </div>
+                            <div>
+                                <h4 class="text-base font-semibold text-gray-900 dark:text-white">WakaTime</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    @if($hasWakatimeKey)
+                                        {{ __('API key saved. Data syncs automatically each day.') }}
+                                    @else
+                                        {{ __('Track your coding time automatically.') }}
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="ml-auto">
+                                <x-filament::badge :color="$hasWakatimeKey ? 'success' : 'gray'">
+                                    {{ $hasWakatimeKey ? __('Enabled') : __('Inactive') }}
+                                </x-filament::badge>
+                            </div>
+                        </div>
+
+                        @if($hasWakatimeKey && ($profile?->wakatime_settings['last_synced_at'] ?? false))
+                            <p class="text-xs text-gray-500 dark:text-gray-500">
+                                {{ __('Last sync:') }}
+                                {{ \Illuminate\Support\Carbon::parse($profile->wakatime_settings['last_synced_at'])->diffForHumans() }}
+                            </p>
+                        @endif
+
+                        @if($hasWakatimeKey && ($profile?->wakatime_settings['last_error'] ?? false))
+                            <div class="rounded-md bg-rose-50 dark:bg-rose-900/20 p-3">
+                                <p class="text-sm text-rose-600 dark:text-rose-400">
+                                    {{ __('Last error: :message', ['message' => $profile->wakatime_settings['last_error']]) }}
+                                </p>
+                            </div>
+                        @endif
+
+                        <div class="grid grid-cols-1 gap-6 pt-4">
+                            {{ $this->form->getComponent('integrations.wakatime_api_key') }}
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {{ $this->form->getComponent('integrations.wakatime_hide_project_names') }}
+                                @if($hasWakatimeKey)
+                                    {{ $this->form->getComponent('integrations.wakatime_remove_key') }}
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- GitHub Section --}}
+                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                    <svg class="h-5 w-5 text-gray-600 dark:text-gray-400" viewBox="0 0 16 16" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-.98.08-2.04 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.06.16 1.84.08 2.04.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-base font-semibold text-gray-900 dark:text-white">GitHub</h4>
+                                    @if($profile?->github_id)
+                                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            {{ __('Signed in as :username', ['username' => $profile->github_username ?? __('linked profile')]) }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                                            {{ __('Your GitHub avatar and handle stay in sync with your profile.') }}
+                                        </p>
+                                    @else
+                                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            {{ __('Link your GitHub account to streamline sign-in.') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                @if($profile?->github_id)
+                                    <x-filament::badge color="success">
+                                        {{ __('Connected') }}
+                                    </x-filament::badge>
+                                @else
+                                    <x-filament::button tag="a" href="{{ route('auth.github.redirect') }}" color="gray" outlined size="sm">
+                                        <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-.98.08-2.04 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.06.16 1.84.08 2.04.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                                        </svg>
+                                        {{ __('Connect GitHub') }}
+                                    </x-filament::button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             {{-- Action buttons --}}
             <div class="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
@@ -25,126 +281,14 @@
                 <x-filament::button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
                     <span wire:loading.remove wire:target="save">{{ __('Save changes') }}</span>
                     <span wire:loading wire:loading.flex wire:target="save" class="flex items-center gap-2 flex-row">
-                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
+                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ __('Saving...') }}
                     </span>
                 </x-filament::button>
             </div>
         </form>
-    </x-filament::card>
-
-    {{-- GitHub card --}}
-    @if ($profile?->github_id)
-        <x-filament::card>
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                        <svg class="h-6 w-6 text-gray-600 dark:text-gray-400" viewBox="0 0 1024 1024" fill="none">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
-                                transform="scale(64)" fill="#ffff" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Connected GitHub account') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Signed in as :username', ['username' => $profile->github_username ?? __('linked profile')]) }}
-                        </p>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                            {{ __('Your GitHub avatar and handle stay in sync with your profile.') }}
-                        </p>
-                    </div>
-                </div>
-                <div>
-                    <x-filament::badge color="success">
-                        {{ __('Connected') }}
-                    </x-filament::badge>
-                </div>
-            </div>
-        </x-filament::card>
-    @else
-        <x-filament::card>
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                        <svg class="h-6 w-6 text-gray-600 dark:text-gray-400" viewBox="0 0 1024 1024" fill="none">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
-                                transform="scale(64)" fill="#ffff" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('Connect GitHub') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Link your GitHub account to streamline sign-in and keep your profile in sync.') }}
-                        </p>
-                    </div>
-                </div>
-                <div class="flex-shrink-0">
-                    <x-filament::button tag="a" href="{{ route('auth.github.redirect') }}" color="gray" outlined size="sm">
-                        <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd"
-                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        {{ __('Connect GitHub') }}
-                    </x-filament::button>
-                </div>
-            </div>
-        </x-filament::card>
-    @endif
-
-    {{-- WakaTime card --}}
-    <x-filament::card>
-        <div class="flex items-start justify-between gap-4">
-            <div class="flex items-start gap-4">
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-800">
-                    {{-- <svg class="h-6 w-6 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor"
-                        stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 6v6l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg> --}}
-                    <img src="{{ asset('images/wakatime-white.svg') }}" alt="WakaTime Logo" class="h-6 w-6">
-                </div>
-                <div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">{{ __('WakaTime sync') }}</h3>
-                    @if ($hasWakatimeKey)
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('API key saved. Data syncs automatically each day.') }}
-                        </p>
-                        @if ($profile?->wakatime_settings['last_synced_at'] ?? false)
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                                {{ __('Last sync:') }}
-                                {{ \Illuminate\Support\Carbon::parse($profile->wakatime_settings['last_synced_at'])->diffForHumans() }}
-                            </p>
-                        @endif
-                        @if ($profile?->wakatime_settings['last_error'] ?? false)
-                            <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">
-                                {{ __('Last error: :message', ['message' => $profile->wakatime_settings['last_error']]) }}
-                            </p>
-                        @endif
-                    @else
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Add your WakaTime API key to prefill daily logs with real coding time.') }}
-                        </p>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                            {{ __('Generate a key from your WakaTime dashboard.') }}
-                        </p>
-                    @endif
-                </div>
-            </div>
-            <div>
-                <x-filament::badge :color="$hasWakatimeKey ? 'success' : 'gray'">
-                    {{ $hasWakatimeKey ? __('Enabled') : __('Inactive') }}
-                </x-filament::badge>
-            </div>
-        </div>
     </x-filament::card>
 </div>

@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Title('Paramètres')]
@@ -38,6 +39,9 @@ class Settings extends Component implements HasActions, HasForms
     use InteractsWithActions, InteractsWithForms;
 
     private const TELEGRAM_LANGUAGES = ['auto', 'en', 'fr'];
+
+    #[Url(as: 'tab')]
+    public string $activeTab = 'profile';
 
     public ?array $data = [];
 
@@ -113,16 +117,10 @@ class Settings extends Component implements HasActions, HasForms
     {
         $profile = Auth::user()->profile;
 
-        $sectionHeadingClass = 'text-base font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4';
-
         return $schema
             ->statePath('data')
             ->schema([
-                // Section Profil Public
-                Placeholder::make('profile_section')
-                    ->content(__('settings.profile.section'))
-                    ->extraAttributes(['class' => $sectionHeadingClass]),
-
+                // Profile Tab Content
                 TextInput::make('profile.name')
                     ->label(__('settings.profile.name_label'))
                     ->maxLength(255)
@@ -158,18 +156,14 @@ class Settings extends Component implements HasActions, HasForms
                     ->url()
                     ->maxLength(255)
                     ->columnSpan(1),
+
                 Toggle::make('profile.is_public')
                     ->label(__('settings.profile.public_toggle_label'))
                     ->helperText(__('settings.profile.public_toggle_helper'))
                     ->inline(false)
                     ->columnSpan(1),
 
-                // Section Réseaux Sociaux
-
-                Placeholder::make('social_section')
-                    ->content(__('settings.social.section'))
-                    ->extraAttributes(['class' => $sectionHeadingClass]),
-
+                // Social Links Tab Content
                 KeyValue::make('profile.social_links')
                     ->label(__('settings.social.label'))
                     ->keyLabel(__('settings.social.key_label'))
@@ -178,13 +172,9 @@ class Settings extends Component implements HasActions, HasForms
                     ->valuePlaceholder(__('settings.social.value_placeholder'))
                     ->addActionLabel(__('settings.social.add_button'))
                     ->reorderable()
-                    ->columnSpan(1),
+                    ->columnSpan(2),
 
-                // Section Notifications
-                TextEntry::make('notifications_section')
-                    ->state(__('settings.notifications.section'))
-                    ->extraAttributes(['class' => $sectionHeadingClass]),
-
+                // Notifications Tab Content
                 Select::make('notifications.language')
                     ->label(__('settings.notifications.language_label'))
                     ->native(false)
@@ -219,7 +209,7 @@ class Settings extends Component implements HasActions, HasForms
                         'push' => __('settings.notifications.channel_options.push'),
                     ])
                     ->columns(3)
-                    ->columnSpan(1),
+                    ->columnSpan(2),
 
                 Fieldset::make('notifications.telegram_config')
                     ->label(__('settings.notifications.telegram.section'))
@@ -261,13 +251,9 @@ class Settings extends Component implements HasActions, HasForms
                         'weekly_digest' => __('settings.notifications.type_options.weekly_digest'),
                     ])
                     ->columns(2)
-                    ->columnSpan(1),
+                    ->columnSpan(2),
 
-                // Section IA
-                TextEntry::make('ai_section')
-                    ->state(__('settings.ai.section'))
-                    ->extraAttributes(['class' => $sectionHeadingClass]),
-
+                // AI Tab Content
                 Select::make('ai.provider')
                     ->label(__('settings.ai.provider_label'))
                     ->native(false)
@@ -294,19 +280,14 @@ class Settings extends Component implements HasActions, HasForms
                     ->placeholder(__('settings.ai.hashtags_placeholder'))
                     ->helperText(__('settings.ai.hashtags_helper'))
                     ->separator(',')
-                    // ->maxItems(6)
-                    ->columnSpan(1),
+                    ->columnSpan(2),
 
-                // Section Intégrations
-                TextEntry::make('integrations_section')
-                    ->state(__('settings.integrations.section'))
-                    ->extraAttributes(['class' => $sectionHeadingClass]),
-
+                // Integrations Tab Content
                 TextInput::make('integrations.wakatime_api_key')
                     ->label(__('settings.integrations.wakatime_key_label'))
                     ->password()
                     ->helperText(__('settings.integrations.wakatime_key_helper'))
-                    ->columnSpan(1),
+                    ->columnSpan(2),
 
                 Toggle::make('integrations.wakatime_hide_project_names')
                     ->label(__('settings.integrations.wakatime_hide_label'))
@@ -576,6 +557,65 @@ class Settings extends Component implements HasActions, HasForms
             ->all();
 
         return $preferred + $common;
+    }
+
+    public function getTabFields(string $tab): array
+    {
+        $allFields = [
+            'profile.name',
+            'profile.username',
+            'profile.focus_area',
+            'profile.bio',
+            'profile.avatar_url',
+            'profile.is_public',
+            'profile.social_links',
+            'notifications.language',
+            'notifications.timezone',
+            'notifications.reminder_time',
+            'notifications.channels',
+            'notifications.telegram_config',
+            'notifications.notification_types',
+            'ai.provider',
+            'ai.tone',
+            'ai.share_hashtags',
+            'integrations.wakatime_api_key',
+            'integrations.wakatime_hide_project_names',
+            'integrations.wakatime_remove_key',
+        ];
+
+        $fieldsByTab = [
+            'profile' => [
+                'profile.name',
+                'profile.username',
+                'profile.focus_area',
+                'profile.bio',
+                'profile.avatar_url',
+                'profile.is_public',
+            ],
+            'social' => [
+                'profile.social_links',
+            ],
+            'notifications' => [
+                'notifications.language',
+                'notifications.timezone',
+                'notifications.reminder_time',
+                'notifications.channels',
+                'notifications.telegram_config',
+                'notifications.notification_types',
+            ],
+            'ai' => [
+                'ai.provider',
+                'ai.tone',
+                'ai.share_hashtags',
+            ],
+            'integrations' => [
+                'integrations.wakatime_api_key',
+                'integrations.wakatime_hide_project_names',
+                'integrations.wakatime_remove_key',
+            ],
+        ];
+
+        return $fieldsByTab[$tab] ?? [];
     }
 
     public function render(): View
