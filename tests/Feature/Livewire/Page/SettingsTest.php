@@ -29,10 +29,12 @@ test('settings page updates user preferences', function (): void {
         ->set('data.profile.username', 'ada-heroine')
         ->set('data.profile.focus_area', 'Créer un agent IA')
         ->set('data.profile.bio', 'First programmer, still shipping')
-        ->set('data.profile.social_links.github', 'https://github.com/ada')
-        ->set('data.profile.social_links.twitter', 'https://x.com/ada')
-        ->set('data.profile.social_links.linkedin', 'https://www.linkedin.com/in/ada')
-        ->set('data.profile.social_links.website', 'https://ada.dev')
+        ->set('data.profile.social_links', [
+            ['platform' => 'github', 'url' => 'https://github.com/ada'],
+            ['platform' => 'twitter', 'url' => 'https://x.com/ada'],
+            ['platform' => 'linkedin', 'url' => 'https://www.linkedin.com/in/ada'],
+            ['platform' => 'website', 'url' => 'https://ada.dev'],
+        ])
         ->set('data.profile.is_public', true)
         ->set('data.notifications.timezone', 'Europe/Paris')
         ->set('data.notifications.reminder_time', '18:45')
@@ -60,6 +62,7 @@ test('settings page updates user preferences', function (): void {
         ->and(data_get($user->profile->preferences, 'timezone'))->toBe('Europe/Paris')
         ->and(data_get($user->profile->preferences, 'reminder_time'))->toBe('18:45')
         ->and(data_get($user->profile->preferences, 'channels.email'))->toBeTrue()
+        ->and(data_get($user->profile->preferences, 'channels.telegram'))->toBeFalse()
         ->and(data_get($user->profile->preferences, 'channels.slack'))->toBeTrue()
         ->and(data_get($user->profile->preferences, 'channels.push'))->toBeFalse()
         ->and(data_get($user->profile->preferences, 'ai_provider'))->toBe('openai')

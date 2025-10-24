@@ -101,7 +101,7 @@ return [
     'integrations' => [
         'section' => 'Integrations',
         'wakatime_key_label' => 'WakaTime API key',
-        'wakatime_key_helper' => 'Paste your API key from https://wakatime.com/settings/api-key. Leave blank to keep the current key.',
+        'wakatime_key_helper' => 'Paste your API key from <a href="https://wakatime.com/settings/api-key" target="_blank">https://wakatime.com/settings/api-key</a>. Leave blank to keep the current key.',
         'wakatime_hide_label' => 'Hide synced project names',
         'wakatime_hide_helper' => 'Use generic names when showing WakaTime data.',
         'wakatime_remove_label' => 'Delete saved WakaTime key',

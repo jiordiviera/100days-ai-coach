@@ -25,6 +25,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -384,7 +385,7 @@ class Settings extends Component implements HasActions, HasForms
                 TextInput::make('integrations.wakatime_api_key')
                     ->label(__('settings.integrations.wakatime_key_label'))
                     ->password()
-                    ->helperText(__('settings.integrations.wakatime_key_helper'))
+                    ->helperText(fn () => new HtmlString(__('settings.integrations.wakatime_key_helper')))
                     ->columnSpan(2),
 
                 Toggle::make('integrations.wakatime_hide_project_names')

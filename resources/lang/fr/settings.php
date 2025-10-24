@@ -101,7 +101,7 @@ return [
     'integrations' => [
         'section' => 'Intégrations',
         'wakatime_key_label' => 'Clé API WakaTime',
-        'wakatime_key_helper' => 'Colle ta clé API depuis https://wakatime.com/settings/api-key. Laisse vide pour conserver la clé actuelle.',
+        'wakatime_key_helper' => 'Colle ta clé API depuis <a href="https://wakatime.com/settings/api-key" target="_blank">https://wakatime.com/settings/api-key</a>. Laisse vide pour conserver la clé actuelle.',
         'wakatime_hide_label' => 'Masquer les noms des projets synchronisés',
         'wakatime_hide_helper' => 'Utilise des noms génériques lors de l’affichage des données WakaTime.',
         'wakatime_remove_label' => 'Supprimer la clé WakaTime enregistrée',
