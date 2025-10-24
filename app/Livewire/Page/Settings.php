@@ -7,7 +7,7 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -78,6 +78,17 @@ class Settings extends Component implements HasActions, HasForms
 
         $this->hasWakatimeKey = (bool) $profile->wakatime_api_key;
 
+        // Transform social_links from key-value to repeater format
+        $socialLinksRepeater = [];
+        if ($profile->social_links) {
+            foreach ($profile->social_links as $platform => $url) {
+                $socialLinksRepeater[] = [
+                    'platform' => $platform,
+                    'url' => $url,
+                ];
+            }
+        }
+
         $this->form->fill([
             'profile' => [
                 'name' => $user->name,
@@ -86,7 +97,7 @@ class Settings extends Component implements HasActions, HasForms
                 'focus_area' => $profile->focus_area,
                 'bio' => $profile->bio,
                 'avatar_url' => $profile->avatar_url,
-                'social_links' => $profile->social_links ?? [],
+                'social_links' => $socialLinksRepeater,
             ],
             'notifications' => [
                 'language' => $preferences['language'] ?? 'en',
@@ -164,14 +175,101 @@ class Settings extends Component implements HasActions, HasForms
                     ->columnSpan(1),
 
                 // Social Links Tab Content
-                KeyValue::make('profile.social_links')
-                    ->label(__('settings.social.label'))
-                    ->keyLabel(__('settings.social.key_label'))
-                    ->valueLabel(__('settings.social.value_label'))
-                    ->keyPlaceholder(__('settings.social.key_placeholder'))
-                    ->valuePlaceholder(__('settings.social.value_placeholder'))
-                    ->addActionLabel(__('settings.social.add_button'))
+                // KeyValue::make('profile.social_links')
+                //     ->label(__('settings.social.label'))
+                //     ->keyLabel(__('settings.social.key_label'))
+                //     ->valueLabel(__('settings.social.value_label'))
+                //     ->keyPlaceholder(__('settings.social.key_placeholder'))
+                //     ->valuePlaceholder(__('settings.social.value_placeholder'))
+                //     ->addActionLabel(__('settings.social.add_button'))
+                //     ->reorderable()
+                //     ->columnSpan(2),
+                Repeater::make('profile.social_links')
+                    ->schema([
+                        Select::make('platform')
+                            ->label(__('settings.social.platform_label'))
+                            ->options([
+                                'github' => 'GitHub',
+                                'linkedin' => 'LinkedIn',
+                                'twitter' => 'X (Twitter)',
+                                'youtube' => 'YouTube',
+                                'facebook' => 'Facebook',
+                                'instagram' => 'Instagram',
+                                'tiktok' => 'TikTok',
+                                'twitch' => 'Twitch',
+                                'discord' => 'Discord',
+                                'website' => __('settings.social.platform_website'),
+                                'portfolio' => __('settings.social.platform_portfolio'),
+                                'blog' => __('settings.social.platform_blog'),
+                                'other' => __('settings.social.platform_other'),
+                            ])
+                            ->native(false)
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                if ($get('url')) {
+                                    $set('url', '');
+                                }
+                            })
+                            ->columnSpan(1),
+
+                        TextInput::make('url')
+                            ->label(__('settings.social.url_label'))
+                            ->required()
+                            ->placeholder(function (callable $get) {
+                                return match ($get('platform')) {
+                                    'github' => '@username',
+                                    'linkedin' => 'username',
+                                    'twitter' => '@username',
+                                    'youtube' => '@username',
+                                    'facebook' => 'username',
+                                    'instagram' => 'username',
+                                    'tiktok' => 'username',
+                                    'twitch' => 'username',
+                                    'discord' => 'invite-code',
+                                    'website' => 'https://example.com',
+                                    'portfolio' => 'https://portfolio.example.com',
+                                    'blog' => 'https://blog.example.com',
+                                    default => 'https://',
+                                };
+                            })
+                            ->helperText(function (callable $get) {
+                                return match ($get('platform')) {
+                                    'github' => __('settings.social.helper.github'),
+                                    'linkedin' => __('settings.social.helper.linkedin'),
+                                    'twitter' => __('settings.social.helper.twitter'),
+                                    'discord' => __('settings.social.helper.discord'),
+                                    default => null,
+                                };
+                            })
+                            ->prefixIcon(function (callable $get) {
+                                return match ($get('platform')) {
+                                    'github' => 'heroicon-o-code-bracket',
+                                    'linkedin' => 'heroicon-o-briefcase',
+                                    'twitter' => 'heroicon-o-chat-bubble-left',
+                                    'youtube' => 'heroicon-o-video-camera',
+                                    'facebook' => 'heroicon-o-user-group',
+                                    'instagram' => 'heroicon-o-camera',
+                                    'tiktok' => 'heroicon-o-musical-note',
+                                    'twitch' => 'heroicon-o-play',
+                                    'discord' => 'heroicon-o-chat-bubble-bottom-center-text',
+                                    'website' => 'heroicon-o-globe-alt',
+                                    'portfolio' => 'heroicon-o-briefcase',
+                                    'blog' => 'heroicon-o-document-text',
+                                    default => 'heroicon-o-link',
+                                };
+                            })
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
                     ->reorderable()
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['platform']
+                            ? ucfirst($state['platform']).($state['url'] ? ' - '.parse_url($state['url'], PHP_URL_HOST) : '')
+                            : null
+                    )
+                    ->addActionLabel(__('settings.social.add_link'))
+                    ->defaultItems(0)
                     ->columnSpan(2),
 
                 // Notifications Tab Content
@@ -335,10 +433,10 @@ class Settings extends Component implements HasActions, HasForms
         }
 
         $socialLinksArray = [];
-        foreach ($data['profile']['social_links'] ?? [] as $platform => $link) {
-            if (filled($platform) && filled($link)) {
-                $key = Str::of($platform)->lower()->slug('_')->value();
-                $socialLinksArray[$key] = trim($link);
+        foreach ($data['profile']['social_links'] ?? [] as $link) {
+            if (filled($link['platform'] ?? null) && filled($link['url'] ?? null)) {
+                $key = Str::of($link['platform'])->lower()->slug('_')->value();
+                $socialLinksArray[$key] = trim($link['url']);
             }
         }
 

@@ -24,6 +24,22 @@ return [
         'key_placeholder' => 'github',
         'value_placeholder' => '@username or https://...',
         'add_button' => 'Add a social profile',
+        
+        'platform_label' => 'Platform',
+        'url_label' => 'URL',
+        'add_link' => 'Add social link',
+        
+        'platform_website' => 'Website',
+        'platform_portfolio' => 'Portfolio',
+        'platform_blog' => 'Blog',
+        'platform_other' => 'Other',
+        
+        'helper' => [
+            'github' => 'Your GitHub profile username',
+            'linkedin' => 'Your LinkedIn profile username',
+            'twitter' => 'Your X (Twitter) profile username',
+            'discord' => 'Your Discord server invite link or username',
+        ],
     ],
     'notifications' => [
         'section' => 'Daily notifications',

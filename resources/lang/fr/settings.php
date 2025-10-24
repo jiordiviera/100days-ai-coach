@@ -24,6 +24,22 @@ return [
         'key_placeholder' => 'github',
         'value_placeholder' => '@username ou https://...',
         'add_button' => 'Ajouter un réseau social',
+
+        'platform_label' => 'Plateforme',
+        'url_label' => 'URL',
+        'add_link' => 'Ajouter un lien',
+
+        'platform_website' => 'Site web',
+        'platform_portfolio' => 'Portfolio',
+        'platform_blog' => 'Blog',
+        'platform_other' => 'Autre',
+
+        'helper' => [
+            'github' => 'Nom d\'utilisateur de votre profil GitHub',
+            'linkedin' => 'Nom d\'utilisateur de votre profil LinkedIn',
+            'twitter' => 'Nom d\'utilisateur de votre profil X (Twitter)',
+            'discord' => 'Lien d\'invitation Discord ou nom d\'utilisateur',
+        ],
     ],
     'notifications' => [
         'section' => 'Notifications quotidiennes',
