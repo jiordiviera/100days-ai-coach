@@ -320,7 +320,7 @@ class ChallengeShow extends Component implements HasForms
         $link = $this->run->participantLinks()->whereKey($participantId)->firstOrFail();
         // Ne pas retirer l'owner par ce chemin
         if ($link->user_id === $this->run->owner_id) {
-            $this->addError('inviteForm.email', __("You cannot remove the owner."));
+            $this->addError('inviteForm.email', __('You cannot remove the owner.'));
 
             return;
         }

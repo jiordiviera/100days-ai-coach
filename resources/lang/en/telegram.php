@@ -40,7 +40,7 @@ return [
     ],
     'fallback' => [
         'unknown_command' => 'I didn’t recognise that command. Type /help to see what I can do.',
-        'default' => "Thanks! If you need help, use /support or submit the in-app support form.",
+        'default' => 'Thanks! If you need help, use /support or submit the in-app support form.',
     ],
     'signup' => [
         'instructions' => 'Ready to join? Tap the button below to open the sign-up page with your Telegram chat prefilled. If the link does not open, go to :url and enter your chat ID manually.',

@@ -13,6 +13,7 @@ class AllowTelegramWebhook
         // Désactiver la vérification CSRF pour le webhook Telegram
         if ($request->is('api/telegram/*')) {
             config(['session.driver' => 'array']);
+
             return $next($request)
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')

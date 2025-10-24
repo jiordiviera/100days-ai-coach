@@ -14,7 +14,7 @@ it('notifies the user when AI generation fails', function () {
 
     $log = DailyLog::factory()->create();
 
-    $listener = new NotifyUserOfAiFailure();
+    $listener = new NotifyUserOfAiFailure;
     $listener->handle(new DailyLogAiFailed($log->id, 'Service unavailable'));
 
     Notification::assertSentTo(

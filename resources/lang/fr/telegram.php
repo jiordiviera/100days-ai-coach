@@ -40,7 +40,7 @@ return [
     ],
     'fallback' => [
         'unknown_command' => 'Cette commande est inconnue. Tape /help pour voir ce que je peux faire.',
-        'default' => "Merci ! Si tu as besoin d’aide, utilise /support ou le formulaire support dans l’app.",
+        'default' => 'Merci ! Si tu as besoin d’aide, utilise /support ou le formulaire support dans l’app.',
     ],
     'signup' => [
         'instructions' => 'Prêt à rejoindre la communauté ? Appuie sur le bouton ci-dessous pour ouvrir la page d’inscription avec ton chat Telegram pré-rempli. Si le lien ne s’ouvre pas, rends-toi sur :url et saisis ton identifiant manuellement.',

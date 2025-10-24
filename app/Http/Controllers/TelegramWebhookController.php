@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\NotificationChannel;
 use App\Services\Telegram\TelegramClient;
 use App\Services\Telegram\TelegramException;
@@ -18,9 +17,13 @@ use Throwable;
 class TelegramWebhookController extends Controller
 {
     private const SUPPORTED_LANGUAGES = ['en', 'fr'];
+
     private const DEFAULT_LANGUAGE = 'en';
+
     private const CACHE_LANGUAGE_TTL = 365; // days
+
     private const LINK_TOKEN_TTL_MINUTES = 30;
+
     private const SIGNUP_TOKEN_TTL_MINUTES = 30;
 
     public function __construct(

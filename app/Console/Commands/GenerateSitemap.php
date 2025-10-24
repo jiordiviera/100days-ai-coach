@@ -52,7 +52,6 @@ class GenerateSitemap extends Command
             ],
         ]);
 
-
         $profiles = UserProfile::query()
             ->where('is_public', true)
             ->whereNotNull('username')

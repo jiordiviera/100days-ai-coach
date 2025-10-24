@@ -6,12 +6,11 @@ use App\Listeners\RecordDailyLogAiMetrics;
 use App\Models\AiGenerationMetric;
 use App\Models\DailyLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
 it('records metrics when generation succeeds', function () {
-    $listener = new RecordDailyLogAiMetrics();
+    $listener = new RecordDailyLogAiMetrics;
 
     $event = new DailyLogAiGenerated('log-id', 'gpt-4o-mini', 250, 0.045, ['request' => ['model' => 'gpt-4o-mini']]);
 
@@ -26,7 +25,7 @@ it('records metrics when generation succeeds', function () {
 });
 
 it('records failures when generation fails', function () {
-    $listener = new RecordDailyLogAiMetrics();
+    $listener = new RecordDailyLogAiMetrics;
 
     $log = DailyLog::factory()->create([
         'public_token' => null,

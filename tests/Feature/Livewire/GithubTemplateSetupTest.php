@@ -5,8 +5,8 @@ use App\Models\User;
 use App\Models\UserRepository;
 use App\Services\GitHub\GitHubTemplateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);

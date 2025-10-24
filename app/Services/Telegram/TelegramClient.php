@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Telegram;
 
 use App\Notifications\Messages\TelegramMessage;
@@ -15,8 +16,6 @@ class TelegramClient
     ) {}
 
     /**
-     * @param  string  $chatId
-     * @param  TelegramMessage|array|string  $message
      * @param  array<string, mixed>  $options
      *
      * @throws TelegramException
@@ -52,7 +51,6 @@ class TelegramClient
     }
 
     /**
-     * @param  TelegramMessage|array|string  $message
      * @param  array<string, mixed>  $options
      * @return array<string, mixed>
      */

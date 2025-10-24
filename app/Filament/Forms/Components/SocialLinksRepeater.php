@@ -7,10 +7,10 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 
-
 class SocialLinksRepeater extends Field
 {
     protected string $view = 'filament.forms.components.social-links-repeater';
+
     public static function make(?string $name = null): static
     {
         return app(static::class, ['name' => $name]);
@@ -101,9 +101,8 @@ class SocialLinksRepeater extends Field
                 ->columns(2)
                 ->reorderable()
                 ->collapsible()
-                ->itemLabel(fn (array $state): ?string => 
-                    $state['platform'] 
-                        ? ucfirst($state['platform']) . ($state['url'] ? ' - ' . parse_url($state['url'], PHP_URL_HOST) : '') 
+                ->itemLabel(fn (array $state): ?string => $state['platform']
+                        ? ucfirst($state['platform']).($state['url'] ? ' - '.parse_url($state['url'], PHP_URL_HOST) : '')
                         : null
                 )
                 ->addActionLabel(__('settings.social.add_link'))
@@ -111,5 +110,4 @@ class SocialLinksRepeater extends Field
                 ->columnSpanFull(),
         ];
     }
-
 }

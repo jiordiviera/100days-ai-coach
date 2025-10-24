@@ -20,7 +20,7 @@ class TaskPolicy
 
     public function create(User $user, Project $project): bool
     {
-        return (new ProjectPolicy())->view($user, $project);
+        return (new ProjectPolicy)->view($user, $project);
     }
 
     public function update(User $user, Task $task): bool
@@ -46,6 +46,6 @@ class TaskPolicy
             return false;
         }
 
-        return (new ProjectPolicy())->view($user, $project);
+        return (new ProjectPolicy)->view($user, $project);
     }
 }

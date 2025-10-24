@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\URL;
 class SetWebhook extends Command
 {
     protected $signature = 'telegram:set-webhook {url?}';
+
     protected $description = 'Define the webhook URL for the Telegram bot';
 
     public function handle(TelegramClient $telegram)
@@ -23,8 +24,8 @@ class SetWebhook extends Command
         $this->info("Configuration of the webhook : {$url}");
 
         try {
-            $response = Http::post("https://api.telegram.org/bot" . config('services.telegram.bot_token') . "/setWebhook", [
-                'url' => $url
+            $response = Http::post('https://api.telegram.org/bot'.config('services.telegram.bot_token').'/setWebhook', [
+                'url' => $url,
             ]);
 
             if ($response->successful()) {
@@ -33,10 +34,10 @@ class SetWebhook extends Command
 
                 $this->setBotCommands();
             } else {
-                $this->error('Error configuring the webhook : ' . $response->body());
+                $this->error('Error configuring the webhook : '.$response->body());
             }
         } catch (\Exception $e) {
-            $this->error('Error : ' . $e->getMessage());
+            $this->error('Error : '.$e->getMessage());
         }
     }
 

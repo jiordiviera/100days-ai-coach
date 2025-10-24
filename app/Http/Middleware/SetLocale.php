@@ -32,7 +32,7 @@ class SetLocale
         }
 
         App::setLocale($locale);
-        session(['locale' => $locale]); 
+        session(['locale' => $locale]);
 
         return $next($request);
     }

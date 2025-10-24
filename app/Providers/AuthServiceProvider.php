@@ -7,8 +7,8 @@ use App\Models\Task;
 use App\Models\User;
 use App\Policies\ProjectPolicy;
 use App\Policies\TaskPolicy;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {

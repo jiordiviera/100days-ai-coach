@@ -1,12 +1,10 @@
 <?php
 
+use App\Http\Controllers\AiMetricsController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PublicChallengeController;
 use App\Http\Controllers\PublicDailyLogController;
 use App\Http\Controllers\PublicProfileController;
-use App\Http\Controllers\AiMetricsController;
-use App\Livewire\Pages\LegalNotice;
-use App\Livewire\Pages\PrivacyPolicy;
 use App\Livewire\Onboarding\Wizard as OnboardingWizard;
 use App\Livewire\Page\ChallengeIndex;
 use App\Livewire\Page\ChallengeInsights;
@@ -18,6 +16,8 @@ use App\Livewire\Page\ProjectManager;
 use App\Livewire\Page\Support;
 use App\Livewire\Page\TaskManager;
 use App\Livewire\Page\Welcome;
+use App\Livewire\Pages\LegalNotice;
+use App\Livewire\Pages\PrivacyPolicy;
 use App\Models\ChallengeInvitation;
 use App\Models\ChallengeRun;
 use Illuminate\Support\Facades\Auth;

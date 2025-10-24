@@ -26,13 +26,15 @@ class Register extends Component implements HasForms
     use InteractsWithForms;
 
     public ?array $registerForm = [];
+
     public ?string $telegramToken = null;
+
     public ?array $telegramPayload = null;
 
     public function mount(): void
     {
         $this->telegramToken = request()->query('telegram_token');
-        
+
         if ($this->telegramToken) {
             $payload = Cache::get($this->signupCacheKey($this->telegramToken));
 
@@ -105,8 +107,8 @@ class Register extends Component implements HasForms
     {
         $this->form->validate();
         $data = $this->form->getState();
-        
-        $preferences = (new User())->profilePreferencesDefaults();
+
+        $preferences = (new User)->profilePreferencesDefaults();
 
         $username = null;
         if (! empty($data['username'])) {
@@ -118,7 +120,7 @@ class Register extends Component implements HasForms
             'email' => strtolower(trim($data['email'] ?? '')),
             'password' => $data['password'] ?? '',
         ]);
-        
+
         if ($this->telegramPayload) {
             data_set($preferences, 'channels.telegram', true);
         }

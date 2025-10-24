@@ -3,12 +3,12 @@
 use App\Livewire\Support\FeedbackForm;
 use App\Models\SupportTicket;
 use App\Models\User;
+use App\Notifications\Channels\TelegramChannel;
 use App\Notifications\SupportTicketReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
-use App\Notifications\Channels\TelegramChannel;
 
 uses(RefreshDatabase::class);
 

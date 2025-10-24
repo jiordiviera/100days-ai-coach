@@ -8,7 +8,7 @@
 
 @if (!$run)
     <div class="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        <section class="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-xl">
+        <section class="relative overflow-hidden rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-primary/5 to-background shadow-xl">
             <div class="absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-primary/20 blur-3xl"></div>
             <div class="absolute -right-12 top-0 h-40 w-40 rounded-full bg-primary/15 blur-3xl"></div>
 
@@ -103,7 +103,7 @@
     <livewire:onboarding.daily-challenge-tour />
     
     {{-- Hero Section --}}
-    <section class="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-xl">
+    <section class="relative overflow-hidden rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-primary/5 to-background shadow-xl">
         <div class="absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-primary/20 blur-3xl"></div>
         <div class="absolute -right-12 top-0 h-40 w-40 rounded-full bg-primary/15 blur-3xl"></div>
 
@@ -149,10 +149,10 @@
 
                 {{-- Stats Grid --}}
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="group rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 p-6 transition-all hover:border-primary/30 hover:shadow-lg">
+                    <div class="group rounded-2xl border border-primary/20 bg-linear-to-br from-primary/15 via-primary/10 to-primary/5 p-6 transition-all hover:border-primary/30 hover:shadow-lg">
                         <p class="text-xs font-semibold uppercase tracking-wider text-primary/70">{{ __('Current streak') }}</p>
                         <div class="mt-4 flex items-center gap-4">
-                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-4xl shadow-lg shadow-primary/30">
+                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-primary/80 text-4xl shadow-lg shadow-primary/30">
                                 🔥
                             </div>
                             <div>
@@ -433,13 +433,13 @@
                                     @if ($linkedinTemplate)
                                         <div>
                                             <p class="text-[10px] font-bold uppercase tracking-wider text-primary/60">LinkedIn</p>
-                                            <pre class="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-primary/20 bg-background px-4 py-3 text-xs">{{ $linkedinTemplate }}</pre>
+                                            <pre class="mt-2 max-h-48 overflow-auto whitespace-pre-wrap  wrap-break-word rounded-2xl border border-primary/20 bg-background px-4 py-3 text-xs">{{ $linkedinTemplate }}</pre>
                                         </div>
                                     @endif
                                     @if ($xTemplate)
                                         <div>
                                             <p class="text-[10px] font-bold uppercase tracking-wider text-primary/60">X</p>
-                                            <pre class="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-primary/20 bg-background px-4 py-3 text-xs">{{ $xTemplate }}</pre>
+                                            <pre class="mt-2 max-h-40 overflow-auto whitespace-pre-wrap  wrap-break-word rounded-2xl border border-primary/20 bg-background px-4 py-3 text-xs">{{ $xTemplate }}</pre>
                                         </div>
                                     @endif
                                 </div>
@@ -454,7 +454,7 @@
 
                     @if ($aiPanel['status'] === 'ready' && $aiPanel['model'])
                         <p class="text-xs text-muted-foreground">
-                            {{ __('Generated with :model · :latency ms', ['model' => $aiPanel['model'], 'latency' => $aiPanel['latency_ms'] ?? '—']) }}
+                            {{ __("Generated with :model · :latency ms", ['model' => $aiPanel['model'], 'latency' => $aiPanel['latency_ms'] ?? '—']) }}
                             · ${{ number_format((float) ($aiPanel['cost_usd'] ?? 0), 3) }}
                         </p>
                     @endif

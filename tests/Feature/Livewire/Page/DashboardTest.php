@@ -23,5 +23,5 @@ it('renders successfully', function () {
 
     Livewire::test(Dashboard::class)
         ->assertStatus(200)
-        ->assertSee(__("Daily progress"));
+        ->assertSee(__('Daily progress'));
 });
