@@ -58,6 +58,42 @@
         ],
     ];
 
+    $integrations = [
+        [
+            'title' => __('GitHub Automation'),
+            'description' => __('Authenticate with GitHub, bootstrap a template repository, and jump into your daily shipping flow with pre-filled tasks.'),
+            'icon' => 'github',
+            'detail' => __('Repository provisioning, issue templates, activity timeline.'),
+        ],
+        [
+            'title' => __('WakaTime Sync'),
+            'description' => __('Bring your coding stats into the dashboard. We import projects, languages, and hours while handling privacy with project masking.'),
+            'icon' => 'wakatime',
+            'detail' => __('Daily sync job, error monitoring, admin overview.'),
+        ],
+        [
+            'title' => __('Telegram Coach'),
+            'description' => __('Link your chat, receive the daily reminder, and interact with the bot to log progress or grab your unique signup link.'),
+            'icon' => 'telegram',
+            'detail' => __('/signup command, webhook automations, multilingual replies.'),
+        ],
+    ];
+
+    $faq = [
+        [
+            'question' => __('Is the app usable solo?'),
+            'answer' => __('Yes. You can join a private run or keep everything personal. Shared runs simply unlock invitations and leaderboards.'),
+        ],
+        [
+            'question' => __('What happens if I miss a day?'),
+            'answer' => __('The AI coach suggests catch-up strategies, and the dashboard highlights gaps so you can plan a recovery log.'),
+        ],
+        [
+            'question' => __('Do I need to keep my logs public?'),
+            'answer' => __('No. Public sharing is optional. You can generate a public link per log and revoke it anytime.'),
+        ],
+    ];
+
     $testimonials = [
         [
             'initials' => 'JV',
@@ -85,9 +121,17 @@
         ['value' => '2,500+', 'label' => __('Active makers')],
         ['value' => '100', 'label' => __('Days to ship')],
     ];
+
+    $heroImage = null;
+
+    if (file_exists(public_path('images/landing/hero-dashboard.jpeg'))) {
+        $heroImage = asset('images/landing/hero-dashboard.jpeg');
+    } elseif (file_exists(public_path('images/hero-dashboard.png'))) {
+        $heroImage = asset('images/hero-dashboard.png');
+    }
 @endphp
 
-<div x-data="{ heroVisible: false }" x-init="setTimeout(() => heroVisible = true, 100)" class="space-y-32 pb-32">
+<div x-data="{ heroVisible: false }" x-init="setTimeout(() => heroVisible = true, 100)" class="space-y-32 pb-32 overflow-x-hidden">
   {{-- Hero Section --}}
   <section class="relative overflow-hidden bg-linear-to-b from-background via-background to-background/80">
     {{-- Animated background gradients --}}
@@ -178,7 +222,7 @@
         </div>
       </div>
 
-      {{-- Hero Card --}}
+      {{-- Hero Visual --}}
       <div 
         class="relative mx-auto w-full max-w-lg transition-all duration-1000 delay-300"
         x-bind:class="heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
@@ -187,95 +231,141 @@
         <div class="absolute -right-10 -bottom-10 h-24 w-24 rounded-full bg-secondary/15 blur-2xl animate-pulse" style="animation-delay: 1.5s;"></div>
         
         <div class="relative overflow-hidden rounded-3xl border border-border/60 bg-card/80 shadow-2xl backdrop-blur-sm transition-all hover:shadow-primary/10 hover:shadow-3xl">
-          {{-- Card Header --}}
-          <div class="border-b border-border/60 bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-6 py-5">
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
-                <span class="relative flex h-2 w-2">
-                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                  <span class="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
-                </span>
-                {{ __('Today') }}
-              </span>
-              <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">#87</span>
-            </div>
-            <h3 class="mt-2 text-lg font-semibold text-foreground">{{ __('Your log is ready') }}</h3>
-            <p class="mt-1 text-xs text-muted-foreground">{{ __('Write your insight of the day in under 60 seconds.') }}</p>
-          </div>
-
-          {{-- Card Content --}}
-          <div class="space-y-6 px-6 py-8">
-            {{-- Focus Section --}}
-            <div class="space-y-2 rounded-2xl border border-border/50 bg-background/50 p-4">
+          @if ($heroImage)
+            <img
+              src="{{ $heroImage }}"
+              alt="{{ __('Preview of the daily log dashboard') }}"
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
+          @else
+            {{-- Original card fallback when no image is available --}}
+            <div class="border-b border-border/60 bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-6 py-5">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{{ __('Focus') }}</span>
-                <span class="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{{ __('Shipping') }}</span>
+                <span class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                  <span class="relative flex h-2 w-2">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                  </span>
+                  {{ __('Today') }}
+                </span>
+                <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">#87</span>
               </div>
-              <p class="text-sm font-medium text-foreground">{{ __('Extend the tasks API for automated check-ins.') }}</p>
+              <h3 class="mt-2 text-lg font-semibold text-foreground">{{ __('Your log is ready') }}</h3>
+              <p class="mt-1 text-xs text-muted-foreground">{{ __('Write your insight of the day in under 60 seconds.') }}</p>
             </div>
 
-            {{-- Stats Grid --}}
-            <div class="grid grid-cols-2 gap-4">
-              <div class="rounded-xl border border-border/50 bg-background/50 p-4">
-                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Streak') }}</p>
-                <p class="mt-1 text-2xl font-bold text-primary">86</p>
-                <p class="text-xs text-muted-foreground">{{ __('days') }}</p>
+            <div class="space-y-6 px-6 py-8">
+              <div class="space-y-2 rounded-2xl border border-border/50 bg-background/50 p-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{{ __('Focus') }}</span>
+                  <span class="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{{ __('Shipping') }}</span>
+                </div>
+                <p class="text-sm font-medium text-foreground">{{ __('Extend the tasks API for automated check-ins.') }}</p>
               </div>
-              <div class="rounded-xl border border-border/50 bg-background/50 p-4">
-                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Progress') }}</p>
-                <p class="mt-1 text-2xl font-bold text-foreground">87%</p>
-                <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                  <div class="h-full w-[87%] rounded-full bg-linear-to-r from-primary to-primary/70"></div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="rounded-xl border border-border/50 bg-background/50 p-4">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Streak') }}</p>
+                  <p class="mt-1 text-2xl font-bold text-primary">86</p>
+                  <p class="text-xs text-muted-foreground">{{ __('days') }}</p>
+                </div>
+                <div class="rounded-xl border border-border/50 bg-background/50 p-4">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Progress') }}</p>
+                  <p class="mt-1 text-2xl font-bold text-foreground">87%</p>
+                  <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div class="h-full w-[87%] rounded-full bg-linear-to-r from-primary to-primary/70"></div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {{-- Last Shipment --}}
-            <div class="flex items-center gap-3 rounded-xl border border-border/50 bg-background/50 p-4">
-              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <svg class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Last shipment') }}</p>
-                <p class="truncate text-sm font-medium text-foreground">{{ __('CI/CD automation on main') }}</p>
-              </div>
-            </div>
-
-            {{-- AI Coach --}}
-            <div class="flex items-center justify-between rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 to-primary/5 p-4">
-              <div class="flex-1">
-                <div class="flex items-center gap-2">
-                  <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 12l8-4-8-4-8 4 8 4zM4 12l8 4 8-4M4 16l8 4 8-4"></path>
+              <div class="flex items-center gap-3 rounded-xl border border-border/50 bg-background/50 p-4">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <svg class="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <p class="text-xs font-semibold uppercase tracking-widest text-primary">{{ __('AI Coach') }}</p>
                 </div>
-                <p class="mt-1 text-sm text-foreground">{{ __('Need a punchline for todays log?') }}</p>
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs uppercase tracking-widest text-muted-foreground">{{ __('Last shipment') }}</p>
+                  <p class="truncate text-sm font-medium text-foreground">{{ __('CI/CD automation on main') }}</p>
+                </div>
               </div>
-              <button class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary transition-all hover:bg-primary/25 hover:scale-110">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M5 3l14 9-14 9V3z"></path>
-                </svg>
+
+              <div class="flex items-center justify-between rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 to-primary/5 p-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 12l8-4-8-4-8 4 8 4zM4 12l8 4 8-4M4 16l8 4 8-4"></path>
+                    </svg>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-primary">{{ __('AI Coach') }}</p>
+                  </div>
+                  <p class="mt-1 text-sm text-foreground">{{ __('Need a punchline for todays log?') }}</p>
+                </div>
+                <button class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary transition-all hover:bg-primary/25 hover:scale-110">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5 3l14 9-14 9V3z"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                class="group w-full rounded-full border-2 border-primary/40 bg-primary/10 py-3 text-sm font-semibold text-primary transition-all hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/20"
+              >
+                <span class="flex items-center justify-center gap-2">
+                  {{ __('Preview a log') }}
+                  <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h9.69l-2.47-2.47a.75.75 0 111.06-1.06l3.75 3.75a.75.75 0 010 1.06l-3.75 3.75a.75.75 0 01-1.06-1.06l2.47-2.47H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
+                  </svg>
+                </span>
               </button>
             </div>
-
-            {{-- CTA Button --}}
-            <button
-              type="button"
-              class="group w-full rounded-full border-2 border-primary/40 bg-primary/10 py-3 text-sm font-semibold text-primary transition-all hover:border-primary hover:bg-primary/20 hover:shadow-lg hover:shadow-primary/20"
-            >
-              <span class="flex items-center justify-center gap-2">
-                {{ __('Preview a log') }}
-                <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h9.69l-2.47-2.47a.75.75 0 111.06-1.06l3.75 3.75a.75.75 0 010 1.06l-3.75 3.75a.75.75 0 01-1.06-1.06l2.47-2.47H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
-                </svg>
-              </span>
-            </button>
-          </div>
+          @endif
         </div>
       </div>
+    </div>
+  </section>
+
+  {{-- Integrations Section --}}
+  <section class="mx-auto max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-4 text-center">
+      <span class="self-center rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground backdrop-blur-sm">{{ __('Integrations & automations') }}</span>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">{{ __('Connect your existing workflow') }}</h2>
+      <p class="mx-auto max-w-3xl text-lg text-muted-foreground">
+        {{ __('Plug the tools you already use and let the platform orchestrate the routine: repositories, coding stats, notifications.') }}
+      </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-3">
+      @foreach ($integrations as $integration)
+        <div class="group flex h-full flex-col gap-4 rounded-3xl border border-border/70 bg-card/80 p-8 backdrop-blur-sm transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:scale-110 group-hover:bg-primary/20">
+            @switch($integration['icon'])
+              @case('github')
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.58 2 12.21c0 4.5 2.87 8.31 6.84 9.66.5.1.68-.22.68-.5 0-.25-.01-1.04-.02-1.89-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.23 9.23 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.57 5.06.36.32.68.95.68 1.93 0 1.39-.02 2.51-.02 2.85 0 .28.18.61.69.5A10.22 10.22 0 0 0 22 12.21C22 6.58 17.52 2 12 2Z" clip-rule="evenodd" />
+                </svg>
+                @break
+              @case('wakatime')
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 7v5l3 3"></path>
+                </svg>
+                @break
+              @case('telegram')
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 3L3 10.53l6.62 2.47L12 21l4.38-14.53L21 3z"></path>
+                </svg>
+                @break
+            @endswitch
+          </div>
+          <div class="space-y-3">
+            <h3 class="text-xl font-bold text-foreground">{{ $integration['title'] }}</h3>
+            <p class="text-sm leading-relaxed text-muted-foreground">{{ $integration['description'] }}</p>
+            <p class="text-xs uppercase tracking-widest text-primary/80">{{ $integration['detail'] }}</p>
+          </div>
+        </div>
+      @endforeach
     </div>
   </section>
 
@@ -413,6 +503,31 @@
             </div>
           </figcaption>
         </figure>
+      @endforeach
+    </div>
+  </section>
+
+  {{-- FAQ Section --}}
+  <section id="how-it-works" class="mx-auto max-w-5xl space-y-12 px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-4 text-center">
+      <span class="self-center rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground backdrop-blur-sm">{{ __('Questions fréquentes') }}</span>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl">{{ __('Everything you need to keep the streak alive') }}</h2>
+      <p class="mx-auto max-w-2xl text-lg text-muted-foreground">
+        {{ __('From solo practice to team cohorts—here is how the platform fits your routine.') }}
+      </p>
+    </div>
+
+    <div class="space-y-6">
+      @foreach ($faq as $item)
+        <details class="group overflow-hidden rounded-3xl border border-border/70 bg-card/80 p-6 backdrop-blur-sm transition-all">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 text-left text-lg font-semibold text-foreground">
+            <span>{{ $item['question'] }}</span>
+            <svg class="h-5 w-5 text-primary transition-transform group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+          </summary>
+          <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{{ $item['answer'] }}</p>
+        </details>
       @endforeach
     </div>
   </section>
