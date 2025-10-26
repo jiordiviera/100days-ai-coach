@@ -17,7 +17,7 @@ use Throwable;
 
 class SendDailyReminders extends Command
 {
-    protected $signature = 'daily-logs:send-reminders';
+    protected $signature = 'daily:send-reminders';
 
     protected $description = 'Send timezone-aware daily reminders to users without a log entry for the day.';
 

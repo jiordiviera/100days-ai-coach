@@ -34,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('wakatime:sync')->dailyAt('01:00');
         $schedule->command('digest:weekly')->dailyAt('06:00');
         $schedule->command('daily-logs:purge-public-links')->dailyAt('03:00');
+        $schedule->command('daily-logs:send-reminders')->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('daily:send-reminders')->dailyAt('07:00');
     })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

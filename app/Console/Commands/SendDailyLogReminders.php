@@ -14,7 +14,7 @@ class SendDailyLogReminders extends Command
 {
     protected $signature = 'daily-logs:send-reminders';
 
-    protected $description = 'Envoie un rappel aux participant·es n’ayant pas saisi leur journal du jour.';
+    protected $description = 'Send daily log reminders to users who have not logged today.';
 
     public function handle(): int
     {

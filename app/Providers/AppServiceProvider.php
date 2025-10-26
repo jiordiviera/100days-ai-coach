@@ -5,7 +5,6 @@ namespace App\Providers;
 use App\Services\Ai\AiManager;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
-use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,7 +30,5 @@ class AppServiceProvider extends ServiceProvider
             'success' => Color::Green,
             'warning' => Color::Amber,
         ]);
-
-        Schedule::command('daily-logs:send-reminders')->everyFiveMinutes()->withoutOverlapping();
     }
 }
